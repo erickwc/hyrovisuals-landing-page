@@ -1,0 +1,19 @@
+{
+  "name": "hyrovisuals-landing-page",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "astro": "^5.7.0",
+    "bootstrap": "^5.3.3",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {}
+}
