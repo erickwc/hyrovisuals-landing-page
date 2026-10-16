@@ -32,5 +32,19 @@
   "visualLabel": "Vista previa del visualizador de audio Hyro",
   "pause": "Pausar visuales",
   "play": "Reproducir visuales",
-  "skip": "Ir al contenido"
+  "skip": "Ir al contenido",
+  "purchaseLabel": "Acceso de por vida",
+  "purchaseDescription": "Una herramienta visual en tiempo real para creadores de contenido, DJs y profesionales del audio. Compra una sola vez y obtén acceso de por vida, con todas las actualizaciones futuras incluidas.",
+  "purchaseBenefitSpectrums": "Más de 30 espectros de audio",
+  "purchaseBenefitCustom": "Colores, estilos y ajustes personalizables",
+  "purchaseBenefitUpdates": "Todas las futuras actualizaciones incluidas",
+  "purchaseBenefitDownload": "Descarga inmediata",
+  "purchaseBenefitUsage": "Uso personal y comercial",
+  "purchaseBenefitPlatforms": "Compatible con Mac y Windows",
+  "purchaseBenefitGuide": "Guía de instalación incluida",
+  "purchaseBenefitSupport": "Soporte en caso de dudas",
+  "purchaseLicense": "Licencia personal",
+  "purchaseFullAccess": "Acceso completo a HYRO VISUALS",
+  "purchaseDeviceNote": "Esta licencia permite utilizar HYRO VISUALS en un solo dispositivo a la vez.",
+  "purchaseNow": "Comprar ahora"
 }

@@ -1,6 +1,6 @@
-# Hyro · reglas del header
+# Hyro · reglas de la landing
 
-La referencia entregada por el usuario define la dirección: composición centrada, título ancho de dos líneas, visual panorámico protagonista, textura técnica sutil y cuatro beneficios. Alcance actual: navegación y hero. Las anclas de secciones futuras quedan preparadas.
+El hero mantiene su composición centrada, título ancho de dos líneas, visual panorámico y cuatro beneficios. La sección de compra utiliza la referencia entregada por el usuario: dos columnas en escritorio amplio, una columna en tablet y móvil, una sola licencia personal de $20 USD y borde dorado animado. Las anclas de secciones futuras quedan preparadas.
 
 ## Sistema de variables
 
@@ -31,13 +31,13 @@ Glow del visual: `--glow-intensity` 0.17 en claro y 0.08 en oscuro; `--glow-blur
 
 Puntos de fondo: `--dot-size: 1.5px`, `--dot-alpha: 0.95` y `--dot-pulse-opacity: 0.65` en claro; 1px, 0.7 y 0.3 en oscuro. Mantienen el color del visual y pulsan sin tapar el contenido.
 
-Botón principal sólido, 3.25rem de alto y 15rem de ancho mínimo, texto mayúsculo, flecha outline. Es un button sin navegación por requerimiento. Controles con foco visible; menú móvil con aria-expanded, Escape y cierre al pulsar fuera.
+Botón principal sólido, 3.25rem de alto y 15rem de ancho mínimo, texto mayúsculo, flecha outline. Es un enlace a `#compra`; Lenis anima el desplazamiento y el navegador conserva un desplazamiento suave como respaldo. Controles con foco visible; menú móvil con aria-expanded, Escape y cierre al pulsar fuera.
 
 Íconos de beneficios: SVG de Heroicons outline 24×24, trazo 1.5, tamaño --feature-icon-size dentro de --feature-box-size. La fila completa de beneficios comparte `--visual-max-width` con el visual y usa un espacio superior menor en escritorio. Se usan SVG estáticos, sin hidratación React. Licencia en public/images/heroicons-LICENSE.txt. Logo original con transparencia y recorte CSS para mostrar solo Hyro; filtro invertido en tema claro.
 
 ## Responsive
 
-Desktop >=1024px: cuatro columnas. Tablet 768–1023px: dos columnas. Teléfono <768px: una columna. Menú colapsable por debajo de 1024px para evitar compresión de enlaces. Revisar siempre 360, 768 y 1440px. El visual conserva la proporción completa en los tres tamaños; en teléfono se muestra toda la franja, aunque sus detalles naturalmente se ven más pequeños.
+El hero utiliza cuatro columnas >=1024px, dos columnas entre 768–1023px y una columna <768px. La sección de compra utiliza dos columnas >=1024px y una columna por debajo. Menú colapsable por debajo de 1024px para evitar compresión de enlaces. Revisar siempre 360, 768 y 1440px. El visual conserva la proporción completa en los tres tamaños; en teléfono se muestra toda la franja, aunque sus detalles naturalmente se ven más pequeños.
 
 ## Movimiento
 
@@ -63,7 +63,7 @@ Carrusel: cuatro MP4 de unos tres segundos derivados de los MOV originales. Cada
 ## Componentes reutilizables
 
 - Navbar: logo, anclas y controles; único menú global.
-- Button: acción principal estática con etiqueta traducida y flecha.
+- Button: enlace del hero a `#compra` con etiqueta traducida y flecha.
 - SectionLabel: text + translationKey.
 - Title: firstLine, secondLine y keyPrefix; separa automáticamente la última palabra de la segunda línea para aplicarle el degradado en ES y EN.
 - FeatureItem: icon, title, description y translationKey.
@@ -72,5 +72,6 @@ Carrusel: cuatro MP4 de unos tres segundos derivados de los MOV originales. Cada
 - ThemeToggle: alterna claro/oscuro con persistencia.
 - VisualCarousel: videos, poster, glow, puntos y pausa.
 - Icon: SVG outline compartido; tamaños heredados de tokens.
+- PurchaseSection: oferta única, beneficios traducidos, precio fijo y tarjeta de compra sin integración de pago.
 
-Todos los textos de interfaz y accesibilidad se definen en src/i18n/en.json y es.json. Mantener claves idénticas. Los nombres de plataforma y marca son propios. No añadir copy comercial ni secciones adicionales hasta definirlas.
+Todos los textos de interfaz y accesibilidad se definen en src/i18n/en.json y es.json. Mantener claves idénticas. Los nombres de plataforma y marca son propios. No añadir más ofertas ni promesas comerciales sin confirmación.

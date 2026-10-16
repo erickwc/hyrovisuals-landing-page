@@ -32,5 +32,19 @@
   "visualLabel": "Hyro audio visualizer preview",
   "pause": "Pause visuals",
   "play": "Play visuals",
-  "skip": "Skip to content"
+  "skip": "Skip to content",
+  "purchaseLabel": "Lifetime access",
+  "purchaseDescription": "A real-time visual tool for content creators, DJs, and audio professionals. Pay once for lifetime access, with every future update included.",
+  "purchaseBenefitSpectrums": "More than 30 audio spectrums",
+  "purchaseBenefitCustom": "Customizable colors, styles, and settings",
+  "purchaseBenefitUpdates": "All future updates included",
+  "purchaseBenefitDownload": "Instant download",
+  "purchaseBenefitUsage": "Personal and commercial use",
+  "purchaseBenefitPlatforms": "Works on Mac and Windows",
+  "purchaseBenefitGuide": "Installation guide included",
+  "purchaseBenefitSupport": "Help when you need it",
+  "purchaseLicense": "Personal license",
+  "purchaseFullAccess": "Full access to HYRO VISUALS",
+  "purchaseDeviceNote": "This license lets you use HYRO VISUALS on one device at a time.",
+  "purchaseNow": "Buy now"
 }

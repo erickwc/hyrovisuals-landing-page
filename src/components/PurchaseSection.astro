@@ -1,0 +1,84 @@
+---
+import Icon from './Icon.astro';
+import en from '../i18n/en.json';
+
+const benefits = [
+  'purchaseBenefitSpectrums',
+  'purchaseBenefitCustom',
+  'purchaseBenefitUpdates',
+  'purchaseBenefitDownload',
+  'purchaseBenefitUsage',
+  'purchaseBenefitPlatforms',
+  'purchaseBenefitGuide',
+  'purchaseBenefitSupport',
+] as const;
+---
+
+<section
+  id="compra"
+  class="purchase-section"
+  aria-labelledby="purchase-heading"
+>
+  <div class="purchase-dots purchase-dots-top" aria-hidden="true"></div>
+  <div class="purchase-dots purchase-dots-bottom" aria-hidden="true"></div>
+  <div class="purchase-layout page-shell">
+    <div class="purchase-copy">
+      <p class="purchase-label" data-anim="purchase-copy">
+        <span class="purchase-label-dot" aria-hidden="true"></span>
+        <span data-i18n="purchaseLabel">{en.purchaseLabel}</span>
+      </p>
+      <h2
+        id="purchase-heading"
+        class="purchase-heading"
+        data-anim="purchase-copy"
+      >
+        <span>HYRO</span>
+        <span>VISUALS</span>
+      </h2>
+      <p
+        class="purchase-description"
+        data-i18n="purchaseDescription"
+        data-anim="purchase-copy"
+      >
+        {en.purchaseDescription}
+      </p>
+      <ul class="purchase-benefits">
+        {benefits.map((key) => (
+          <li data-anim="purchase-benefit">
+            <span class="purchase-check" aria-hidden="true">
+              <Icon name="check" />
+            </span>
+            <span data-i18n={key}>{en[key]}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="purchase-card" data-anim="purchase-card">
+      <svg class="purchase-border" aria-hidden="true">
+        <rect class="purchase-border-glow" pathLength="100"></rect>
+        <rect class="purchase-border-light" pathLength="100"></rect>
+      </svg>
+      <div class="purchase-card-content">
+        <div class="purchase-license">
+          <span class="purchase-license-mark" aria-hidden="true"></span>
+          <div class="purchase-license-copy">
+            <h3 data-i18n="purchaseLicense">{en.purchaseLicense}</h3>
+            <p data-i18n="purchaseFullAccess">{en.purchaseFullAccess}</p>
+          </div>
+          <strong class="purchase-price">$20 USD</strong>
+        </div>
+        <div class="purchase-device-note">
+          <span class="purchase-device-icon" aria-hidden="true">
+            <Icon name="device" />
+          </span>
+          <p data-i18n="purchaseDeviceNote">{en.purchaseDeviceNote}</p>
+        </div>
+        <button class="purchase-button" type="button" disabled>
+          <span data-i18n="purchaseNow">{en.purchaseNow}</span>
+          <Icon name="arrow" />
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

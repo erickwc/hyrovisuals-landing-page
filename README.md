@@ -1,6 +1,6 @@
 # Hyro
 
-Header de la landing: Astro + Tailwind CSS, GSAP (ScrollTrigger y SplitText) y Lenis.
+Landing de HYRO VISUALS: Astro + Tailwind CSS, GSAP (ScrollTrigger y SplitText) y Lenis. Incluye hero y sección de compra.
 
 ## Desarrollo
 
@@ -34,6 +34,6 @@ La comprobación usa Microsoft Edge instalado, recorre 360/768/1440px y verifica
 - `public/media/`: cuatro clips MP4 optimizados de tres segundos y poster.
 - `DESIGN_RULES.md`: criterios que deben seguir las siguientes secciones.
 
-Los MOV originales en `src/videos/` se conservan. La página sirve las versiones MP4 de `public/media/`. Los enlaces a secciones futuras quedan preparados; el botón principal es estático.
+Los MOV originales en `src/videos/` se conservan. La página sirve las versiones MP4 de `public/media/`. Los enlaces a secciones futuras quedan preparados. El botón del hero lleva a `#compra` con desplazamiento suave. El botón «Comprar ahora» está deshabilitado hasta integrar el pago.
 
 `npm run format` aplica el formato de Astro al código.

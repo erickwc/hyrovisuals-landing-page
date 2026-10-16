@@ -56,6 +56,37 @@ export function initAnimations(reduced: boolean) {
       ease,
       scrollTrigger: { trigger: '.features', start: 'top 92%', once: true },
     });
+    gsap
+      .timeline({
+        scrollTrigger: {
+          trigger: '.purchase-section',
+          start: 'top 72%',
+          once: true,
+        },
+      })
+      .from('[data-anim="purchase-copy"]', {
+        y: 24,
+        autoAlpha: 0,
+        duration: base,
+        stagger: 0.09,
+        ease,
+      })
+      .from(
+        '[data-anim="purchase-benefit"]',
+        {
+          y: 16,
+          autoAlpha: 0,
+          duration: base * 0.8,
+          stagger: 0.055,
+          ease,
+        },
+        '-=0.3',
+      )
+      .from(
+        '[data-anim="purchase-card"]',
+        { y: 24, autoAlpha: 0, duration: slow, ease },
+        0.16,
+      );
     const mobile = matchMedia('(max-width: 767px)').matches;
     gsap.to('[data-anim="visual"]', {
       y: number(mobile ? '--parallax-mobile' : '--parallax-desktop'),
