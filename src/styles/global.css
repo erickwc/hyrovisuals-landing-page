@@ -839,13 +839,12 @@ select:focus-visible {
   background: var(--purchase-note);
   white-space: nowrap;
 }
-.payment-visa {
-  color: #1434a4;
-  font-family: Arial, sans-serif;
-  font-size: clamp(1rem, 1.5vw, 1.45rem);
-  font-style: italic;
-  font-weight: 900;
-  letter-spacing: -0.09em;
+.payment-method img {
+  display: block;
+  width: auto;
+  max-width: 90%;
+  max-height: 1.8rem;
+  object-fit: contain;
 }
 .payment-mastercard span {
   width: 1.65rem;
@@ -858,63 +857,9 @@ select:focus-visible {
   background: #f79e1b;
   opacity: 0.88;
 }
-.payment-paypal {
-  color: #0070ba;
-  font-family: Arial, sans-serif;
-  font-size: clamp(0.75rem, 1vw, 1rem);
-  font-weight: 800;
-  font-style: italic;
-  letter-spacing: -0.065em;
-}
-.paypal-mark {
-  color: #003087;
-  font-size: 1.45em;
-  font-weight: 900;
-  text-shadow: 0.13em 0.1em #009cde;
-}
-.payment-google {
-  color: #5f6368;
-  font-family: Arial, sans-serif;
-  font-size: clamp(0.9rem, 1.3vw, 1.25rem);
-  letter-spacing: -0.05em;
-}
-.google-mark {
-  margin-right: 0.12rem;
-  background: conic-gradient(
-    #4285f4 0 25%,
-    #34a853 25% 46%,
-    #fbbc05 46% 66%,
-    #ea4335 66% 83%,
-    #4285f4 83%
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  font-weight: 700;
-}
-.payment-apple {
-  color: var(--text);
-  font-family: Arial, sans-serif;
-  font-size: clamp(0.9rem, 1.4vw, 1.3rem);
-  font-weight: 600;
-  letter-spacing: -0.055em;
-}
-.payment-apple svg {
-  width: 1.4em;
-  height: 1.4em;
-  fill: currentColor;
-}
-:root[data-theme='dark'] .payment-visa {
-  color: #7594ff;
-}
-:root[data-theme='dark'] .payment-paypal {
-  color: #69bef3;
-}
-:root[data-theme='dark'] .paypal-mark {
-  color: #5b91e7;
-}
-:root[data-theme='dark'] .payment-google {
-  color: #e0e2e4;
+:root[data-theme='dark'] .payment-method {
+  background: #f8f8f6;
+  border-color: #d7d7d4;
 }
 .purchase-secure {
   display: flex;
