@@ -33,7 +33,7 @@ const benefits = [
         data-anim="purchase-copy"
       >
         <span>HYRO</span>
-        <span>VISUALS</span>
+        <span class="gradient-text">VISUALS</span>
       </h2>
       <p
         class="purchase-description"
@@ -78,6 +78,43 @@ const benefits = [
           <span data-i18n="purchaseNow">{en.purchaseNow}</span>
           <Icon name="arrow" />
         </button>
+        <ul
+          class="purchase-payment-methods"
+          data-i18n-aria="purchasePaymentMethods"
+          aria-label={en.purchasePaymentMethods}
+        >
+          <li class="payment-method payment-visa" aria-label="Visa">
+            VISA
+          </li>
+          <li class="payment-method payment-mastercard" aria-label="Mastercard">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </li>
+          <li class="payment-method payment-paypal" aria-label="PayPal">
+            <span class="paypal-mark" aria-hidden="true">
+              P
+            </span>
+            <span aria-hidden="true">PayPal</span>
+          </li>
+          <li class="payment-method payment-google" aria-label="Google Pay">
+            <span class="google-mark" aria-hidden="true">
+              G
+            </span>
+            <span aria-hidden="true">Pay</span>
+          </li>
+          <li class="payment-method payment-apple" aria-label="Apple Pay">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M17.3 12.7c0-2 1.6-3 1.7-3.1-1-1.5-2.5-1.7-3.1-1.7-1.3-.1-2.5.8-3.2.8-.6 0-1.6-.8-2.7-.8-1.4 0-2.7.8-3.4 2-1.5 2.5-.4 6.2 1 8.2.7 1 1.5 2 2.5 2 1 0 1.4-.7 2.7-.7s1.7.7 2.8.7 1.8-1 2.4-2c.8-1.1 1.1-2.2 1.1-2.3-.1 0-1.8-.7-1.8-3.1ZM15.2 6.6c.5-.7.9-1.6.8-2.6-.8 0-1.8.5-2.4 1.2-.5.6-1 1.6-.9 2.5.9.1 1.8-.5 2.5-1.1Z" />
+            </svg>
+            <span aria-hidden="true">Pay</span>
+          </li>
+        </ul>
+        <div class="purchase-secure">
+          <Icon name="lock" />
+          <span data-i18n="purchaseSecurePayment">
+            {en.purchaseSecurePayment}
+          </span>
+        </div>
       </div>
     </div>
   </div>

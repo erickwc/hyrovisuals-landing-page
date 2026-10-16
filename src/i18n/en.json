@@ -46,5 +46,7 @@
   "purchaseLicense": "Personal license",
   "purchaseFullAccess": "Full access to HYRO VISUALS",
   "purchaseDeviceNote": "This license lets you use HYRO VISUALS on one device at a time.",
-  "purchaseNow": "Buy now"
+  "purchaseNow": "Buy now",
+  "purchasePaymentMethods": "Payment methods",
+  "purchaseSecurePayment": "Secure payment"
 }
