@@ -133,7 +133,12 @@ const widgetUrl =
 <dialog class="checkout-dialog" aria-labelledby="checkout-dialog-title">
   <div class="checkout-dialog-header">
     <span class="checkout-dialog-brand" id="checkout-dialog-title">
-      HYRO <span>VISUALS</span>
+      <img
+        src="/images/hyro-logo.png"
+        alt="HYRO VISUALS"
+        width="5339"
+        height="724"
+      />
     </span>
     <button
       class="checkout-dialog-close"
@@ -160,14 +165,24 @@ const widgetUrl =
       </div>
       <strong>$20 USD</strong>
     </div>
-    <a
-      class="checkout-dialog-continue"
-      href={checkoutUrl}
-      data-checkout-continue
-    >
-      <span data-i18n="checkoutContinue">{en.checkoutContinue}</span>
-      <Icon name="arrow" />
-    </a>
+    <p class="checkout-dialog-payment-label" data-i18n="checkoutPaymentMethod">
+      {en.checkoutPaymentMethod}
+    </p>
+    <div class="checkout-dialog-payment-options">
+      <a
+        class="checkout-dialog-continue"
+        href={checkoutUrl}
+        data-checkout-continue
+      >
+        <span data-i18n="checkoutPayCard">{en.checkoutPayCard}</span>
+        <Icon name="arrow" />
+      </a>
+      <button class="checkout-dialog-paypal" type="button" disabled>
+        <img src="/images/payment/paypal.png" alt="" width="600" height="148" />
+        <span data-i18n="checkoutPayPayPal">{en.checkoutPayPayPal}</span>
+        <small data-i18n="checkoutComingSoon">{en.checkoutComingSoon}</small>
+      </button>
+    </div>
     <p class="checkout-dialog-provider" data-i18n="checkoutProvider">
       {en.checkoutProvider}
     </p>

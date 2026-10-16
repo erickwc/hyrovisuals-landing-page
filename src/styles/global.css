@@ -959,13 +959,16 @@ select:focus-visible {
   border-bottom: 1px solid var(--purchase-line);
 }
 .checkout-dialog-brand {
-  font-family: var(--font-title);
-  font-size: 1rem;
-  letter-spacing: -0.06em;
+  display: flex;
+  align-items: center;
 }
-.checkout-dialog-brand span {
-  margin-left: 0.18em;
-  color: var(--secondary);
+.checkout-dialog-brand img {
+  display: block;
+  width: clamp(13rem, 38vw, 16rem);
+  height: auto;
+}
+:root:not([data-theme='dark']) .checkout-dialog-brand img {
+  filter: invert(1);
 }
 .checkout-dialog-close {
   display: grid;
@@ -1035,13 +1038,23 @@ select:focus-visible {
   flex: none;
   font-size: 1.15rem;
 }
+.checkout-dialog-payment-label {
+  margin: 1.4rem 0 0.7rem;
+  color: var(--secondary);
+  font-family: var(--font-label);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.checkout-dialog-payment-options {
+  display: grid;
+  gap: 0.7rem;
+}
 .checkout-dialog-continue {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
   min-height: 3.6rem;
-  margin-top: 1.25rem;
   border-radius: 0.9rem;
   background: var(--button-bg);
   color: var(--button-text);
@@ -1059,6 +1072,38 @@ select:focus-visible {
 .checkout-dialog-continue .icon {
   width: 1.2rem;
   height: 1.2rem;
+}
+.checkout-dialog-paypal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 3.6rem;
+  padding: 0.75rem;
+  border: 1px solid var(--purchase-line);
+  border-radius: 0.9rem;
+  background: var(--purchase-note);
+  color: var(--text);
+  font-family: var(--font-label);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.checkout-dialog-paypal img {
+  width: 3.4rem;
+  height: auto;
+  padding: 0.18rem 0.24rem;
+  border-radius: 0.25rem;
+  background: #f8f8f6;
+}
+.checkout-dialog-paypal small {
+  margin-left: auto;
+  color: var(--secondary);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+.checkout-dialog-paypal:disabled {
+  cursor: not-allowed;
 }
 .checkout-dialog-provider {
   margin: 1rem 0 0;

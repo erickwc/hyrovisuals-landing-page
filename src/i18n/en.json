@@ -53,7 +53,10 @@
   "checkoutTestMode": "Test mode",
   "checkoutTitle": "Your HYRO VISUALS license",
   "checkoutDescription": "Confirm your order and continue to the secure payment step.",
-  "checkoutContinue": "Continue to secure payment",
-  "checkoutProvider": "Payment is processed securely by Wompi.",
+  "checkoutPaymentMethod": "Choose a payment method",
+  "checkoutPayCard": "Pay by card",
+  "checkoutPayPayPal": "Pay with PayPal",
+  "checkoutComingSoon": "Coming soon",
+  "checkoutProvider": "Card payments are processed securely by Wompi.",
   "checkoutFallback": "Trouble opening payment? Open it in a new tab"
 }
