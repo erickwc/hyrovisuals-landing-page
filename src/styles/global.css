@@ -160,7 +160,6 @@
 }
 html {
   background: var(--background);
-  scroll-padding-top: var(--nav-height);
 }
 html:not(.lenis) {
   scroll-behavior: smooth;
@@ -563,7 +562,7 @@ select:focus-visible {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-height: calc(100svh - var(--nav-height));
+  min-height: 100svh;
   padding-block: clamp(6rem, 9vw, 9rem);
   background: var(--background);
 }

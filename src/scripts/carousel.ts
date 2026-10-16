@@ -6,8 +6,7 @@ export const VIDEO_DURATION = 4500;
 export const FADE_DURATION = 1800;
 
 export function initCarousel(reduced: boolean) {
-  const stage = document.querySelector<HTMLElement>('[data-carousel]');
-  if (!stage) return () => {};
+  const stage = document.querySelector<HTMLElement>('[data-carousel]')!;
   const videos = Array.from(stage.querySelectorAll<HTMLVideoElement>('video'));
   const button = stage.querySelector<HTMLButtonElement>(
     '[data-motion-toggle]',
