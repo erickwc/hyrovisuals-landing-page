@@ -55,6 +55,19 @@ export function initPreferences(onLanguage: () => void) {
       const key = el.dataset.i18n as Key;
       if (key in dictionary) el.textContent = dictionary[key];
     });
+    document
+      .querySelectorAll<HTMLElement>('[data-title-key]')
+      .forEach((line) => {
+        const key = line.dataset.titleKey as Key;
+        if (!(key in dictionary)) return;
+        const words = dictionary[key].trim().split(/\s+/);
+        const lastWord = words.pop() ?? '';
+        const leadingWords = words.join(' ');
+        const leading = line.querySelector<HTMLElement>('[data-title-leading]');
+        const last = line.querySelector<HTMLElement>('[data-title-last]');
+        if (leading) leading.textContent = leadingWords;
+        if (last) last.textContent = lastWord;
+      });
     document.querySelectorAll<HTMLElement>('[data-i18n-aria]').forEach((el) => {
       const key = el.dataset.i18nAria as Key;
       if (key in dictionary) el.setAttribute('aria-label', dictionary[key]);

@@ -2,25 +2,22 @@
 interface Props {
   firstLine: string;
   secondLine: string;
-  gradientText: string;
   keyPrefix?: string;
 }
-const {
-  firstLine,
-  secondLine,
-  gradientText,
-  keyPrefix = 'title',
-} = Astro.props;
+const { firstLine, secondLine, keyPrefix = 'title' } = Astro.props;
+const words = secondLine.trim().split(/\s+/);
+const lastWord = words.pop() ?? '';
+const leadingWords = words.join(' ');
 ---
 
 <h1 class="hero-title" data-anim="title">
   <span class="title-line">
     <span data-i18n={`${keyPrefix}First`}>{firstLine}</span>
   </span>
-  <span class="title-line">
-    <span data-i18n={`${keyPrefix}Second`}>{secondLine}</span>{' '}
-    <span class="gradient-text" data-i18n={`${keyPrefix}Gradient`}>
-      {gradientText}
+  <span class="title-line" data-title-key={`${keyPrefix}Second`}>
+    <span data-title-leading>{leadingWords}</span>{' '}
+    <span class="gradient-text" data-title-last>
+      {lastWord}
     </span>
   </span>
 </h1>

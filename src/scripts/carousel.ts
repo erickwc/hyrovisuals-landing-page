@@ -1,6 +1,10 @@
 import en from '../i18n/en.json';
 import es from '../i18n/es.json';
 import { gsap } from 'gsap';
+
+export const VIDEO_DURATION = 4500;
+export const FADE_DURATION = 1800;
+
 export function initCarousel(reduced: boolean) {
   const stage = document.querySelector<HTMLElement>('[data-carousel]')!;
   const videos = Array.from(stage.querySelectorAll<HTMLVideoElement>('video'));
@@ -10,19 +14,20 @@ export function initCarousel(reduced: boolean) {
   button.hidden = reduced;
   const controller = new AbortController();
   const signal = controller.signal;
-  const css = getComputedStyle(document.documentElement);
-  const duration = parseFloat(css.getPropertyValue('--duration-crossfade'));
-  const interval = parseFloat(css.getPropertyValue('--duration-slide')) * 1000;
   let active = 0,
     paused = reduced,
     destroyed = false,
+    fading = false,
     timer: ReturnType<typeof setTimeout> | undefined;
-  let transition: gsap.core.Tween | undefined;
+  let transition: gsap.core.Timeline | undefined;
+  let currentTint: [number, number, number] = [255, 90, 30];
   const canvas = document.createElement('canvas');
   canvas.width = 48;
   canvas.height = 8;
   const context = canvas.getContext('2d', { willReadFrequently: true });
-  const color = (video: HTMLVideoElement) => {
+  const color = (
+    video: HTMLVideoElement,
+  ): [number, number, number] | undefined => {
     if (!context) return;
     try {
       context.drawImage(video, 0, 0, 48, 8);
@@ -42,13 +47,11 @@ export function initCarousel(reduced: boolean) {
           w += weight;
         }
       }
-      if (w)
-        stage.style.setProperty(
-          '--visual-tint',
-          `${Math.round(r / w)} ${Math.round(g / w)} ${Math.round(b / w)}`,
-        );
+      if (w) return [Math.round(r / w), Math.round(g / w), Math.round(b / w)];
     } catch {}
   };
+  const setTint = (tint: [number, number, number]) =>
+    stage.style.setProperty('--visual-tint', tint.map(Math.round).join(' '));
   const updateButton = () => {
     button.dataset.i18n = paused ? 'play' : 'pause';
     button.textContent = (document.documentElement.lang === 'es' ? es : en)[
@@ -56,7 +59,7 @@ export function initCarousel(reduced: boolean) {
     ];
     button.setAttribute('aria-pressed', String(paused));
   };
-  const schedule = (delay = interval) => {
+  const schedule = (delay = VIDEO_DURATION) => {
     clearTimeout(timer);
     if (!paused && !destroyed && !document.hidden)
       timer = setTimeout(next, delay);
@@ -83,19 +86,43 @@ export function initCarousel(reduced: boolean) {
       if (destroyed || paused) return;
       incoming.style.zIndex = '2';
       outgoing.style.zIndex = '1';
-      color(incoming);
-      transition = gsap.to(incoming, {
-        opacity: 1,
-        duration,
-        ease: 'sine.inOut',
-        onComplete: () => {
+      fading = true;
+      const nextTint = color(incoming) ?? currentTint;
+      const tint = { r: currentTint[0], g: currentTint[1], b: currentTint[2] };
+      transition = gsap.timeline({
+        onComplete() {
           outgoing.style.opacity = '0';
           outgoing.pause();
           incoming.style.zIndex = '1';
           active = index;
-          schedule(interval - duration * 1000);
+          currentTint = nextTint;
+          setTint(currentTint);
+          fading = false;
+          schedule();
         },
       });
+      transition
+        .to(
+          incoming,
+          {
+            opacity: 1,
+            duration: FADE_DURATION / 1000,
+            ease: 'sine.inOut',
+          },
+          0,
+        )
+        .to(
+          tint,
+          {
+            r: nextTint[0],
+            g: nextTint[1],
+            b: nextTint[2],
+            duration: FADE_DURATION / 1000,
+            ease: 'sine.inOut',
+            onUpdate: () => setTint([tint.r, tint.g, tint.b]),
+          },
+          0,
+        );
     };
     if ('requestVideoFrameCallback' in incoming)
       incoming.requestVideoFrameCallback(reveal);
@@ -110,11 +137,12 @@ export function initCarousel(reduced: boolean) {
   const start = () => {
     if (destroyed) return;
     videos[0].style.opacity = '1';
-    color(videos[0]);
+    currentTint = color(videos[0]) ?? currentTint;
+    setTint(currentTint);
     if (!paused)
       videos[0]
         .play()
-        .then(() => schedule(interval - duration * 1000))
+        .then(() => schedule())
         .catch(() => {
           paused = true;
           updateButton();
@@ -137,7 +165,7 @@ export function initCarousel(reduced: boolean) {
           .filter((v) => v.style.opacity !== '0')
           .forEach((v) => v.play().catch(() => {}));
         transition?.resume();
-        schedule();
+        if (!fading) schedule();
       }
     },
     { signal },
@@ -161,7 +189,7 @@ export function initCarousel(reduced: boolean) {
           .filter((v) => v.style.opacity !== '0')
           .forEach((v) => v.play().catch(() => {}));
         transition?.resume();
-        schedule();
+        if (!fading) schedule();
       }
     },
     { signal },

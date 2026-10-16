@@ -41,7 +41,7 @@ export function initAnimations(reduced: boolean) {
         base,
       );
     gsap.to('[data-anim="dots"]', {
-      opacity: 0.3,
+      opacity: number('--dot-pulse-opacity'),
       duration: number('--duration-pulse'),
       repeat: -1,
       yoyo: true,

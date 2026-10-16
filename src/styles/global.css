@@ -1,5 +1,12 @@
 @import 'tailwindcss';
 @import 'lenis/dist/lenis.css';
+@font-face {
+  font-family: 'Gelegar Expanded';
+  src: url('/fonts/gelegar-expanded.otf') format('opentype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
 :root {
   --background: #f3f3ef;
   --surface: #fafaf8;
@@ -9,22 +16,24 @@
   --accent: #a95013;
   --button-bg: #151615;
   --button-text: #fff;
-  --gradient-start: #414440;
-  --gradient-end: #979b92;
+  --gradient-start: var(--text);
+  --gradient-end: #777b75;
+  --gradient-tail-start: 62%;
+  --gradient-overhang: 0.12em;
   --logo-filter: invert(1);
   --texture: #b8bbb2;
   --font-body: 'Inter Variable', Arial, sans-serif;
-  --font-display: 'Inter Variable', Arial, sans-serif;
+  --font-title: 'Gelegar Expanded', 'Inter Variable', Arial, sans-serif;
   --font-label: 'Space Grotesk Variable', Arial, sans-serif;
   --text-small: 0.75rem;
   --text-label: 0.8125rem;
-  --text-body: 0.9375rem;
-  --text-description: 1.125rem;
-  --title-size: clamp(2.15rem, 6.15vw, 5.6rem);
-  --title-weight: 900;
-  --title-leading: 0.97;
-  --title-tracking: -0.065em;
-  --label-tracking: 0.35em;
+  --text-body: 0.875rem;
+  --text-description: 1rem;
+  --title-size: clamp(1.4rem, 5.4vw, 5.25rem);
+  --title-weight: 400;
+  --title-leading: 1.06;
+  --title-tracking: -0.03em;
+  --label-tracking: 0.18em;
   --feature-tracking: 0.12em;
   --space-xs: 0.5rem;
   --space-sm: 0.75rem;
@@ -34,39 +43,46 @@
   --space-2xl: 3rem;
   --space-3xl: 4.5rem;
   --space-4xl: 6rem;
+  --gap-label-title: var(--space-md);
+  --gap-title-copy: var(--space-md);
+  --gap-copy-button: var(--space-lg);
+  --gap-button-visual: var(--space-xl);
+  --gap-visual-features: var(--space-lg);
+  --gap-features-availability: var(--space-lg);
   --page-gutter: clamp(1.25rem, 4.4vw, 4.5rem);
   --page-max: 100rem;
-  --nav-height: 5.5rem;
-  --hero-top: 3.3rem;
-  --copy-width: 54rem;
-  --description-width: 32rem;
-  --description-min-height: 4.9rem;
+  --nav-height: 4.8rem;
+  --hero-top: 2.75rem;
+  --copy-width: 86rem;
+  --description-width: 42rem;
+  --description-min-height: 4rem;
   --radius-sm: 0.6rem;
+  --radius-visual: 0.6rem;
   --radius-md: 0.8rem;
   --radius-button: 1.5rem;
   --radius-full: 999px;
   --line-width: 1px;
   --icon-size: 1.125rem;
-  --feature-icon-size: 1.7rem;
-  --feature-box-size: 3.35rem;
-  --platform-size: 2rem;
-  --control-height: 2.6rem;
-  --button-height: 3.6rem;
-  --button-width: 17rem;
-  --logo-width: 7.5rem;
-  --logo-height: 2.3rem;
-  --logo-image-width: 18.5rem;
+  --feature-icon-size: 1.45rem;
+  --feature-box-size: 2.8rem;
+  --platform-size: 1.75rem;
+  --control-height: 2.35rem;
+  --button-height: 3.25rem;
+  --button-width: 15rem;
+  --logo-width: 6.5rem;
+  --logo-height: 2rem;
+  --logo-image-width: 16rem;
   --logo-offset-x: -0.1rem;
-  --logo-offset-y: -0.48rem;
+  --logo-offset-y: -0.42rem;
   --visual-ratio: 10.088;
-  --visual-min-height: 5rem;
-  --visual-border: #6d6256;
-  --visual-background: #030403;
+  --visual-max-width: calc(76rem + 25px);
   --visual-tint: 255 90 30;
-  --glow-opacity: 0.17;
+  --glow-intensity: 0.17;
   --glow-blur: 3rem;
   --glow-height: 7rem;
-  --dot-size: 1px;
+  --dot-size: 1.5px;
+  --dot-alpha: 0.95;
+  --dot-pulse-opacity: 0.65;
   --dot-gap: 1rem;
   --dot-width: 17rem;
   --dot-height: 8rem;
@@ -74,8 +90,6 @@
   --duration-fast: 0.25s;
   --duration-base: 0.65s;
   --duration-slow: 1.1s;
-  --duration-crossfade: 0.65s;
-  --duration-slide: 3s;
   --duration-pulse: 2.4s;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-gsap: power3.out;
@@ -88,7 +102,7 @@
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --background: #080908;
+  --background: #080808;
   --surface: #10110f;
   --text: #f8f8f6;
   --secondary: #a9aba6;
@@ -96,10 +110,15 @@
   --accent: #efae4b;
   --button-bg: #fafaf8;
   --button-text: #10110f;
-  --gradient-start: #f8f8f6;
   --gradient-end: #70726e;
   --logo-filter: none;
   --texture: #5b5f56;
+  --glow-intensity: 0.08;
+  --glow-blur: 2rem;
+  --glow-height: 5rem;
+  --dot-size: 1px;
+  --dot-alpha: 0.7;
+  --dot-pulse-opacity: 0.3;
 }
 :root[data-theme='light'] {
   color-scheme: light;
@@ -112,7 +131,7 @@
   --color-border: var(--border);
   --color-accent: var(--accent);
   --font-sans: var(--font-body);
-  --font-display: var(--font-display);
+  --font-heading: var(--font-title);
   --text-body: var(--text-body);
   --text-label: var(--text-label);
   --text-hero: var(--title-size);
@@ -271,7 +290,7 @@ select:focus-visible {
   position: relative;
   isolation: isolate;
   padding-top: var(--hero-top);
-  padding-bottom: var(--space-2xl);
+  padding-bottom: var(--space-xl);
   overflow: hidden;
 }
 .hero-copy {
@@ -286,10 +305,10 @@ select:focus-visible {
   text-transform: uppercase;
   letter-spacing: var(--label-tracking);
   color: var(--secondary);
-  margin: 0 0 var(--space-lg);
+  margin: 0 0 var(--gap-label-title);
 }
 .hero-title {
-  font-family: var(--font-display);
+  font-family: var(--font-title);
   font-size: var(--title-size);
   font-weight: var(--title-weight);
   line-height: var(--title-leading);
@@ -302,9 +321,13 @@ select:focus-visible {
   white-space: nowrap;
 }
 .gradient-text {
+  display: inline-block;
+  padding-inline-end: var(--gradient-overhang);
+  margin-inline-end: calc(0px - var(--gradient-overhang));
   background: linear-gradient(
-    135deg,
-    var(--gradient-start),
+    90deg,
+    var(--gradient-start) 0%,
+    var(--gradient-start) var(--gradient-tail-start),
     var(--gradient-end)
   );
   background-clip: text;
@@ -314,7 +337,7 @@ select:focus-visible {
 .hero-description {
   max-width: var(--description-width);
   min-height: var(--description-min-height);
-  margin: var(--space-lg) auto var(--space-xl);
+  margin: var(--gap-title-copy) auto var(--gap-copy-button);
   font-size: var(--text-description);
   line-height: 1.5;
   color: var(--secondary);
@@ -324,10 +347,10 @@ select:focus-visible {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  gap: var(--space-xl);
+  gap: var(--space-md);
   min-width: var(--button-width);
   height: var(--button-height);
-  padding-inline: var(--space-xl);
+  padding-inline: var(--space-lg);
   border: 0;
   border-radius: var(--radius-button);
   background: var(--button-bg);
@@ -362,18 +385,16 @@ select:focus-visible {
 }
 .visual-stage {
   position: relative;
-  margin-top: var(--space-2xl);
+  max-width: var(--visual-max-width);
+  margin-top: var(--gap-button-visual);
   z-index: 1;
 }
 .visual-frame {
   position: relative;
   width: 100%;
   aspect-ratio: var(--visual-ratio);
-  min-height: var(--visual-min-height);
-  border: var(--line-width) solid var(--visual-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-visual);
   overflow: hidden;
-  background: var(--visual-background);
 }
 .visual-poster,
 .visual-video {
@@ -381,7 +402,7 @@ select:focus-visible {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 .visual-video {
   opacity: 0;
@@ -393,9 +414,8 @@ select:focus-visible {
   height: var(--glow-height);
   background: rgb(var(--visual-tint));
   filter: blur(var(--glow-blur));
-  opacity: var(--glow-opacity);
+  opacity: var(--glow-intensity);
   pointer-events: none;
-  transition: background-color var(--duration-slow);
 }
 .dot-field {
   position: absolute;
@@ -403,7 +423,7 @@ select:focus-visible {
   width: var(--dot-width);
   height: var(--dot-height);
   background-image: radial-gradient(
-    rgb(var(--visual-tint) / 0.7) var(--dot-size),
+    rgb(var(--visual-tint) / var(--dot-alpha)) var(--dot-size),
     transparent var(--dot-size)
   );
   background-size: var(--dot-gap) var(--dot-gap);
@@ -429,12 +449,13 @@ select:focus-visible {
 .features {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: var(--space-xl);
+  max-width: var(--visual-max-width);
+  margin-top: var(--gap-visual-features);
 }
 .feature-item {
   text-align: center;
   position: relative;
-  padding: var(--space-md) var(--space-xl);
+  padding: var(--space-sm) var(--space-lg);
 }
 .feature-item + .feature-item:before {
   content: '';
@@ -461,7 +482,7 @@ select:focus-visible {
 .feature-item h2 {
   font-family: var(--font-label);
   text-transform: uppercase;
-  font-size: var(--text-label);
+  font-size: var(--text-small);
   font-weight: 600;
   letter-spacing: var(--feature-tracking);
   margin: 0 0 var(--space-xs);
@@ -474,7 +495,7 @@ select:focus-visible {
   margin: 0 auto;
 }
 .availability {
-  margin-top: var(--space-xl);
+  margin-top: var(--gap-features-availability);
   text-align: center;
 }
 .availability > p {
@@ -488,13 +509,6 @@ select:focus-visible {
   letter-spacing: var(--feature-tracking);
   color: var(--secondary);
   margin-bottom: var(--space-md);
-}
-.availability > p:before,
-.availability > p:after {
-  content: '';
-  width: var(--space-xl);
-  height: var(--line-width);
-  background: var(--border);
 }
 .platforms {
   display: flex;
@@ -524,6 +538,17 @@ select:focus-visible {
 .skip-link:focus {
   transform: none;
 }
+@media (min-width: 64rem) {
+  :root {
+    --hero-top: clamp(3.5rem, 5vw, 5rem);
+    --gap-label-title: 1.25rem;
+    --gap-title-copy: var(--space-lg);
+    --gap-copy-button: var(--space-xl);
+    --gap-button-visual: 2.75rem;
+    --gap-visual-features: 0;
+    --gap-features-availability: var(--space-xl);
+  }
+}
 @media (max-width: 63.99rem) {
   .nav-links {
     gap: var(--space-lg);
@@ -536,15 +561,15 @@ select:focus-visible {
     display: none;
   }
   :root {
-    --hero-top: var(--space-2xl);
-    --title-size: clamp(2.15rem, 7.5vw, 5.6rem);
+    --hero-top: var(--space-xl);
+    --title-size: clamp(1.4rem, 5.4vw, 5.25rem);
   }
 }
 @media (max-width: 47.99rem) {
   :root {
-    --hero-top: var(--space-2xl);
-    --title-size: clamp(2.3rem, 7.5vw, 3.5rem);
-    --text-description: 1rem;
+    --hero-top: var(--space-xl);
+    --title-size: clamp(1.4rem, 6.2vw, 3.25rem);
+    --text-description: 0.9375rem;
     --text-label: 0.7rem;
     --nav-height: 4.5rem;
     --logo-width: 5.5rem;
@@ -553,7 +578,6 @@ select:focus-visible {
     --logo-offset-y: -0.3rem;
     --dot-width: 8rem;
     --description-min-height: 6rem;
-    --visual-min-height: 8.5rem;
   }
   .nav-controls {
     gap: var(--space-xs);
@@ -596,10 +620,6 @@ select:focus-visible {
   }
   .visual-stage {
     width: calc(100% - var(--space-md) * 2);
-  }
-  .visual-video,
-  .visual-poster {
-    object-fit: cover;
   }
   .section-label {
     letter-spacing: var(--feature-tracking);
