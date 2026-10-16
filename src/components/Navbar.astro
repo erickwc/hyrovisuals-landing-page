@@ -18,7 +18,7 @@ const links = [
   data-i18n-aria="navigation"
 >
   <a
-    href="#inicio"
+    href="/"
     class="brand"
     aria-label={en.brandHome}
     data-i18n-aria="brandHome"
@@ -35,7 +35,7 @@ const links = [
   </a>
   <div class="nav-links" id="navigation-links">
     {links.map(([id, key]) => (
-      <a href={`#${id}`} data-i18n={key}>
+      <a href={id === 'inicio' ? '/' : `/#${id}`} data-i18n={key}>
         {en[key]}
       </a>
     ))}

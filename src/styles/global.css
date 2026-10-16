@@ -322,6 +322,7 @@ select:focus-visible {
 .hero {
   position: relative;
   isolation: isolate;
+  min-height: calc(100svh - var(--nav-height));
   padding-top: var(--hero-top);
   padding-bottom: var(--space-xl);
   overflow: hidden;
@@ -562,9 +563,9 @@ select:focus-visible {
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  min-height: calc(100svh - var(--nav-height));
   padding-block: clamp(6rem, 9vw, 9rem);
   background: var(--background);
-  scroll-margin-top: var(--space-lg);
 }
 .purchase-layout {
   position: relative;

@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import PurchaseSection from '../components/PurchaseSection.astro';
+import en from '../i18n/en.json';
+---
+
+<Layout>
+  <a class="skip-link" href="#main" data-i18n="skip">
+    {en.skip}
+  </a>
+  <header>
+    <Navbar />
+  </header>
+  <main id="main">
+    <PurchaseSection />
+  </main>
+</Layout>

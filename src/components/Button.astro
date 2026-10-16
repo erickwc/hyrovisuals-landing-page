@@ -9,7 +9,7 @@ interface Props {
 const { text = en.cta, translationKey = 'cta', icon = 'arrow' } = Astro.props;
 ---
 
-<a href="#compra" class="primary-button" data-anim="button">
+<a href="/compra/" class="primary-button" data-anim="button">
   <span data-i18n={translationKey}>{text}</span>
   <Icon name={icon} />
 </a>
