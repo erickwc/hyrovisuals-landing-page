@@ -6,6 +6,7 @@ import { initPreferences } from './preferences';
 import { initAnimations } from './animations';
 import { initCarousel } from './carousel';
 import { initPurchaseReflection } from './purchase-reflection';
+import { initPurchaseCheckout } from './purchase-checkout';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 let cleanup = () => {};
 async function init() {
@@ -14,6 +15,7 @@ async function init() {
   let stopAnimations = () => {};
   let stopCarousel = () => {};
   let stopReflection = () => {};
+  const stopCheckout = initPurchaseCheckout();
   let lenis: Lenis | undefined;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const stopPreferences = initPreferences(() => {
@@ -43,6 +45,7 @@ async function init() {
     stopAnimations();
     stopCarousel();
     stopReflection();
+    stopCheckout();
     lenis?.destroy();
     gsap.ticker.remove(tick);
     reduced.removeEventListener('change', motion);

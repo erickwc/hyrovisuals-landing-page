@@ -71,7 +71,7 @@ const checkoutUrl = 'https://payhip.com/buy?link=X6ucD';
           </span>
           <p data-i18n="purchaseDeviceNote">{en.purchaseDeviceNote}</p>
         </div>
-        <a class="purchase-button" href={checkoutUrl}>
+        <a class="purchase-button" href={checkoutUrl} data-checkout-open>
           <span data-i18n="purchaseNow">{en.purchaseNow}</span>
           <Icon name="arrow" />
         </a>
@@ -127,3 +127,40 @@ const checkoutUrl = 'https://payhip.com/buy?link=X6ucD';
     </div>
   </div>
 </section>
+
+<dialog class="checkout-dialog" aria-labelledby="checkout-dialog-title">
+  <div class="checkout-dialog-header">
+    <span id="checkout-dialog-title" data-i18n="purchaseSecurePayment">
+      {en.purchaseSecurePayment}
+    </span>
+    <button
+      class="checkout-dialog-close"
+      type="button"
+      data-checkout-close
+      data-i18n-aria="checkoutClose"
+      aria-label={en.checkoutClose}
+    >
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+  <div class="checkout-dialog-content">
+    <p class="checkout-dialog-loading" data-i18n="checkoutLoading">
+      {en.checkoutLoading}
+    </p>
+    <iframe
+      class="checkout-dialog-frame"
+      title="Payhip"
+      allow="payment"
+      referrerpolicy="strict-origin-when-cross-origin"
+    ></iframe>
+  </div>
+  <a
+    class="checkout-dialog-fallback"
+    href={checkoutUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    data-i18n="checkoutFallback"
+  >
+    {en.checkoutFallback}
+  </a>
+</dialog>

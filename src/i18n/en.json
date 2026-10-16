@@ -48,5 +48,8 @@
   "purchaseDeviceNote": "This license lets you use HYRO VISUALS on one device at a time.",
   "purchaseNow": "Buy now",
   "purchasePaymentMethods": "Payment methods",
-  "purchaseSecurePayment": "Secure payment"
+  "purchaseSecurePayment": "Secure payment",
+  "checkoutClose": "Close checkout",
+  "checkoutLoading": "Loading secure checkout…",
+  "checkoutFallback": "Trouble loading? Open checkout in a new tab"
 }
