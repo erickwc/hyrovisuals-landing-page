@@ -26,8 +26,19 @@
   --purchase-card: #fffefa;
   --purchase-note: #faf9f5;
   --purchase-line: #e9e5da;
-  --purchase-edge: #fff;
   --purchase-gold: #c99a4d;
+  --purchase-border-gradient: conic-gradient(
+    from 200deg,
+    #fff 0deg,
+    #d8b16e 27deg,
+    #fff 58deg,
+    #fff 232deg,
+    #e1bc7e 284deg,
+    #fff 326deg,
+    #fff 360deg
+  );
+  --purchase-reflection-hover: rgb(255 213 134 / 0.48);
+  --purchase-button-sheen: rgb(255 255 255 / 0.24);
   --purchase-shadow:
     0 0 28px rgb(221 181 108 / 0.2), 0 24px 70px rgb(83 64 26 / 0.07);
   --font-body: 'Inter Variable', Arial, sans-serif;
@@ -126,8 +137,19 @@
   --purchase-card: #1b1b18;
   --purchase-note: #22221e;
   --purchase-line: #39372f;
-  --purchase-edge: #746045;
   --purchase-gold: #d5a85e;
+  --purchase-border-gradient: conic-gradient(
+    from 200deg,
+    #f5efdf 0deg,
+    #a87838 27deg,
+    #8c704a 58deg,
+    #765d3d 232deg,
+    #d4aa68 284deg,
+    #f5efdf 326deg,
+    #f5efdf 360deg
+  );
+  --purchase-reflection-hover: rgb(246 193 105 / 0.36);
+  --purchase-button-sheen: rgb(171 127 62 / 0.18);
   --purchase-shadow:
     0 0 26px rgb(211 163 86 / 0.12), 0 24px 70px rgb(0 0 0 / 0.15);
   --glow-intensity: 0.08;
@@ -218,6 +240,12 @@ select:focus-visible {
   width: calc(100% - var(--page-gutter) * 2);
   max-width: var(--page-max);
   margin-inline: auto;
+}
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--background);
 }
 .icon {
   width: var(--icon-size);
@@ -565,6 +593,7 @@ select:focus-visible {
   min-height: 100svh;
   padding-block: clamp(6rem, 9vw, 9rem);
   background: var(--background);
+  scroll-margin-top: var(--nav-height);
 }
 .purchase-layout {
   position: relative;
@@ -671,46 +700,30 @@ select:focus-visible {
 }
 .purchase-card {
   position: relative;
+  isolation: isolate;
   min-width: 0;
   margin-top: 3.5rem;
   padding: clamp(1.25rem, 2.1vw, 2rem);
-  border: 2px solid var(--purchase-edge);
+  border: 2px solid transparent;
   border-radius: 2.4rem;
-  background: var(--purchase-frame);
+  background:
+    linear-gradient(var(--purchase-frame), var(--purchase-frame)) padding-box,
+    var(--purchase-border-gradient) border-box;
   box-shadow: var(--purchase-shadow);
 }
-.purchase-border {
+.purchase-card::before {
+  content: '';
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+  inset: -2px;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle 9rem at var(--reflection-x, 50%) var(--reflection-y, 50%),
+    var(--purchase-reflection-hover),
+    transparent 76%
+  );
+  opacity: 0;
+  transition: opacity 260ms ease-out;
   pointer-events: none;
-}
-.purchase-border rect {
-  x: 1px;
-  y: 1px;
-  width: calc(100% - 2px);
-  height: calc(100% - 2px);
-  rx: 38px;
-  fill: none;
-  stroke: var(--purchase-gold);
-  stroke-dasharray: 5 95;
-  animation: purchase-border-trace 6s linear infinite;
-}
-.purchase-border-glow {
-  stroke-width: 12px;
-  opacity: 0.5;
-  filter: blur(9px);
-}
-.purchase-border-light {
-  stroke-width: 2.5px;
-  opacity: 1;
-}
-@keyframes purchase-border-trace {
-  to {
-    stroke-dashoffset: -100;
-  }
 }
 .purchase-card-content {
   position: relative;
@@ -795,6 +808,7 @@ select:focus-visible {
   line-height: 1.5;
 }
 .purchase-button {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -804,11 +818,32 @@ select:focus-visible {
   padding: 0.9rem 1.2rem;
   border: 0;
   border-radius: 1rem;
+  overflow: hidden;
   background: var(--button-bg);
   color: var(--button-text);
   font-family: var(--font-label);
   font-size: 1.1rem;
   font-weight: 600;
+  transition:
+    transform 260ms var(--ease-out),
+    box-shadow 260ms var(--ease-out);
+}
+.purchase-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 28%,
+    var(--purchase-button-sheen) 50%,
+    transparent 72%
+  );
+  transform: translateX(-140%);
+  transition: transform 650ms var(--ease-out);
+  pointer-events: none;
+}
+.purchase-button:active {
+  transform: translateY(0);
 }
 .purchase-button:disabled {
   opacity: 1;
@@ -817,6 +852,22 @@ select:focus-visible {
 .purchase-button .icon {
   width: 1.3rem;
   height: 1.3rem;
+  transition: transform 260ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .purchase-card:hover::before {
+    opacity: 1;
+  }
+  .purchase-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgb(0 0 0 / 0.16);
+  }
+  .purchase-button:hover::before {
+    transform: translateX(140%);
+  }
+  .purchase-button:hover .icon {
+    transform: translateX(0.35rem);
+  }
 }
 .purchase-payment-methods {
   display: grid;
@@ -956,9 +1007,6 @@ select:focus-visible {
   }
   .purchase-card {
     border-radius: 1.7rem;
-  }
-  .purchase-border rect {
-    rx: 27px;
   }
   :root {
     --hero-top: var(--space-xl);
