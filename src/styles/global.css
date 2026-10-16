@@ -930,37 +930,42 @@ select:focus-visible {
 .checkout-dialog {
   position: fixed;
   inset: 50% auto auto 50%;
-  width: min(70rem, calc(100vw - 2rem));
-  height: min(54rem, calc(100svh - 2rem));
+  width: min(38rem, calc(100vw - 2rem));
   max-width: none;
-  max-height: none;
+  max-height: calc(100svh - 2rem);
   margin: 0;
   padding: 0;
-  border: 1px solid #e6e2da;
+  border: 1px solid var(--purchase-line);
   border-radius: 1.35rem;
-  overflow: hidden;
-  background: #fff;
-  color: #171717;
+  overflow: auto;
+  background: var(--purchase-card);
+  color: var(--text);
   box-shadow: 0 2rem 6rem rgb(0 0 0 / 0.3);
   transform: translate(-50%, -50%);
-}
-.checkout-dialog[open] {
-  display: flex;
-  flex-direction: column;
+  transition:
+    background-color var(--duration-theme),
+    color var(--duration-theme);
 }
 .checkout-dialog::backdrop {
-  background: rgb(0 0 0 / 0.7);
+  background: rgb(0 0 0 / 0.66);
   backdrop-filter: blur(8px);
 }
 .checkout-dialog-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 3.6rem;
-  padding-inline: 1.25rem;
-  border-bottom: 1px solid #e6e2da;
-  font-family: var(--font-label);
-  font-weight: 600;
+  min-height: 4.25rem;
+  padding-inline: clamp(1.4rem, 5vw, 2rem);
+  border-bottom: 1px solid var(--purchase-line);
+}
+.checkout-dialog-brand {
+  font-family: var(--font-title);
+  font-size: 1rem;
+  letter-spacing: -0.06em;
+}
+.checkout-dialog-brand span {
+  margin-left: 0.18em;
+  color: var(--secondary);
 }
 .checkout-dialog-close {
   display: grid;
@@ -968,50 +973,111 @@ select:focus-visible {
   width: 2.25rem;
   height: 2.25rem;
   padding: 0;
-  border: 1px solid #dedbd4;
+  border: 1px solid var(--purchase-line);
   border-radius: 50%;
-  background: #fff;
-  color: #171717;
+  background: var(--purchase-note);
+  color: var(--text);
   font-size: 1.5rem;
   line-height: 1;
+  cursor: pointer;
 }
 .checkout-dialog-close:hover {
-  background: #f5f2ec;
+  border-color: var(--purchase-gold);
 }
 .checkout-dialog-content {
-  position: relative;
-  flex: 1;
-  min-height: 0;
+  padding: clamp(1.5rem, 5vw, 2.4rem);
 }
-.checkout-dialog-loading {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: grid;
-  place-items: center;
+.checkout-dialog-eyebrow {
+  margin: 0 0 1.25rem;
+  color: var(--purchase-gold);
+  font-family: var(--font-label);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.checkout-dialog-content h2 {
   margin: 0;
-  background: #fff;
-  color: #595959;
+  font-family: var(--font-label);
+  font-size: clamp(1.7rem, 5vw, 2.15rem);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  line-height: 1.12;
 }
-.checkout-dialog.is-ready .checkout-dialog-loading {
-  display: none;
+.checkout-dialog-description {
+  max-width: 29rem;
+  margin: 0.8rem 0 1.7rem;
+  color: var(--secondary);
+  line-height: 1.55;
 }
-.checkout-dialog-frame {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  background: #fff;
+.checkout-dialog-order {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--purchase-line);
+  border-radius: 0.9rem;
+  background: var(--purchase-note);
+}
+.checkout-dialog-order > div {
+  display: grid;
+  gap: 0.3rem;
+}
+.checkout-dialog-order strong {
+  font-family: var(--font-label);
+}
+.checkout-dialog-order span {
+  color: var(--secondary);
+  font-size: 0.82rem;
+}
+.checkout-dialog-order > strong {
+  flex: none;
+  font-size: 1.15rem;
+}
+.checkout-dialog-continue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  min-height: 3.6rem;
+  margin-top: 1.25rem;
+  border-radius: 0.9rem;
+  background: var(--button-bg);
+  color: var(--button-text);
+  font-family: var(--font-label);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+.checkout-dialog-continue:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.7rem 1.5rem rgb(0 0 0 / 0.15);
+}
+.checkout-dialog-continue .icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+.checkout-dialog-provider {
+  margin: 1rem 0 0;
+  color: var(--secondary);
+  font-size: 0.77rem;
+  text-align: center;
 }
 .checkout-dialog-fallback {
   display: block;
-  padding: 0.75rem 1.25rem;
-  border-top: 1px solid #e6e2da;
-  color: #595959;
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid var(--purchase-line);
+  color: var(--secondary);
   font-size: 0.75rem;
   text-align: center;
   text-decoration: underline;
   text-underline-offset: 0.2em;
+}
+.wompi_button_widget > button {
+  display: none !important;
 }
 .skip-link {
   position: fixed;
@@ -1066,14 +1132,6 @@ select:focus-visible {
   }
 }
 @media (max-width: 47.99rem) {
-  .checkout-dialog {
-    inset: 0;
-    width: 100vw;
-    height: 100svh;
-    border: 0;
-    border-radius: 0;
-    transform: none;
-  }
   .purchase-section {
     padding-block: 5rem;
   }

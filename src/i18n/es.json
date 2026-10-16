@@ -50,6 +50,10 @@
   "purchasePaymentMethods": "Métodos de pago",
   "purchaseSecurePayment": "Pago seguro",
   "checkoutClose": "Cerrar pago",
-  "checkoutLoading": "Cargando el pago seguro…",
-  "checkoutFallback": "¿No carga? Abrir el pago en otra pestaña"
+  "checkoutTestMode": "Modo de prueba",
+  "checkoutTitle": "Tu licencia de HYRO VISUALS",
+  "checkoutDescription": "Confirma tu pedido y continúa al pago seguro.",
+  "checkoutContinue": "Continuar al pago seguro",
+  "checkoutProvider": "El pago se procesa de forma segura con Wompi.",
+  "checkoutFallback": "¿No se abre el pago? Ábrelo en otra pestaña"
 }

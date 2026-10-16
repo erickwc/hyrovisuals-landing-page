@@ -12,7 +12,9 @@ const benefits = [
   'purchaseBenefitGuide',
   'purchaseBenefitSupport',
 ] as const;
-const checkoutUrl = 'https://payhip.com/buy?link=X6ucD';
+const checkoutUrl = 'https://s.wompi.sv/2361344t6-';
+const widgetUrl =
+  'https://pagos.wompi.sv/IntentoPago/Redirect?id=8f27d888-8ea0-4900-8036-b5ad5296e996&esWidget=1';
 ---
 
 <section
@@ -130,8 +132,8 @@ const checkoutUrl = 'https://payhip.com/buy?link=X6ucD';
 
 <dialog class="checkout-dialog" aria-labelledby="checkout-dialog-title">
   <div class="checkout-dialog-header">
-    <span id="checkout-dialog-title" data-i18n="purchaseSecurePayment">
-      {en.purchaseSecurePayment}
+    <span class="checkout-dialog-brand" id="checkout-dialog-title">
+      HYRO <span>VISUALS</span>
     </span>
     <button
       class="checkout-dialog-close"
@@ -144,15 +146,31 @@ const checkoutUrl = 'https://payhip.com/buy?link=X6ucD';
     </button>
   </div>
   <div class="checkout-dialog-content">
-    <p class="checkout-dialog-loading" data-i18n="checkoutLoading">
-      {en.checkoutLoading}
+    <p class="checkout-dialog-eyebrow" data-i18n="checkoutTestMode">
+      {en.checkoutTestMode}
     </p>
-    <iframe
-      class="checkout-dialog-frame"
-      title="Payhip"
-      allow="payment"
-      referrerpolicy="strict-origin-when-cross-origin"
-    ></iframe>
+    <h2 data-i18n="checkoutTitle">{en.checkoutTitle}</h2>
+    <p class="checkout-dialog-description" data-i18n="checkoutDescription">
+      {en.checkoutDescription}
+    </p>
+    <div class="checkout-dialog-order">
+      <div>
+        <strong data-i18n="purchaseLicense">{en.purchaseLicense}</strong>
+        <span data-i18n="purchaseFullAccess">{en.purchaseFullAccess}</span>
+      </div>
+      <strong>$20 USD</strong>
+    </div>
+    <a
+      class="checkout-dialog-continue"
+      href={checkoutUrl}
+      data-checkout-continue
+    >
+      <span data-i18n="checkoutContinue">{en.checkoutContinue}</span>
+      <Icon name="arrow" />
+    </a>
+    <p class="checkout-dialog-provider" data-i18n="checkoutProvider">
+      {en.checkoutProvider}
+    </p>
   </div>
   <a
     class="checkout-dialog-fallback"
@@ -164,3 +182,10 @@ const checkoutUrl = 'https://payhip.com/buy?link=X6ucD';
     {en.checkoutFallback}
   </a>
 </dialog>
+
+<div
+  class="wompi_button_widget"
+  data-url-pago={widgetUrl}
+  data-render="widget"
+></div>
+<script is:inline src="https://pagos.wompi.sv/js/wompi.pagos.js"></script>
