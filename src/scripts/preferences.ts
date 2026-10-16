@@ -23,6 +23,8 @@ export function initPreferences(onLanguage: () => void) {
   const menu = document.querySelector<HTMLButtonElement>('.menu-toggle')!;
   const links = document.querySelector('.nav-links')!;
   const system = matchMedia('(prefers-color-scheme: dark)');
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let themeTransition: ViewTransition | undefined;
   let lang = readSaved('hyro-language');
   if (lang !== 'en' && lang !== 'es')
     lang = navigator.language.toLowerCase().startsWith('es') ? 'es' : 'en';
@@ -74,6 +76,23 @@ export function initPreferences(onLanguage: () => void) {
     });
     labels();
   };
+  const changeTheme = (theme: 'light' | 'dark') => {
+    if (document.documentElement.dataset.theme === theme) return;
+    themeTransition?.skipTransition();
+    const apply = () => {
+      document.documentElement.dataset.theme = theme;
+      labels();
+    };
+    if (reducedMotion.matches || !document.startViewTransition) {
+      apply();
+      return;
+    }
+    const transition = document.startViewTransition(apply);
+    themeTransition = transition;
+    transition.finished.finally(() => {
+      if (themeTransition === transition) themeTransition = undefined;
+    });
+  };
   translate();
   select.addEventListener(
     'change',
@@ -91,9 +110,8 @@ export function initPreferences(onLanguage: () => void) {
     () => {
       const theme =
         document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-      document.documentElement.dataset.theme = theme;
+      changeTheme(theme);
       save('hyro-theme', theme);
-      labels();
     },
     { signal },
   );
@@ -101,10 +119,7 @@ export function initPreferences(onLanguage: () => void) {
     'change',
     () => {
       if (!readSaved('hyro-theme')) {
-        document.documentElement.dataset.theme = system.matches
-          ? 'dark'
-          : 'light';
-        labels();
+        changeTheme(system.matches ? 'dark' : 'light');
       }
     },
     { signal },
@@ -140,5 +155,8 @@ export function initPreferences(onLanguage: () => void) {
     },
     { signal },
   );
-  return () => controller.abort();
+  return () => {
+    controller.abort();
+    themeTransition?.skipTransition();
+  };
 }

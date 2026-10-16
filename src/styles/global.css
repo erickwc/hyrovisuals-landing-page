@@ -89,6 +89,7 @@
   --texture-opacity: 0.13;
   --duration-fast: 0.25s;
   --duration-base: 0.65s;
+  --duration-theme: 0.45s;
   --duration-slow: 1.1s;
   --duration-pulse: 2.4s;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -151,9 +152,22 @@ body {
   color: var(--text);
   font-family: var(--font-body);
   font-size: var(--text-body);
-  transition:
-    background-color var(--duration-base),
-    color var(--duration-base);
+}
+@keyframes theme-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes theme-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+::view-transition-old(root) {
+  animation: var(--duration-theme) ease-in-out both theme-fade-out;
+}
+::view-transition-new(root) {
+  animation: var(--duration-theme) ease-in-out both theme-fade-in;
 }
 button,
 select,
@@ -429,7 +443,6 @@ select:focus-visible {
   background-size: var(--dot-gap) var(--dot-gap);
   mask-image: linear-gradient(transparent, black);
   z-index: -1;
-  transition: background-image var(--duration-base);
 }
 .dots-left {
   left: 0;

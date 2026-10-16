@@ -4,7 +4,7 @@ La referencia entregada por el usuario define la dirección: composición centra
 
 ## Sistema de variables
 
-Fuente única: `src/styles/global.css`. Tema claro en `:root`; oscuro en `[data-theme="dark"]`. El sistema operativo determina el tema inicial; `hyro-theme` en localStorage conserva una elección manual. El selector de idioma usa `hyro-language`, después navigator.language (es → español; resto → inglés).
+Fuente única: `src/styles/global.css`. Tema claro en `:root`; oscuro en `[data-theme="dark"]`. El sistema operativo determina el tema inicial; `hyro-theme` en localStorage conserva una elección manual. El cambio de tema funde la página completa mediante View Transitions, con duración `--duration-theme`; con movimiento reducido o sin soporte, el cambio es inmediato y uniforme. El selector de idioma usa `hyro-language`, después navigator.language (es → español; resto → inglés).
 
 | Token            | Claro       | Oscuro      |
 | ---------------- | ----------- | ----------- |
