@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.astro/
+Videos/
+src/videos/
+public/
+artifacts/
+package-lock.json

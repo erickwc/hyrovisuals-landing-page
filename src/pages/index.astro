@@ -1,7 +1,71 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Button from '../components/Button.astro';
+import SectionLabel from '../components/SectionLabel.astro';
+import Title from '../components/Title.astro';
+import FeatureItem from '../components/FeatureItem.astro';
+import PlatformBadge from '../components/PlatformBadge.astro';
+import VisualCarousel from '../components/VisualCarousel.astro';
+import en from '../i18n/en.json';
+const features = [
+  ['spectrum', 'spectrums'],
+  ['sliders', 'custom'],
+  ['grid', 'modes'],
+  ['resize', 'resize'],
+] as const;
 ---
 
 <Layout>
-  <main></main>
+  <a class="skip-link" href="#main" data-i18n="skip">
+    {en.skip}
+  </a>
+  <header id="inicio">
+    <Navbar />
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="background-lines page-shell" aria-hidden="true">
+          {Array.from({ length: 7 }, () => (
+            <span data-anim="line"></span>
+          ))}
+        </div>
+        <div class="hero-copy relative text-center">
+          <SectionLabel text={en.label} translationKey="label" />
+          <div id="hero-heading">
+            <Title
+              firstLine={en.titleFirst}
+              secondLine={en.titleSecond}
+              gradientText={en.titleGradient}
+            />
+          </div>
+          <p
+            class="hero-description"
+            data-anim="description"
+            data-i18n="description"
+          >
+            {en.description}
+          </p>
+          <Button />
+        </div>
+        <VisualCarousel />
+        <div class="features page-shell">
+          {features.map(([icon, key]) => (
+            <FeatureItem
+              icon={icon}
+              translationKey={key}
+              title={en[`${key}Title`]}
+              description={en[`${key}Description`]}
+            />
+          ))}
+        </div>
+        <div class="availability">
+          <p data-i18n="available">{en.available}</p>
+          <div class="platforms">
+            <PlatformBadge platform="mac" label={en.mac} />
+            <PlatformBadge platform="windows" label={en.windows} />
+          </div>
+        </div>
+      </section>
+    </main>
+  </header>
 </Layout>

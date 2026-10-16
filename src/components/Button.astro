@@ -1,0 +1,15 @@
+---
+import Icon from './Icon.astro';
+import en from '../i18n/en.json';
+interface Props {
+  text?: string;
+  translationKey?: string;
+  icon?: string;
+}
+const { text = en.cta, translationKey = 'cta', icon = 'arrow' } = Astro.props;
+---
+
+<button type="button" class="primary-button" data-anim="button">
+  <span data-i18n={translationKey}>{text}</span>
+  <Icon name={icon} />
+</button>

@@ -1,0 +1,21 @@
+---
+import Icon from './Icon.astro';
+import en from '../i18n/en.json';
+---
+
+<div class="language-control">
+  <Icon name="globe" />
+  <select
+    id="language"
+    aria-label={en.languageLabel}
+    data-i18n-aria="languageLabel"
+  >
+    <option value="en" lang="en">
+      EN
+    </option>
+    <option value="es" lang="es">
+      ES
+    </option>
+  </select>
+  <Icon name="chevron" />
+</div>

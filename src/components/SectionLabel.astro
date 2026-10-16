@@ -1,0 +1,11 @@
+---
+interface Props {
+  text: string;
+  translationKey: string;
+}
+const { text, translationKey } = Astro.props;
+---
+
+<p class="section-label" data-anim="label" data-i18n={translationKey}>
+  {text}
+</p>

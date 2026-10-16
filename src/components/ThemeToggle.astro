@@ -1,0 +1,19 @@
+---
+import Icon from './Icon.astro';
+import en from '../i18n/en.json';
+---
+
+<button
+  class="theme-toggle"
+  type="button"
+  data-theme-toggle
+  aria-label={en.themeDark}
+  data-i18n-aria="themeDark"
+>
+  <span class="sun-icon">
+    <Icon name="sun" />
+  </span>
+  <span class="moon-icon">
+    <Icon name="moon" />
+  </span>
+</button>

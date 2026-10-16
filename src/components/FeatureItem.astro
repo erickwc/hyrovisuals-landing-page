@@ -1,0 +1,18 @@
+---
+import Icon from './Icon.astro';
+interface Props {
+  icon: string;
+  title: string;
+  description: string;
+  translationKey: string;
+}
+const { icon, title, description, translationKey } = Astro.props;
+---
+
+<article class="feature-item" data-anim="feature">
+  <span class="feature-icon">
+    <Icon name={icon} />
+  </span>
+  <h2 data-i18n={`${translationKey}Title`}>{title}</h2>
+  <p data-i18n={`${translationKey}Description`}>{description}</p>
+</article>

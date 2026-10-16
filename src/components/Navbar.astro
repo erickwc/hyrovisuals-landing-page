@@ -1,0 +1,57 @@
+---
+import LanguageSelector from './LanguageSelector.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import Icon from './Icon.astro';
+import en from '../i18n/en.json';
+const links = [
+  ['inicio', 'navHome'],
+  ['personalizacion', 'navCustomize'],
+  ['enfoque', 'navFocus'],
+  ['faq', 'navFaq'],
+  ['footer', 'navFooter'],
+] as const;
+---
+
+<nav
+  class="navbar page-shell"
+  aria-label={en.navigation}
+  data-i18n-aria="navigation"
+>
+  <a
+    href="#inicio"
+    class="brand"
+    aria-label={en.brandHome}
+    data-i18n-aria="brandHome"
+  >
+    <span class="brand-crop">
+      <img
+        src="/images/hyro-logo.png"
+        alt="Hyro"
+        width="5339"
+        height="724"
+        fetchpriority="high"
+      />
+    </span>
+  </a>
+  <div class="nav-links" id="navigation-links">
+    {links.map(([id, key]) => (
+      <a href={`#${id}`} data-i18n={key}>
+        {en[key]}
+      </a>
+    ))}
+  </div>
+  <div class="nav-controls">
+    <LanguageSelector />
+    <ThemeToggle />
+    <button
+      type="button"
+      class="menu-toggle"
+      aria-controls="navigation-links"
+      aria-expanded="false"
+      aria-label={en.menuOpen}
+      data-i18n-aria="menuOpen"
+    >
+      <Icon name="menu" />
+    </button>
+  </div>
+</nav>

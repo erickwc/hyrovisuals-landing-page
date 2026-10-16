@@ -1,0 +1,26 @@
+---
+interface Props {
+  firstLine: string;
+  secondLine: string;
+  gradientText: string;
+  keyPrefix?: string;
+}
+const {
+  firstLine,
+  secondLine,
+  gradientText,
+  keyPrefix = 'title',
+} = Astro.props;
+---
+
+<h1 class="hero-title" data-anim="title">
+  <span class="title-line">
+    <span data-i18n={`${keyPrefix}First`}>{firstLine}</span>
+  </span>
+  <span class="title-line">
+    <span data-i18n={`${keyPrefix}Second`}>{secondLine}</span>{' '}
+    <span class="gradient-text" data-i18n={`${keyPrefix}Gradient`}>
+      {gradientText}
+    </span>
+  </span>
+</h1>
