@@ -38,7 +38,7 @@
     #fff 360deg
   );
   --purchase-reflection-hover: rgb(255 213 134 / 0.48);
-  --purchase-button-sheen: rgb(255 255 255 / 0.24);
+  --purchase-button-sheen: rgb(255 255 255 / 0.34);
   --purchase-shadow:
     0 0 28px rgb(221 181 108 / 0.2), 0 24px 70px rgb(83 64 26 / 0.07);
   --font-body: 'Inter Variable', Arial, sans-serif;
@@ -149,7 +149,7 @@
     #f5efdf 360deg
   );
   --purchase-reflection-hover: rgb(246 193 105 / 0.36);
-  --purchase-button-sheen: rgb(171 127 62 / 0.18);
+  --purchase-button-sheen: rgb(171 127 62 / 0.28);
   --purchase-shadow:
     0 0 26px rgb(211 163 86 / 0.12), 0 24px 70px rgb(0 0 0 / 0.15);
   --glow-intensity: 0.08;
@@ -831,23 +831,22 @@ select:focus-visible {
 .purchase-button::before {
   content: '';
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: -55%;
+  width: 55%;
   background: linear-gradient(
     105deg,
-    transparent 28%,
+    transparent 22%,
     var(--purchase-button-sheen) 50%,
-    transparent 72%
+    transparent 78%
   );
-  transform: translateX(-140%);
-  transition: transform 650ms var(--ease-out);
+  transform: translateX(0);
+  transition: transform 1.55s cubic-bezier(0.22, 0.48, 0.28, 1);
   pointer-events: none;
 }
 .purchase-button:active {
   transform: translateY(0);
-}
-.purchase-button:disabled {
-  opacity: 1;
-  cursor: default;
 }
 .purchase-button .icon {
   width: 1.3rem;
@@ -863,7 +862,7 @@ select:focus-visible {
     box-shadow: 0 10px 24px rgb(0 0 0 / 0.16);
   }
   .purchase-button:hover::before {
-    transform: translateX(140%);
+    transform: translateX(282%);
   }
   .purchase-button:hover .icon {
     transform: translateX(0.35rem);

@@ -12,6 +12,7 @@ const benefits = [
   'purchaseBenefitGuide',
   'purchaseBenefitSupport',
 ] as const;
+const checkoutUrl = 'https://payhip.com/buy?link=X6ucD';
 ---
 
 <section
@@ -70,10 +71,10 @@ const benefits = [
           </span>
           <p data-i18n="purchaseDeviceNote">{en.purchaseDeviceNote}</p>
         </div>
-        <button class="purchase-button" type="button" disabled>
+        <a class="purchase-button" href={checkoutUrl}>
           <span data-i18n="purchaseNow">{en.purchaseNow}</span>
           <Icon name="arrow" />
-        </button>
+        </a>
         <ul
           class="purchase-payment-methods"
           data-i18n-aria="purchasePaymentMethods"
