@@ -56,7 +56,5 @@
   "checkoutPaymentMethod": "Choose a payment method",
   "checkoutPayCard": "Pay by card",
   "checkoutPayPayPal": "Pay with PayPal",
-  "checkoutComingSoon": "Coming soon",
-  "checkoutProvider": "Card payments are processed securely by Wompi.",
   "checkoutFallback": "Trouble opening payment? Open it in a new tab"
 }

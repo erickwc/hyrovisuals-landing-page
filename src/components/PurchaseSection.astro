@@ -169,23 +169,29 @@ const widgetUrl =
       {en.checkoutPaymentMethod}
     </p>
     <div class="checkout-dialog-payment-options">
+      <button
+        class="checkout-dialog-paypal"
+        type="button"
+        data-i18n-aria="checkoutPayPayPal"
+        aria-label={en.checkoutPayPayPal}
+      >
+        <img src="/images/payment/paypal.png" alt="" width="600" height="148" />
+      </button>
       <a
         class="checkout-dialog-continue"
         href={checkoutUrl}
         data-checkout-continue
       >
+        <Icon name="card" />
         <span data-i18n="checkoutPayCard">{en.checkoutPayCard}</span>
-        <Icon name="arrow" />
       </a>
-      <button class="checkout-dialog-paypal" type="button" disabled>
-        <img src="/images/payment/paypal.png" alt="" width="600" height="148" />
-        <span data-i18n="checkoutPayPayPal">{en.checkoutPayPayPal}</span>
-        <small data-i18n="checkoutComingSoon">{en.checkoutComingSoon}</small>
-      </button>
     </div>
-    <p class="checkout-dialog-provider" data-i18n="checkoutProvider">
-      {en.checkoutProvider}
-    </p>
+    <div class="checkout-dialog-powered">
+      <span>Powered by</span>
+      <span class="checkout-powered-logo" aria-label="HYRO">
+        <img src="/images/hyro-logo.png" alt="HYRO" width="5339" height="724" />
+      </span>
+    </div>
   </div>
   <a
     class="checkout-dialog-fallback"

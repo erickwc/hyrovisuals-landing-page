@@ -56,7 +56,5 @@
   "checkoutPaymentMethod": "Elige un método de pago",
   "checkoutPayCard": "Pagar con tarjeta",
   "checkoutPayPayPal": "Pagar con PayPal",
-  "checkoutComingSoon": "Próximamente",
-  "checkoutProvider": "El pago con tarjeta se procesa de forma segura con Wompi.",
   "checkoutFallback": "¿No se abre el pago? Ábrelo en otra pestaña"
 }
