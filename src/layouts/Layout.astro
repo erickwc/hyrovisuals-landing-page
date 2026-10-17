@@ -3,6 +3,10 @@ import '../styles/global.css';
 import '@fontsource-variable/inter';
 import '@fontsource-variable/space-grotesk';
 import en from '../i18n/en.json';
+interface Props {
+  page?: 'home' | 'account';
+}
+const { page = 'home' } = Astro.props;
 ---
 
 <!doctype html>
@@ -10,8 +14,13 @@ import en from '../i18n/en.json';
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={en.metaDescription} />
-    <title>{en.pageTitle}</title>
+    <meta
+      name="description"
+      content={
+        page === 'account' ? en.accountMetaDescription : en.metaDescription
+      }
+    />
+    <title>{page === 'account' ? en.accountPageTitle : en.pageTitle}</title>
     <script is:inline>
       try {
         const t = localStorage.getItem('hyro-theme');
@@ -30,7 +39,7 @@ import en from '../i18n/en.json';
       }
     </script>
   </head>
-  <body>
+  <body data-page={page}>
     <slot />
     <script>
       import '../scripts/init';

@@ -299,6 +299,33 @@ select:focus-visible {
   gap: var(--space-sm);
   align-items: center;
 }
+.account-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: var(--control-height);
+  padding-inline: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--purchase-note);
+  font-family: var(--font-label);
+  font-size: var(--text-small);
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    border-color var(--duration-fast),
+    background-color var(--duration-fast);
+}
+.account-link:hover,
+.account-link[aria-current='page'] {
+  border-color: var(--purchase-gold);
+  background: var(--purchase-frame);
+}
+.account-link .icon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
 .language-control {
   position: relative;
   display: flex;
@@ -1013,6 +1040,248 @@ select:focus-visible {
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
+.account-page {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: calc(100svh - var(--nav-height));
+  padding-block: clamp(1.5rem, 3vw, 3rem);
+  overflow: hidden;
+}
+.account-page::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(20% - 1px),
+    var(--purchase-line) 20%
+  );
+  opacity: 0.18;
+  content: '';
+  pointer-events: none;
+}
+.account-page::after {
+  position: absolute;
+  z-index: -1;
+  right: -7rem;
+  bottom: 0;
+  width: min(55vw, 40rem);
+  height: 22rem;
+  background-image: radial-gradient(var(--purchase-gold) 1px, transparent 1px);
+  background-size: 1.5rem 1.5rem;
+  opacity: 0.38;
+  mask-image: linear-gradient(90deg, transparent, #000 42%, transparent 95%);
+  content: '';
+  pointer-events: none;
+}
+.account-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(24rem, 30rem);
+  align-items: center;
+  gap: clamp(3rem, 7vw, 9rem);
+}
+.account-intro {
+  position: relative;
+  z-index: 1;
+  animation: account-enter 0.7s var(--ease-out) both;
+}
+.account-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0 0 1.8rem;
+  font-family: var(--font-label);
+  font-size: var(--text-label);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+.account-eyebrow-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--purchase-gold);
+  box-shadow: 0 0 1rem var(--purchase-gold);
+}
+.account-title {
+  display: grid;
+  gap: 0.12em;
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(3.5rem, 5.8vw, 6rem);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  line-height: 0.98;
+  white-space: nowrap;
+}
+.account-intro-copy {
+  max-width: 29rem;
+  margin: 2rem 0 2.6rem;
+  color: var(--secondary);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+.account-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--purchase-gold);
+  font-family: var(--font-label);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.account-back .icon {
+  width: 1rem;
+  height: 1rem;
+  transform: rotate(180deg);
+}
+.account-panel {
+  padding: 0.65rem;
+  border: 1px solid var(--purchase-gold);
+  border-radius: 1.8rem;
+  background: var(--purchase-frame);
+  box-shadow: var(--purchase-shadow);
+  animation: account-enter 0.75s 0.1s var(--ease-out) both;
+}
+.account-panel-inner {
+  padding: clamp(1.3rem, 2.4vw, 1.7rem);
+  border: 1px solid var(--purchase-line);
+  border-radius: 1.3rem;
+  background: var(--purchase-card);
+}
+.account-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--purchase-line);
+}
+.account-tabs button {
+  position: relative;
+  padding: 0 0 0.9rem;
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+  font-family: var(--font-label);
+  font-size: 0.87rem;
+  font-weight: 600;
+}
+.account-tabs button[aria-selected='true'] {
+  color: var(--text);
+}
+.account-tabs button[aria-selected='true']::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--purchase-gold);
+  content: '';
+}
+.account-tab-panel[hidden] {
+  display: none;
+}
+.account-tab-panel h2 {
+  margin: 0;
+  font-family: var(--font-label);
+  font-size: clamp(1.7rem, 3vw, 2.15rem);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+}
+.account-panel-copy {
+  margin: 0.45rem 0 0.8rem;
+  color: var(--secondary);
+  line-height: 1.5;
+}
+.account-form {
+  display: grid;
+  gap: 0.6rem;
+}
+.account-field {
+  display: grid;
+  gap: 0.4rem;
+}
+.account-field label {
+  font-family: var(--font-label);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.account-field input {
+  width: 100%;
+  height: 2.75rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--purchase-line);
+  border-radius: 0.6rem;
+  outline: none;
+  background: var(--purchase-note);
+  color: var(--text);
+  font: inherit;
+  transition: border-color var(--duration-fast);
+}
+.account-field input:focus-visible {
+  border-color: var(--purchase-gold);
+  outline: 1px solid var(--purchase-gold);
+  outline-offset: 2px;
+}
+.account-password-field {
+  position: relative;
+}
+.account-password-field input {
+  padding-right: 3.2rem;
+}
+.account-password-field button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: 3.1rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+}
+.account-password-field button:hover {
+  color: var(--text);
+}
+.account-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-height: 3rem;
+  margin-top: 0.35rem;
+  border: 0;
+  border-radius: 0.65rem;
+  background: var(--button-bg);
+  color: var(--button-text);
+  font-family: var(--font-label);
+  font-weight: 600;
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+.account-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.7rem 1.5rem rgb(0 0 0 / 0.15);
+}
+.account-submit .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+@keyframes account-enter {
+  from {
+    opacity: 0;
+    transform: translateY(1.4rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .skip-link {
   position: fixed;
   top: var(--space-md);
@@ -1037,6 +1306,16 @@ select:focus-visible {
   }
 }
 @media (max-width: 63.99rem) {
+  .account-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3.5rem;
+  }
+  .account-panel {
+    width: min(100%, 34rem);
+  }
+  .account-title {
+    font-size: clamp(3.5rem, 7vw, 5rem);
+  }
   .purchase-layout {
     grid-template-columns: minmax(0, 1fr);
     gap: 3rem;
@@ -1073,6 +1352,20 @@ select:focus-visible {
     border: 0;
     border-radius: 0;
     transform: none;
+  }
+  .account-page {
+    align-items: flex-start;
+    padding-block: 3rem 5rem;
+  }
+  .account-layout {
+    gap: 2.8rem;
+  }
+  .account-title {
+    font-size: clamp(3rem, 10vw, 4.5rem);
+  }
+  .account-intro-copy {
+    margin: 1.3rem 0 1.5rem;
+    font-size: 0.95rem;
   }
   .purchase-section {
     padding-block: 5rem;
@@ -1170,6 +1463,19 @@ select:focus-visible {
   }
 }
 @media (max-width: 37.5rem) {
+  .account-link {
+    width: var(--control-height);
+    padding: 0;
+  }
+  .account-link-label {
+    display: none;
+  }
+  .account-title {
+    font-size: clamp(2.75rem, 11vw, 4rem);
+  }
+  .account-panel {
+    padding: 0.45rem;
+  }
   .purchase-card {
     padding: 0.8rem;
   }
