@@ -45,6 +45,8 @@ const links = [
     ))}
   </div>
   <div class="nav-controls">
+    <LanguageSelector />
+    <ThemeToggle />
     <a
       class="account-link"
       href="/cuenta/"
@@ -53,12 +55,7 @@ const links = [
       aria-current={accountPage ? 'page' : undefined}
     >
       <Icon name="user" />
-      <span class="account-link-label" data-i18n="accountNav">
-        {en.accountNav}
-      </span>
     </a>
-    <LanguageSelector />
-    <ThemeToggle />
     <button
       type="button"
       class="menu-toggle"
