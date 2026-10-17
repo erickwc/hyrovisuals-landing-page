@@ -303,16 +303,12 @@ select:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
-  min-height: var(--control-height);
-  padding-inline: 0.85rem;
+  width: var(--control-height);
+  height: var(--control-height);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  background: var(--purchase-note);
-  font-family: var(--font-label);
-  font-size: var(--text-small);
-  font-weight: 600;
-  white-space: nowrap;
+  background: transparent;
+  color: var(--text);
   transition:
     border-color var(--duration-fast),
     background-color var(--duration-fast);
@@ -1112,9 +1108,13 @@ select:focus-visible {
   font-family: var(--font-title);
   font-size: clamp(3.5rem, 5.8vw, 6rem);
   font-weight: 400;
-  letter-spacing: -0.06em;
+  letter-spacing: 0.03em;
   line-height: 0.98;
   white-space: nowrap;
+}
+.account-title .gradient-text {
+  --gradient-tail-start: 45%;
+  justify-self: start;
 }
 .account-intro-copy {
   max-width: 29rem;
@@ -1139,18 +1139,15 @@ select:focus-visible {
   transform: rotate(180deg);
 }
 .account-panel {
-  padding: 0.65rem;
+  padding: clamp(1.4rem, 3vw, 2.35rem);
   border: 1px solid var(--purchase-gold);
   border-radius: 1.8rem;
-  background: var(--purchase-frame);
+  background: var(--purchase-card);
   box-shadow: var(--purchase-shadow);
   animation: account-enter 0.75s 0.1s var(--ease-out) both;
 }
 .account-panel-inner {
-  padding: clamp(1.3rem, 2.4vw, 1.7rem);
-  border: 1px solid var(--purchase-line);
-  border-radius: 1.3rem;
-  background: var(--purchase-card);
+  padding: 0;
 }
 .account-tabs {
   display: grid;
@@ -1463,18 +1460,11 @@ select:focus-visible {
   }
 }
 @media (max-width: 37.5rem) {
-  .account-link {
-    width: var(--control-height);
-    padding: 0;
-  }
-  .account-link-label {
-    display: none;
-  }
   .account-title {
     font-size: clamp(2.75rem, 11vw, 4rem);
   }
   .account-panel {
-    padding: 0.45rem;
+    padding: 1.35rem;
   }
   .purchase-card {
     padding: 0.8rem;
