@@ -49,10 +49,18 @@ export function initPreferences(onLanguage: () => void) {
     dictionary = lang === 'es' ? es : en;
     document.documentElement.lang = lang!;
     select.value = lang!;
-    document.title = dictionary.pageTitle;
+    const accountPage = document.body.dataset.page === 'account';
+    document.title = accountPage
+      ? dictionary.accountPageTitle
+      : dictionary.pageTitle;
     document
       .querySelector('meta[name="description"]')
-      ?.setAttribute('content', dictionary.metaDescription);
+      ?.setAttribute(
+        'content',
+        accountPage
+          ? dictionary.accountMetaDescription
+          : dictionary.metaDescription,
+      );
     document.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
       const key = el.dataset.i18n as Key;
       if (key in dictionary) el.textContent = dictionary[key];

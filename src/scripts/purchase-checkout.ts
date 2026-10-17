@@ -3,14 +3,14 @@ export function initPurchaseCheckout() {
     '[data-checkout-open]',
   );
   const dialog = document.querySelector<HTMLDialogElement>('.checkout-dialog');
-  const frame = dialog?.querySelector<HTMLIFrameElement>(
-    '.checkout-dialog-frame',
+  const continueLink = dialog?.querySelector<HTMLAnchorElement>(
+    '[data-checkout-continue]',
   );
   const closeButton = dialog?.querySelector<HTMLButtonElement>(
     '[data-checkout-close]',
   );
 
-  if (!trigger || !dialog || !frame || !closeButton || !dialog.showModal)
+  if (!trigger || !dialog || !continueLink || !closeButton || !dialog.showModal)
     return () => {};
 
   const controller = new AbortController();
@@ -29,26 +29,29 @@ export function initPurchaseCheckout() {
         return;
 
       event.preventDefault();
-      dialog.classList.remove('is-ready');
       dialog.showModal();
-      frame.src = trigger.href;
     },
     { signal },
   );
 
   closeButton.addEventListener('click', () => dialog.close(), { signal });
-  frame.addEventListener(
-    'load',
-    () => {
-      if (dialog.open) dialog.classList.add('is-ready');
+  continueLink.addEventListener(
+    'click',
+    (event) => {
+      const widgetButton = document.querySelector<HTMLButtonElement>(
+        '.wompi_button_widget > button',
+      );
+      if (!widgetButton) return;
+
+      event.preventDefault();
+      dialog.close();
+      widgetButton.click();
     },
     { signal },
   );
   dialog.addEventListener(
     'close',
     () => {
-      frame.removeAttribute('src');
-      dialog.classList.remove('is-ready');
       trigger.focus();
     },
     { signal },

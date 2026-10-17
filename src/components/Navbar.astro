@@ -3,6 +3,10 @@ import LanguageSelector from './LanguageSelector.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import Icon from './Icon.astro';
 import en from '../i18n/en.json';
+interface Props {
+  accountPage?: boolean;
+}
+const { accountPage = false } = Astro.props;
 const links = [
   ['inicio', 'navHome'],
   ['personalizacion', 'navCustomize'],
@@ -18,7 +22,7 @@ const links = [
   data-i18n-aria="navigation"
 >
   <a
-    href="#inicio"
+    href={accountPage ? '/#inicio' : '#inicio'}
     class="brand"
     aria-label={en.brandHome}
     data-i18n-aria="brandHome"
@@ -35,7 +39,7 @@ const links = [
   </a>
   <div class="nav-links" id="navigation-links">
     {links.map(([id, key]) => (
-      <a href={`#${id}`} data-i18n={key}>
+      <a href={`${accountPage ? '/' : ''}#${id}`} data-i18n={key}>
         {en[key]}
       </a>
     ))}
@@ -43,6 +47,15 @@ const links = [
   <div class="nav-controls">
     <LanguageSelector />
     <ThemeToggle />
+    <a
+      class="account-link"
+      href="/cuenta/"
+      aria-label={en.accountNav}
+      data-i18n-aria="accountNav"
+      aria-current={accountPage ? 'page' : undefined}
+    >
+      <Icon name="user" />
+    </a>
     <button
       type="button"
       class="menu-toggle"
