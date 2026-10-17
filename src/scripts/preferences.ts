@@ -49,17 +49,17 @@ export function initPreferences(onLanguage: () => void) {
     dictionary = lang === 'es' ? es : en;
     document.documentElement.lang = lang!;
     select.value = lang!;
-    const accountPage = document.body.dataset.page === 'account';
-    document.title = accountPage
+    const page = document.body.dataset.page;
+    document.title = page === 'account'
       ? dictionary.accountPageTitle
-      : dictionary.pageTitle;
+      : page === 'admin' ? dictionary.adminPageTitle : dictionary.pageTitle;
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute(
         'content',
-        accountPage
+        page === 'account'
           ? dictionary.accountMetaDescription
-          : dictionary.metaDescription,
+          : page === 'admin' ? dictionary.adminMetaDescription : dictionary.metaDescription,
       );
     document.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
       const key = el.dataset.i18n as Key;

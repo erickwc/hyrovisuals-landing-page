@@ -1,0 +1,30 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import en from '../../i18n/en.json';
+---
+
+<Layout page="admin">
+  <a class="skip-link" href="#main" data-i18n="skip">{en.skip}</a>
+  <header class="site-header"><Navbar accountPage /></header>
+  <main id="main" class="admin-page page-shell" data-admin-root>
+    <div class="admin-heading">
+      <div>
+        <p class="account-eyebrow"><span class="account-eyebrow-dot" aria-hidden="true"></span><span data-i18n="adminEyebrow">{en.adminEyebrow}</span></p>
+        <h1 data-i18n="adminTitle">{en.adminTitle}</h1>
+        <p data-i18n="adminDescription">{en.adminDescription}</p>
+      </div>
+      <a class="account-back" href="/cuenta/" data-i18n="adminBack">{en.adminBack}</a>
+    </div>
+    <section class="admin-panel" aria-live="polite">
+      <p data-admin-status data-i18n="adminLoading">{en.adminLoading}</p>
+      <div data-admin-content hidden>
+        <div class="admin-summary">
+          <h2 data-i18n="adminCustomers">{en.adminCustomers}</h2>
+          <p data-admin-count></p>
+        </div>
+        <div class="admin-customer-list" data-admin-list></div>
+      </div>
+    </section>
+  </main>
+</Layout>

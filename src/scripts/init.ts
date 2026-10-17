@@ -8,15 +8,16 @@ import { initCarousel } from './carousel';
 import { initPurchaseReflection } from './purchase-reflection';
 import { initPurchaseCheckout } from './purchase-checkout';
 import { initAccountPage } from './account';
+import { initAdminPage } from './admin';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 let cleanup = () => {};
 async function init() {
   cleanup();
-  if (document.body.dataset.page === 'account') {
+  if (document.body.dataset.page === 'account' || document.body.dataset.page === 'admin') {
     const stopPreferences = initPreferences(() => {
       document.dispatchEvent(new Event('hyro:language'));
     });
-    const stopAccount = initAccountPage();
+    const stopAccount = document.body.dataset.page === 'admin' ? initAdminPage() : initAccountPage();
     cleanup = () => {
       stopAccount();
       stopPreferences();

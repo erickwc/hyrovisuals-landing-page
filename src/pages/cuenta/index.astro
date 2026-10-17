@@ -87,7 +87,7 @@ import en from '../../i18n/en.json';
             >
               {en.accountRegisterDescription}
             </p>
-            <form class="account-form" autocomplete="on">
+            <form class="account-form" data-auth-form="register" autocomplete="on">
               <div class="account-field">
                 <label for="register-name" data-i18n="accountName">
                   {en.accountName}
@@ -97,6 +97,8 @@ import en from '../../i18n/en.json';
                   name="name"
                   type="text"
                   autocomplete="name"
+                  maxlength="120"
+                  required
                 />
               </div>
               <div class="account-field">
@@ -108,6 +110,7 @@ import en from '../../i18n/en.json';
                   name="email"
                   type="email"
                   autocomplete="email"
+                  required
                 />
               </div>
               <div class="account-field">
@@ -120,6 +123,8 @@ import en from '../../i18n/en.json';
                     name="password"
                     type="password"
                     autocomplete="new-password"
+                    minlength="8"
+                    required
                   />
                   <button
                     type="button"
@@ -143,6 +148,8 @@ import en from '../../i18n/en.json';
                     name="confirmPassword"
                     type="password"
                     autocomplete="new-password"
+                    minlength="8"
+                    required
                   />
                   <button
                     type="button"
@@ -155,7 +162,7 @@ import en from '../../i18n/en.json';
               </div>
               <button
                 class="account-submit"
-                type="button"
+                type="submit"
                 data-auth-action="register"
               >
                 <span data-i18n="accountRegisterAction">
@@ -178,7 +185,7 @@ import en from '../../i18n/en.json';
             <p class="account-panel-copy" data-i18n="accountLoginDescription">
               {en.accountLoginDescription}
             </p>
-            <form class="account-form" autocomplete="on">
+            <form class="account-form" data-auth-form="login" autocomplete="on">
               <div class="account-field">
                 <label for="login-email" data-i18n="accountEmail">
                   {en.accountEmail}
@@ -188,6 +195,7 @@ import en from '../../i18n/en.json';
                   name="email"
                   type="email"
                   autocomplete="email"
+                  required
                 />
               </div>
               <div class="account-field">
@@ -200,6 +208,7 @@ import en from '../../i18n/en.json';
                     name="password"
                     type="password"
                     autocomplete="current-password"
+                    required
                   />
                   <button
                     type="button"
@@ -212,7 +221,7 @@ import en from '../../i18n/en.json';
               </div>
               <button
                 class="account-submit"
-                type="button"
+                type="submit"
                 data-auth-action="login"
               >
                 <span data-i18n="accountLoginAction">
@@ -221,6 +230,16 @@ import en from '../../i18n/en.json';
                 <Icon name="arrow" />
               </button>
             </form>
+          </div>
+          <p class="account-status" data-auth-status role="status" aria-live="polite" hidden></p>
+          <div class="account-signed-in" data-auth-signed-in hidden>
+            <h2 data-i18n="accountSignedInTitle">{en.accountSignedInTitle}</h2>
+            <p data-i18n="accountSignedInDescription">{en.accountSignedInDescription}</p>
+            <p class="account-user-email" data-auth-email></p>
+            <a class="account-admin-link" href="/admin/" data-auth-admin-link hidden data-i18n="accountAdminLink">{en.accountAdminLink}</a>
+            <button class="account-submit" type="button" data-auth-signout>
+              <span data-i18n="accountSignOut">{en.accountSignOut}</span>
+            </button>
           </div>
         </div>
       </section>
