@@ -7,10 +7,23 @@ import { initAnimations } from './animations';
 import { initCarousel } from './carousel';
 import { initPurchaseReflection } from './purchase-reflection';
 import { initPurchaseCheckout } from './purchase-checkout';
+import { initAccountPage } from './account';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 let cleanup = () => {};
 async function init() {
   cleanup();
+  if (document.body.dataset.page === 'account') {
+    const stopPreferences = initPreferences(() => {
+      document.dispatchEvent(new Event('hyro:language'));
+    });
+    const stopAccount = initAccountPage();
+    cleanup = () => {
+      stopAccount();
+      stopPreferences();
+    };
+    document.documentElement.dataset.hyroReady = 'true';
+    return;
+  }
   let cancelled = false;
   let stopAnimations = () => {};
   let stopCarousel = () => {};

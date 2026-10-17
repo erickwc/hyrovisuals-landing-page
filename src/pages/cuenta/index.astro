@@ -1,0 +1,227 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Icon from '../../components/Icon.astro';
+import en from '../../i18n/en.json';
+---
+
+<Layout page="account">
+  <a class="skip-link" href="#main" data-i18n="skip">
+    {en.skip}
+  </a>
+  <header class="site-header">
+    <Navbar accountPage />
+  </header>
+  <main id="main" class="account-page">
+    <div class="account-layout page-shell">
+      <div class="account-intro">
+        <p class="account-eyebrow">
+          <span class="account-eyebrow-dot" aria-hidden="true"></span>
+          <span data-i18n="accountEyebrow">{en.accountEyebrow}</span>
+        </p>
+        <h1 class="account-title">
+          <span data-i18n="accountTitleFirst">{en.accountTitleFirst}</span>
+          <span class="gradient-text" data-i18n="accountTitleSecond">
+            {en.accountTitleSecond}
+          </span>
+        </h1>
+        <p class="account-intro-copy" data-i18n="accountIntro">
+          {en.accountIntro}
+        </p>
+        <a class="account-back" href="/">
+          <Icon name="arrow" />
+          <span data-i18n="accountBack">{en.accountBack}</span>
+        </a>
+      </div>
+
+      <section
+        class="account-panel"
+        aria-label={en.accountNav}
+        data-i18n-aria="accountNav"
+      >
+        <div class="account-panel-inner" data-auth-root>
+          <div
+            class="account-tabs"
+            role="tablist"
+            aria-label={en.accountNav}
+            data-i18n-aria="accountNav"
+          >
+            <button
+              id="account-register-tab"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="account-register-panel"
+              data-auth-tab="register"
+              data-i18n="accountTabRegister"
+            >
+              {en.accountTabRegister}
+            </button>
+            <button
+              id="account-login-tab"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="account-login-panel"
+              tabindex="-1"
+              data-auth-tab="login"
+              data-i18n="accountTabLogin"
+            >
+              {en.accountTabLogin}
+            </button>
+          </div>
+
+          <div
+            id="account-register-panel"
+            class="account-tab-panel"
+            role="tabpanel"
+            aria-labelledby="account-register-tab"
+            data-auth-panel="register"
+          >
+            <h2 data-i18n="accountRegisterTitle">{en.accountRegisterTitle}</h2>
+            <p
+              class="account-panel-copy"
+              data-i18n="accountRegisterDescription"
+            >
+              {en.accountRegisterDescription}
+            </p>
+            <form class="account-form" autocomplete="on">
+              <div class="account-field">
+                <label for="register-name" data-i18n="accountName">
+                  {en.accountName}
+                </label>
+                <input
+                  id="register-name"
+                  name="name"
+                  type="text"
+                  autocomplete="name"
+                />
+              </div>
+              <div class="account-field">
+                <label for="register-email" data-i18n="accountEmail">
+                  {en.accountEmail}
+                </label>
+                <input
+                  id="register-email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                />
+              </div>
+              <div class="account-field">
+                <label for="register-password" data-i18n="accountPassword">
+                  {en.accountPassword}
+                </label>
+                <div class="account-password-field">
+                  <input
+                    id="register-password"
+                    name="password"
+                    type="password"
+                    autocomplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    data-password-toggle
+                    aria-label={en.accountShowPassword}
+                  >
+                    <Icon name="eye" />
+                  </button>
+                </div>
+              </div>
+              <div class="account-field">
+                <label
+                  for="register-confirm"
+                  data-i18n="accountConfirmPassword"
+                >
+                  {en.accountConfirmPassword}
+                </label>
+                <div class="account-password-field">
+                  <input
+                    id="register-confirm"
+                    name="confirmPassword"
+                    type="password"
+                    autocomplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    data-password-toggle
+                    aria-label={en.accountShowPassword}
+                  >
+                    <Icon name="eye" />
+                  </button>
+                </div>
+              </div>
+              <button
+                class="account-submit"
+                type="button"
+                data-auth-action="register"
+              >
+                <span data-i18n="accountRegisterAction">
+                  {en.accountRegisterAction}
+                </span>
+                <Icon name="arrow" />
+              </button>
+            </form>
+          </div>
+
+          <div
+            id="account-login-panel"
+            class="account-tab-panel"
+            role="tabpanel"
+            aria-labelledby="account-login-tab"
+            data-auth-panel="login"
+            hidden
+          >
+            <h2 data-i18n="accountLoginTitle">{en.accountLoginTitle}</h2>
+            <p class="account-panel-copy" data-i18n="accountLoginDescription">
+              {en.accountLoginDescription}
+            </p>
+            <form class="account-form" autocomplete="on">
+              <div class="account-field">
+                <label for="login-email" data-i18n="accountEmail">
+                  {en.accountEmail}
+                </label>
+                <input
+                  id="login-email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                />
+              </div>
+              <div class="account-field">
+                <label for="login-password" data-i18n="accountPassword">
+                  {en.accountPassword}
+                </label>
+                <div class="account-password-field">
+                  <input
+                    id="login-password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    data-password-toggle
+                    aria-label={en.accountShowPassword}
+                  >
+                    <Icon name="eye" />
+                  </button>
+                </div>
+              </div>
+              <button
+                class="account-submit"
+                type="button"
+                data-auth-action="login"
+              >
+                <span data-i18n="accountLoginAction">
+                  {en.accountLoginAction}
+                </span>
+                <Icon name="arrow" />
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>
