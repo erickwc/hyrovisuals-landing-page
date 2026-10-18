@@ -6,20 +6,18 @@ import { initPreferences } from './preferences';
 import { initAnimations } from './animations';
 import { initCarousel } from './carousel';
 import { initPurchaseReflection } from './purchase-reflection';
+import { initPurchaseCheckout } from './purchase-checkout';
 import { initAccountPage } from './account';
 import { initAdminPage } from './admin';
-import { initPurchaseCheckout } from './purchase-checkout';
-import { initLibraryPage } from './library';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 let cleanup = () => {};
 async function init() {
   cleanup();
-  if (['account', 'admin', 'library'].includes(document.body.dataset.page ?? '')) {
+  if (document.body.dataset.page === 'account' || document.body.dataset.page === 'admin') {
     const stopPreferences = initPreferences(() => {
       document.dispatchEvent(new Event('hyro:language'));
     });
-    const stopAccount = document.body.dataset.page === 'admin' ? initAdminPage()
-      : document.body.dataset.page === 'library' ? initLibraryPage() : initAccountPage();
+    const stopAccount = document.body.dataset.page === 'admin' ? initAdminPage() : initAccountPage();
     cleanup = () => {
       stopAccount();
       stopPreferences();

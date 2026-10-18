@@ -4,7 +4,7 @@ import '@fontsource-variable/inter';
 import '@fontsource-variable/space-grotesk';
 import en from '../i18n/en.json';
 interface Props {
-  page?: 'home' | 'account' | 'admin' | 'library';
+  page?: 'home' | 'account' | 'admin';
 }
 const { page = 'home' } = Astro.props;
 ---
@@ -17,10 +17,10 @@ const { page = 'home' } = Astro.props;
     <meta
       name="description"
       content={
-        page === 'account' || page === 'library' ? en.accountMetaDescription : page === 'admin' ? en.adminMetaDescription : en.metaDescription
+        page === 'account' ? en.accountMetaDescription : page === 'admin' ? en.adminMetaDescription : en.metaDescription
       }
     />
-    <title>{page === 'library' ? 'Mi biblioteca | HYRO' : page === 'account' ? en.accountPageTitle : page === 'admin' ? en.adminPageTitle : en.pageTitle}</title>
+    <title>{page === 'account' ? en.accountPageTitle : page === 'admin' ? en.adminPageTitle : en.pageTitle}</title>
     <script is:inline>
       try {
         const t = localStorage.getItem('hyro-theme');
