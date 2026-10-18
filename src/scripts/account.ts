@@ -158,6 +158,7 @@ export function initAccountPage() {
       if (result.session && result.user) {
         showUser(result.user.email ?? email);
         void showAdminLink(result.user.id);
+        if (new URLSearchParams(location.search).get('continuar') === 'compra') location.assign('/#compra');
       }
       else setStatus('accountCheckEmail');
     } catch {
@@ -183,6 +184,7 @@ export function initAccountPage() {
       loginForm.reset();
       showUser(result.user.email ?? null);
       void showAdminLink(result.user.id);
+      if (new URLSearchParams(location.search).get('continuar') === 'compra') location.assign('/#compra');
     } catch {
       setStatus('accountLoginError');
     } finally {
