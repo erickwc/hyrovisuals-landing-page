@@ -1592,7 +1592,6 @@ select:focus-visible {
   border-top: 1px solid var(--purchase-line);
 }
 .library-layout {
-  width: 100%;
   grid-template-columns: minmax(0, 1fr);
   gap: clamp(2rem, 4vw, 3rem);
   padding-block: clamp(1.5rem, 4vw, 3.5rem);
