@@ -37,9 +37,21 @@ export function initLibraryPage() {
     for (const license of licenses) {
       const card = document.createElement('article');
       card.className = 'library-product';
+      const artwork = document.createElement('img');
+      artwork.className = 'library-product-artwork';
+      artwork.src = '/media/poster.jpg';
+      artwork.alt = 'Vista previa de los visualizadores de HYRO Visuals';
+      artwork.width = 112;
+      artwork.height = 112;
+      const details = document.createElement('div');
+      details.className = 'library-product-details';
+      const category = document.createElement('p');
+      category.className = 'library-product-category';
+      category.textContent = 'APP DE ESCRITORIO';
       const heading = document.createElement('h3');
       heading.textContent = license.products?.name ?? 'HYRO Visuals';
       const keyLabel = document.createElement('p');
+      keyLabel.className = 'library-product-key';
       keyLabel.textContent = 'Clave de licencia: •••••';
       keyLabel.setAttribute('aria-live', 'polite');
       const actions = document.createElement('div');
@@ -53,7 +65,7 @@ export function initLibraryPage() {
       };
       const reveal = document.createElement('button');
       reveal.type = 'button';
-      reveal.className = 'account-submit';
+      reveal.className = 'library-pill';
       reveal.textContent = 'Mostrar clave';
       let visible = false;
       reveal.addEventListener('click', async () => {
@@ -74,7 +86,7 @@ export function initLibraryPage() {
       actions.append(reveal);
       const copy = document.createElement('button');
       copy.type = 'button';
-      copy.className = 'account-submit';
+      copy.className = 'library-pill';
       copy.textContent = 'Copiar clave';
       copy.addEventListener('click', async () => {
         copy.disabled = true;
@@ -90,7 +102,7 @@ export function initLibraryPage() {
       for (const build of ownedBuilds) {
         const download = document.createElement('button');
         download.type = 'button';
-        download.className = 'account-submit';
+        download.className = 'library-pill library-pill-download';
         download.textContent = `Descargar para ${build.platform === 'macos' ? 'Mac' : 'Windows'}`;
         download.addEventListener('click', async () => {
           download.disabled = true;
@@ -120,13 +132,14 @@ export function initLibraryPage() {
         actions.append(download);
       }
       const note = document.createElement('p');
-      note.className = 'account-panel-copy';
+      note.className = 'library-product-note';
       note.textContent = buildError
         ? 'No pudimos cargar las descargas. Actualiza esta página para intentarlo de nuevo.'
         : ownedBuilds.length
         ? 'Versión de prueba. Podrás volver a descargarla desde tu biblioteca.'
         : 'El instalador estará disponible aquí cuando publiquemos una versión.';
-      card.append(heading, keyLabel, actions, note);
+      details.append(category, heading, keyLabel, actions, note);
+      card.append(artwork, details);
       list?.append(card);
     }
     if (new URLSearchParams(location.search).has('compra')) history.replaceState(null, '', location.pathname);
