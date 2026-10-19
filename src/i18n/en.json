@@ -107,5 +107,9 @@
 "adminSaved": "Role updated.",
 "adminSaveError": "We couldn't update the role. Please try again.",
 "adminPurchases": "Purchased products",
-"adminNoPurchases": "No paid purchases yet."
+"adminNoPurchases": "No paid purchases yet.",
+"adminTransfer": "Release device",
+"adminTransferReason": "Reason for the transfer (at least 5 characters):",
+"adminTransferDone": "Device released. The customer can activate another one.",
+"adminTransferError": "We couldn't release the device. Check the reason and try again."
 }

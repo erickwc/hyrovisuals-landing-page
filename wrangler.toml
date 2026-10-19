@@ -1,0 +1,11 @@
+name = "byhyro"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-10-17"
+
+[vars]
+PUBLIC_SUPABASE_URL = "https://vvotpvgnzktrxsquztpq.supabase.co"
+PUBLIC_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_sK-akhai6qXf3s3uhFRGMA_VI81cBli"
+
+[[r2_buckets]]
+binding = "HYRO_INSTALLERS"
+bucket_name = "hyro-installers-private"

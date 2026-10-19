@@ -5,6 +5,8 @@ import { supabase } from '../lib/supabase';
 type Role = 'customer' | 'admin';
 type Purchase = {
   order_id: string;
+  license_id: string | null;
+  device_active: boolean;
   product_name: string;
   paid_at: string | null;
   amount_cents: number;
@@ -115,6 +117,30 @@ export function initAdminPage() {
           const item = el('li', '');
           item.append(el('span', '', purchase.product_name));
           item.append(el('small', '', date(purchase.paid_at)));
+          if (purchase.license_id && purchase.device_active) {
+            const transfer = el('button', 'admin-save', w.adminTransfer) as HTMLButtonElement;
+            transfer.type = 'button';
+            transfer.addEventListener('click', async () => {
+              if (!supabase || !purchase.license_id) return;
+              const reason = window.prompt(w.adminTransferReason);
+              if (!reason) return;
+              transfer.disabled = true;
+              const { error } = await supabase.rpc('admin_transfer_license', {
+                p_license_id: purchase.license_id,
+                p_reason: reason,
+              });
+              if (signal.aborted) return;
+              if (error) {
+                setMessage('adminTransferError');
+                transfer.disabled = false;
+              } else {
+                purchase.device_active = false;
+                setMessage('adminTransferDone');
+                render();
+              }
+            }, { signal });
+            item.append(transfer);
+          }
           purchaseList.append(item);
         });
         purchases.append(purchaseList);

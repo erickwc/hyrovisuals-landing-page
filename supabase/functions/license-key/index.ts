@@ -5,7 +5,8 @@ const corsOrigin = (origin: string | null) =>
     ? origin : 'https://byhyro.com';
 const response = (origin: string, status: number, body: object) => new Response(JSON.stringify(body), {
   status, headers: { 'content-type': 'application/json', 'access-control-allow-origin': origin,
-    'access-control-allow-headers': 'authorization, apikey, content-type', 'vary': 'Origin',
+    'access-control-allow-headers': 'authorization, apikey, content-type, x-client-info',
+    'access-control-allow-methods': 'POST, OPTIONS', 'vary': 'Origin',
     'cache-control': 'no-store' },
 });
 

@@ -3,6 +3,19 @@ export {};
 declare const Deno: { env: { get(name: string): string | undefined }; serve(handler: (request: Request) => Promise<Response>): void };
 const encoder = new TextEncoder();
 const hex = (bytes: Uint8Array) => [...bytes].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+const newLicenseKey = () => {
+  const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let characters = '';
+  while (characters.length < 20) {
+    const random = crypto.getRandomValues(new Uint8Array(32));
+    for (const value of random) {
+      // Discard the high tail so every character has the same probability.
+      if (value < 248) characters += alphabet[value % alphabet.length];
+      if (characters.length === 20) break;
+    }
+  }
+  return characters.match(/.{5}/g)!.join('-');
+};
 const json = (status: number, body: object) => new Response(JSON.stringify(body), {
   status, headers: { 'content-type': 'application/json' },
 });
@@ -45,7 +58,9 @@ Deno.serve(async (request: Request) => {
   const items = payload.items;
   if (!Array.isArray(items) || items.length !== 1 || items[0]?.product_key !== 'X6ucD' ||
       Number(items[0]?.quantity) !== 1 || payload.currency !== 'USD' ||
-      !Number.isInteger(payload.price) || Number(payload.price) < 0) {
+      !Number.isInteger(payload.price) || Number(payload.price) < 0 ||
+      typeof payload.email !== 'string' || payload.email.length > 320 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
     return json(422, { error: 'unexpected_product' });
   }
   const metadata = payload.metadata;
@@ -60,11 +75,7 @@ Deno.serve(async (request: Request) => {
     if (keyBytes.length !== 32) throw new Error('invalid key length');
     aesKey = await crypto.subtle.importKey('raw', keyBytes, 'AES-GCM', false, ['encrypt']);
   } catch { return json(503, { error: 'server_not_configured' }); }
-  const random = crypto.getRandomValues(new Uint8Array(20));
-  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const groups = Array.from({ length: 5 }, (_, group) =>
-    [...random.slice(group * 4, group * 4 + 4)].map((value) => alphabet[value % alphabet.length]).join(''));
-  const licenseKey = groups.join('-');
+  const licenseKey = newLicenseKey();
   const nonce = crypto.getRandomValues(new Uint8Array(12));
   const ciphertext = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: nonce }, aesKey, encoder.encode(licenseKey)));
   const keyHash = new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(licenseKey)));
@@ -73,6 +84,7 @@ Deno.serve(async (request: Request) => {
     p_amount_cents: payload.price, p_currency: 'USD',
     p_key_hash: `\\x${hex(keyHash)}`, p_key_ciphertext: `\\x${hex(ciphertext)}`,
     p_key_nonce: `\\x${hex(nonce)}`,
+    p_buyer_email: payload.email,
   });
   if (!response.ok) return json(500, { error: 'purchase_processing_failed' });
   return json(200, { received: true });

@@ -107,5 +107,9 @@
 "adminSaved": "Rol actualizado.",
 "adminSaveError": "No pudimos actualizar el rol. Inténtalo de nuevo.",
 "adminPurchases": "Productos comprados",
-"adminNoPurchases": "Todavía no tiene compras pagadas."
+"adminNoPurchases": "Todavía no tiene compras pagadas.",
+"adminTransfer": "Liberar equipo",
+"adminTransferReason": "Motivo de la transferencia (mínimo 5 caracteres):",
+"adminTransferDone": "Equipo liberado. El cliente puede activar otro.",
+"adminTransferError": "No pudimos liberar el equipo. Revisa el motivo e inténtalo de nuevo."
 }

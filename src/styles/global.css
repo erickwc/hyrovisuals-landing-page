@@ -1590,6 +1590,11 @@ select:focus-visible {
   border-top: 1px solid currentColor;
 }
 
+.library-actions {
+  display: grid;
+  gap: 0.8rem;
+}
+
 .library-product h3,
 .library-product p {
   margin: 0;
