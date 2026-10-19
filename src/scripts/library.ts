@@ -24,11 +24,11 @@ export function initLibraryPage() {
     const licenses = (data ?? []) as unknown as License[];
     if (!licenses.length) {
       say(new URLSearchParams(location.search).has('compra')
-        ? 'Gracias por tu compra. Esperamos la confirmación de Payhip; esta página se actualizará automáticamente.'
-        : 'Todavía no tienes compras confirmadas.');
+        ? 'Preparando tu biblioteca…'
+        : 'Todavía no tienes productos en tu biblioteca.');
       return false;
     }
-    const { data: buildData } = await client.from('product_builds')
+    const { data: buildData, error: buildError } = await client.from('product_builds')
       .select('id,product_id,platform,file_name').eq('is_active', true);
     if (controller.signal.aborted) return false;
     const builds = (buildData ?? []) as Build[];
@@ -121,12 +121,15 @@ export function initLibraryPage() {
       }
       const note = document.createElement('p');
       note.className = 'account-panel-copy';
-      note.textContent = ownedBuilds.length
+      note.textContent = buildError
+        ? 'No pudimos cargar las descargas. Actualiza esta página para intentarlo de nuevo.'
+        : ownedBuilds.length
         ? 'Versión de prueba. Podrás volver a descargarla desde tu biblioteca.'
         : 'El instalador estará disponible aquí cuando publiquemos una versión.';
       card.append(heading, keyLabel, actions, note);
       list?.append(card);
     }
+    if (new URLSearchParams(location.search).has('compra')) history.replaceState(null, '', location.pathname);
     return true;
   };
   void (async () => {
@@ -134,6 +137,9 @@ export function initLibraryPage() {
     for (let attempt = 0; attempt < 20 && !controller.signal.aborted; attempt++) {
       await new Promise<void>((resolve) => setTimeout(resolve, 6000));
       if (controller.signal.aborted || await load()) break;
+    }
+    if (!controller.signal.aborted && !list?.children.length) {
+      say('Aún no vemos esta compra en tu biblioteca. Si acabas de pagar, vuelve a abrirla en unos minutos.');
     }
   })();
   return () => controller.abort();
