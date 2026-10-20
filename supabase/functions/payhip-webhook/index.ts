@@ -56,6 +56,14 @@ Deno.serve(async (request: Request) => {
   }
   if (payload.type !== 'paid') return json(200, { ignored: true });
   const items = payload.items;
+  const paidAt = Number(payload.date);
+  if (Number.isFinite(paidAt) && paidAt > 0) {
+    console.info(JSON.stringify({
+      event: 'payhip_paid_received',
+      product_kind: Array.isArray(items) && items.some((item) => item?.product_key === 'X6ucD') ? 'hyro' : 'other',
+      delivery_lag_seconds: Math.max(0, Math.round(Date.now() / 1000 - paidAt)),
+    }));
+  }
   if (Array.isArray(items) && items.length > 0 &&
       items.every((item) => item?.product_key !== 'X6ucD')) {
     return json(200, { ignored: 'other_product' });
@@ -72,10 +80,6 @@ Deno.serve(async (request: Request) => {
     ? (metadata as Record<string, unknown>).hyro_intent : null;
   if (typeof intent !== 'string' || !/^[0-9a-f-]{36}$/i.test(intent)) {
     return json(422, { error: 'missing_purchase_intent' });
-  }
-  const paidAt = Number(payload.date);
-  if (Number.isFinite(paidAt) && paidAt > 0) {
-    console.info(JSON.stringify({ event: 'payhip_paid_received', delivery_lag_seconds: Math.max(0, Math.round(Date.now() / 1000 - paidAt)) }));
   }
   let aesKey: CryptoKey;
   try {
