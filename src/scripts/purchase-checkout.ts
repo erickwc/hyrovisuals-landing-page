@@ -4,6 +4,11 @@ export function initPurchaseCheckout() {
   const button = document.querySelector<HTMLAnchorElement>('[data-payhip-checkout]');
   const status = document.querySelector<HTMLElement>('[data-payhip-status]');
   if (!button) return () => {};
+  const repeatTest = new URL(location.href).searchParams.get('prueba-compra') === '1';
+  if (repeatTest && status) {
+    status.hidden = false;
+    status.textContent = 'Prueba de recompra: aplica el cupón del 100 % en Payhip y comprueba que el total sea $0 antes de confirmar.';
+  }
   const controller = new AbortController();
   button.addEventListener('click', async (event) => {
     event.preventDefault();
@@ -22,11 +27,18 @@ export function initPurchaseCheckout() {
       if (productError || !product) throw new Error('product_unavailable');
       const { data: existing } = await supabase.from('licenses')
         .select('id').eq('product_id', product.id).eq('status', 'active').maybeSingle();
-      if (existing) { location.assign('/biblioteca/'); return; }
+      if (existing) {
+        if (!repeatTest) { location.assign('/biblioteca/'); return; }
+        const { data: profile, error: profileError } = await supabase.from('profiles')
+          .select('role').eq('id', userResult.user.id).single();
+        if (profileError || profile?.role !== 'admin') { location.assign('/biblioteca/'); return; }
+      }
       const { data: intent, error: intentError } = await supabase.from('purchase_intents')
         .insert({ user_id: userResult.user.id, product_id: product.id }).select('id').single();
       if (intentError || !intent) throw new Error('intent_unavailable');
       try { sessionStorage.setItem('hyro:checkout-product-id', product.id); } catch { /* Storage is optional. */ }
+      try { sessionStorage.setItem('hyro:checkout-intent-id', intent.id); }
+      catch { if (existing) throw new Error('repeat_test_needs_storage'); }
       const checkout = new URL(button.dataset.payhipUrl!);
       checkout.searchParams.set('metadata[hyro_intent]', intent.id);
       location.assign(checkout.href);

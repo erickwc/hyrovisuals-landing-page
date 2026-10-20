@@ -18,6 +18,11 @@ export function initPurchaseProcessing() {
       location.replace('/cuenta/?continuar=compra-pendiente');
       return;
     }
+    let intentId: string | null = null;
+    try {
+      const cached = sessionStorage.getItem('hyro:checkout-intent-id');
+      if (cached && /^[0-9a-f-]{36}$/i.test(cached)) intentId = cached;
+    } catch { /* Storage is optional for older checkouts. */ }
     let productId: string | null = null;
     try {
       const cached = sessionStorage.getItem('hyro:checkout-product-id');
@@ -37,17 +42,29 @@ export function initPurchaseProcessing() {
     const started = Date.now();
     let delayedNoticeShown = false;
     while (!controller.signal.aborted) {
-      const { data: license, error } = await client.from('licenses')
-        .select('id').eq('product_id', productId).eq('status', 'active').limit(1).maybeSingle();
+      let completed = false;
+      let queryFailed = false;
+      if (intentId) {
+        const { data: intent, error } = await client.from('purchase_intents')
+          .select('consumed_at').eq('id', intentId).maybeSingle();
+        completed = Boolean(intent?.consumed_at);
+        queryFailed = Boolean(error);
+      } else {
+        const { data: license, error } = await client.from('licenses')
+          .select('id').eq('product_id', productId).eq('status', 'active').limit(1).maybeSingle();
+        completed = Boolean(license);
+        queryFailed = Boolean(error);
+      }
       if (controller.signal.aborted) return;
-      if (license) {
+      if (completed) {
         try { sessionStorage.removeItem('hyro:checkout-product-id'); } catch { /* Storage is optional. */ }
+        try { sessionStorage.removeItem('hyro:checkout-intent-id'); } catch { /* Storage is optional. */ }
         location.replace('/biblioteca/?compra=confirmada');
         return;
       }
-      if (error) say('Estamos intentando consultar tu compra. Esta página seguirá comprobándola.');
+      if (queryFailed) say('Estamos intentando consultar tu compra. Esta página seguirá comprobándola.');
       const elapsed = Date.now() - started;
-      if (!error && elapsed < 90_000) say('Terminando de preparar tu producto…');
+      if (!queryFailed && elapsed < 90_000) say('Terminando de preparar tu producto…');
       if (!delayedNoticeShown && elapsed >= 90_000) {
         delayedNoticeShown = true;
         say('Está tardando más de lo habitual. Si recibiste el comprobante, conserva el número de pedido y no repitas el pago. Seguimos comprobándolo.');
