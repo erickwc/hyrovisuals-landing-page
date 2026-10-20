@@ -1583,6 +1583,21 @@ select:focus-visible {
   font-size: 0.85rem;
 }
 
+.library-purchase-notice:not([hidden]) {
+  display: block;
+  margin-bottom: 1.4rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--purchase-gold);
+  border-radius: 0.65rem;
+  color: var(--text);
+  background: color-mix(in srgb, var(--purchase-gold) 10%, transparent);
+  line-height: 1.5;
+}
+.library-purchase-notice[data-state="confirmed"] {
+  border-color: #79ba8e;
+  background: rgba(67, 151, 93, 0.11);
+}
+
 .library-product {
   display: grid;
   grid-template-columns: 7rem minmax(0, 1fr);

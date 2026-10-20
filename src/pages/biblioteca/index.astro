@@ -18,6 +18,7 @@ import Navbar from '../../components/Navbar.astro';
       </div>
       <section class="account-panel" aria-label="Productos comprados">
         <div class="account-panel-inner" data-library-root>
+          <div class="library-purchase-notice" data-purchase-notice role="status" aria-live="polite" hidden></div>
           <h2>Mis productos</h2>
           <p class="account-panel-copy" data-library-status role="status">Comprobando tus compras…</p>
           <div data-library-products></div>

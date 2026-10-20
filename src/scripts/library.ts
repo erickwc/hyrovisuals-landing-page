@@ -8,8 +8,19 @@ export function initLibraryPage() {
   if (!root) return () => {};
   const controller = new AbortController();
   const status = root.querySelector<HTMLElement>('[data-library-status]');
+  const purchaseNotice = root.querySelector<HTMLElement>('[data-purchase-notice]');
   const list = root.querySelector<HTMLElement>('[data-library-products]');
   const say = (message: string) => { if (status) status.textContent = message; };
+  const returningFromCheckout = new URLSearchParams(location.search).has('compra');
+  const purchaseState = (state: 'pending' | 'confirmed' | 'delayed', message: string) => {
+    if (!purchaseNotice) return;
+    purchaseNotice.hidden = false;
+    purchaseNotice.dataset.state = state;
+    purchaseNotice.textContent = message;
+  };
+  if (returningFromCheckout) {
+    purchaseState('pending', 'Estamos verificando tu pago con Payhip. Tu producto aparecerá aquí en cuanto se confirme; esta página se actualiza sola.');
+  }
 
   const load = async (): Promise<boolean> => {
     if (!supabase) { say('La cuenta no está configurada.'); return false; }
@@ -23,7 +34,7 @@ export function initLibraryPage() {
     if (error) { say('No pudimos cargar tus productos.'); return false; }
     const licenses = (data ?? []) as unknown as License[];
     if (!licenses.length) {
-      say(new URLSearchParams(location.search).has('compra')
+      say(returningFromCheckout
         ? 'Preparando tu biblioteca…'
         : 'Todavía no tienes productos en tu biblioteca.');
       return false;
@@ -33,6 +44,9 @@ export function initLibraryPage() {
     if (controller.signal.aborted) return false;
     const builds = (buildData ?? []) as Build[];
     say('Tus productos están disponibles en esta cuenta.');
+    if (returningFromCheckout) {
+      purchaseState('confirmed', 'Compra confirmada. HYRO Visuals ya está en tu biblioteca: puedes ver tu clave y descargar el instalador.');
+    }
     list?.replaceChildren();
     for (const license of licenses) {
       const card = document.createElement('article');
@@ -159,17 +173,19 @@ export function initLibraryPage() {
       card.append(artwork, details);
       list?.append(card);
     }
-    if (new URLSearchParams(location.search).has('compra')) history.replaceState(null, '', location.pathname);
+    if (returningFromCheckout) history.replaceState(null, '', location.pathname);
     return true;
   };
   void (async () => {
-    if (await load() || !new URLSearchParams(location.search).has('compra')) return;
-    for (let attempt = 0; attempt < 20 && !controller.signal.aborted; attempt++) {
-      await new Promise<void>((resolve) => setTimeout(resolve, 6000));
+    if (await load() || !returningFromCheckout) return;
+    for (let attempt = 0; attempt < 33 && !controller.signal.aborted; attempt++) {
+      const delay = attempt < 15 ? 2000 : attempt < 23 ? 4000 : 6000;
+      await new Promise<void>((resolve) => setTimeout(resolve, delay));
       if (controller.signal.aborted || await load()) break;
     }
     if (!controller.signal.aborted && !list?.children.length) {
-      say('Aún no vemos esta compra en tu biblioteca. Si acabas de pagar, vuelve a abrirla en unos minutos.');
+      say('Todavía no aparece el producto en tu biblioteca.');
+      purchaseState('delayed', 'Aún no recibimos la confirmación de Payhip. Si tienes un recibo, conserva el número de pedido y no repitas el pago; vuelve a revisar esta página en unos minutos.');
     }
   })();
   return () => controller.abort();
