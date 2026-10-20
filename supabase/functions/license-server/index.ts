@@ -29,7 +29,12 @@ Deno.serve(async (request: Request) => {
   }
   let body: Record<string, unknown>;
   try { body = await request.json(); } catch { return json(400, { error: 'invalid_request' }); }
-  const key = typeof body.license_key === 'string' ? body.license_key.trim().toUpperCase() : '';
+  const compactKey = typeof body.license_key === 'string'
+    ? body.license_key.toUpperCase().replace(/[^A-Z0-9]/g, '') : '';
+  const key = compactKey.length === 20 ? compactKey.match(/.{5}/g)!.join('-') : '';
+  // Earlier HYRO purchases used five blocks of four. The desktop app displays
+  // four blocks of five, so both spellings must resolve to the same license.
+  const legacyKey = compactKey.length === 20 ? compactKey.match(/.{4}/g)!.join('-') : '';
   const device = typeof body.device_id === 'string' ? body.device_id.toLowerCase() : '';
   const token = typeof body.device_token === 'string' ? body.device_token : '';
   const validKey = /^(?:[A-HJKMNP-Z2-9]{5}-){3}[A-HJKMNP-Z2-9]{5}$/.test(key) ||
@@ -54,30 +59,39 @@ Deno.serve(async (request: Request) => {
   const digest = async (value: string) => hex(new Uint8Array(
     await crypto.subtle.sign('HMAC', hmacKey, encoder.encode(value))));
   const keyHash = hex(new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(key))));
+  const legacyHash = hex(new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(legacyKey))));
   const deviceHash = await digest(`device:${device}`);
   const headers = { apikey: serviceKey, authorization: `Bearer ${serviceKey}`,
     'content-type': 'application/json' };
 
   if (action === 'deactivate') {
-    const response = await fetch(`${supabaseUrl}/rest/v1/rpc/release_hyro_activation`, {
-      method: 'POST', headers,
-      body: JSON.stringify({ p_key_hash: `\\x${keyHash}`, p_device_hash: `\\x${deviceHash}` }),
-    });
-    if (!response.ok) return json(503, { error: 'server_unavailable' });
-    return (await response.json()) === true
+    let released = false;
+    for (const hash of [keyHash, legacyHash]) {
+      const response = await fetch(`${supabaseUrl}/rest/v1/rpc/release_hyro_activation`, {
+        method: 'POST', headers,
+        body: JSON.stringify({ p_key_hash: `\\x${hash}`, p_device_hash: `\\x${deviceHash}` }),
+      });
+      if (!response.ok) return json(503, { error: 'server_unavailable' });
+      if ((await response.json()) === true) { released = true; break; }
+    }
+    return released
       ? json(200, { mode: 'hyro', active: false })
       : json(403, { error: 'device_not_authorized' });
   }
 
   // The gateway supplies the address; missing addresses share one conservative bucket.
   const ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-real-ip') || 'unknown';
-  const response = await fetch(`${supabaseUrl}/rest/v1/rpc/claim_hyro_activation`, {
-    method: 'POST', headers,
-    body: JSON.stringify({ p_key_hash: `\\x${keyHash}`,
-      p_device_hash: `\\x${deviceHash}`, p_ip_hash: `\\x${await digest(`ip:${ip}`)}` }),
-  });
-  if (!response.ok) return json(503, { error: 'server_unavailable' });
-  const [activation] = await response.json() as Array<{ outcome: string }>;
+  let activation: { outcome: string } | undefined;
+  for (const hash of [keyHash, legacyHash]) {
+    const response = await fetch(`${supabaseUrl}/rest/v1/rpc/claim_hyro_activation`, {
+      method: 'POST', headers,
+      body: JSON.stringify({ p_key_hash: `\\x${hash}`,
+        p_device_hash: `\\x${deviceHash}`, p_ip_hash: `\\x${await digest(`ip:${ip}`)}` }),
+    });
+    if (!response.ok) return json(503, { error: 'server_unavailable' });
+    [activation] = await response.json() as Array<{ outcome: string }>;
+    if (activation?.outcome !== 'invalid') break;
+  }
   if (!activation || activation.outcome === 'invalid') return json(403, { error: 'invalid_license' });
   if (activation.outcome === 'rate_limited') return json(429, { error: 'rate_limited' });
   if (activation.outcome === 'device_limit') return json(409, { error: 'already_bound' });
