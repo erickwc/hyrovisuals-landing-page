@@ -26,6 +26,7 @@ export function initPurchaseCheckout() {
       const { data: intent, error: intentError } = await supabase.from('purchase_intents')
         .insert({ user_id: userResult.user.id, product_id: product.id }).select('id').single();
       if (intentError || !intent) throw new Error('intent_unavailable');
+      try { sessionStorage.setItem('hyro:checkout-product-id', product.id); } catch { /* Storage is optional. */ }
       const checkout = new URL(button.dataset.payhipUrl!);
       checkout.searchParams.set('metadata[hyro_intent]', intent.id);
       location.assign(checkout.href);

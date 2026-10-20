@@ -18,31 +18,42 @@ export function initPurchaseProcessing() {
       location.replace('/cuenta/?continuar=compra-pendiente');
       return;
     }
-    const { data: product, error: productError } = await client.from('products')
-      .select('id').eq('slug', 'hyro-visuals').eq('is_active', true).single();
-    if (controller.signal.aborted) return;
-    if (productError || !product) {
-      say('No pudimos consultar HYRO Visuals. Actualiza esta página para intentarlo de nuevo.');
-      return;
+    let productId: string | null = null;
+    try {
+      const cached = sessionStorage.getItem('hyro:checkout-product-id');
+      if (cached && /^[0-9a-f-]{36}$/i.test(cached)) productId = cached;
+    } catch { /* Storage is optional. */ }
+    if (!productId) {
+      const { data: product, error: productError } = await client.from('products')
+        .select('id').eq('slug', 'hyro-visuals').eq('is_active', true).single();
+      if (productError || !product) {
+        say('No pudimos consultar HYRO Visuals. Actualiza esta página para intentarlo de nuevo.');
+        return;
+      }
+      productId = product.id;
     }
+    if (controller.signal.aborted) return;
 
-    let attempts = 0;
+    const started = Date.now();
+    let delayedNoticeShown = false;
     while (!controller.signal.aborted) {
       const { data: license, error } = await client.from('licenses')
-        .select('id').eq('product_id', product.id).eq('status', 'active').limit(1).maybeSingle();
+        .select('id').eq('product_id', productId).eq('status', 'active').limit(1).maybeSingle();
       if (controller.signal.aborted) return;
       if (license) {
+        try { sessionStorage.removeItem('hyro:checkout-product-id'); } catch { /* Storage is optional. */ }
         location.replace('/biblioteca/?compra=confirmada');
         return;
       }
       if (error) say('Estamos intentando consultar tu compra. Esta página seguirá comprobándola.');
-      else if (attempts === 0) say('Esperando la confirmación de Payhip…');
-      if (attempts === 33) {
-        say('La confirmación está tardando más de lo habitual. Si recibiste un recibo de Payhip, conserva el número de pedido y no repitas el pago. Seguimos comprobándolo.');
+      const elapsed = Date.now() - started;
+      if (!error && elapsed < 90_000) say('Terminando de preparar tu producto…');
+      if (!delayedNoticeShown && elapsed >= 90_000) {
+        delayedNoticeShown = true;
+        say('Está tardando más de lo habitual. Si recibiste el comprobante, conserva el número de pedido y no repitas el pago. Seguimos comprobándolo.');
         if (back) back.hidden = false;
       }
-      const delay = attempts < 15 ? 2000 : attempts < 23 ? 4000 : attempts < 33 ? 6000 : 10000;
-      attempts++;
+      const delay = elapsed < 12_000 ? 750 : elapsed < 30_000 ? 1500 : elapsed < 90_000 ? 4000 : 10_000;
       await wait(delay);
     }
   })();
