@@ -63,7 +63,9 @@ export function initLibraryPage() {
           body: { license_id: license.id },
         });
         if (keyError || typeof result?.key !== 'string') throw new Error('license_unavailable');
-        return result.key as string;
+        const characters = result.key.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        if (characters.length !== 20) throw new Error('license_unavailable');
+        return characters.match(/.{5}/g)!.join('-');
       };
       const reveal = document.createElement('button');
       reveal.type = 'button';
