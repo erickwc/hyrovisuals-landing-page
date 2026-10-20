@@ -54,6 +54,8 @@ export function initLibraryPage() {
       keyLabel.className = 'library-product-key';
       keyLabel.textContent = 'Clave de licencia: •••••';
       keyLabel.setAttribute('aria-live', 'polite');
+      const keyRow = document.createElement('div');
+      keyRow.className = 'library-product-key-row';
       const actions = document.createElement('div');
       actions.className = 'library-actions';
       const readKey = async () => {
@@ -86,8 +88,10 @@ export function initLibraryPage() {
       actions.append(reveal);
       const copy = document.createElement('button');
       copy.type = 'button';
-      copy.className = 'library-pill';
-      copy.textContent = 'Copiar clave';
+      copy.className = 'library-key-copy';
+      copy.setAttribute('aria-label', 'Copiar clave de licencia');
+      copy.title = 'Copiar clave';
+      copy.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="7" width="12" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></svg>';
       copy.addEventListener('click', async () => {
         copy.disabled = true;
         try {
@@ -97,7 +101,7 @@ export function initLibraryPage() {
           if (!controller.signal.aborted) say('No pudimos copiar la clave. Inténtalo de nuevo.');
         } finally { copy.disabled = false; }
       }, { signal: controller.signal });
-      actions.append(copy);
+      keyRow.append(keyLabel, copy);
       const ownedBuilds = builds.filter((build) => build.product_id === license.product_id);
       for (const build of ownedBuilds) {
         const download = document.createElement('button');
@@ -111,25 +115,36 @@ export function initLibraryPage() {
             const { data: session } = await client.auth.getSession();
             const token = session.session?.access_token;
             if (!token) throw new Error('session_expired');
-            const response = await fetch('/api/download', {
-              method: 'POST',
-              headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
-              body: JSON.stringify({ build_id: build.id }),
-              signal: controller.signal,
-            });
-            if (!response.ok) throw new Error('download_failed');
-            const url = URL.createObjectURL(await response.blob());
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = build.file_name;
-            link.click();
-            setTimeout(() => URL.revokeObjectURL(url), 60_000);
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/api/download';
+            form.hidden = true;
+            for (const [name, value] of Object.entries({ build_id: build.id, access_token: token })) {
+              const input = document.createElement('input');
+              input.type = 'hidden';
+              input.name = name;
+              input.value = value;
+              form.append(input);
+            }
+            document.body.append(form);
+            form.submit();
+            form.remove();
             say('Descarga iniciada.');
           } catch {
             if (!controller.signal.aborted) say('No pudimos iniciar la descarga. Inténtalo de nuevo.');
           } finally { download.disabled = false; }
         }, { signal: controller.signal });
         actions.append(download);
+      }
+      if (!ownedBuilds.some((build) => build.platform === 'macos')) {
+        const mac = document.createElement('button');
+        mac.type = 'button';
+        mac.className = 'library-pill library-pill-download';
+        mac.textContent = 'Descargar para Mac';
+        mac.addEventListener('click', () => {
+          say('La versión para Mac estará disponible aquí cuando recibamos el instalador.');
+        }, { signal: controller.signal });
+        actions.append(mac);
       }
       const note = document.createElement('p');
       note.className = 'library-product-note';
@@ -138,7 +153,7 @@ export function initLibraryPage() {
         : ownedBuilds.length
         ? 'Versión de prueba. Podrás volver a descargarla desde tu biblioteca.'
         : 'El instalador estará disponible aquí cuando publiquemos una versión.';
-      details.append(category, heading, keyLabel, actions, note);
+      details.append(category, heading, keyRow, actions, note);
       card.append(artwork, details);
       list?.append(card);
     }

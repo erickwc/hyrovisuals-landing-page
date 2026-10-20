@@ -1631,6 +1631,28 @@ select:focus-visible {
   font-size: 0.84rem;
   overflow-wrap: anywhere;
 }
+.library-product-key-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.library-key-copy {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border: 1px solid var(--purchase-line);
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--secondary);
+  cursor: pointer;
+}
+.library-key-copy:hover { border-color: var(--purchase-gold); color: var(--text); }
+.library-key-copy:focus-visible { outline: 2px solid var(--purchase-gold); outline-offset: 2px; }
+.library-key-copy:disabled { cursor: wait; opacity: 0.55; }
+.library-key-copy svg { width: 1rem; height: 1rem; }
 .library-actions {
   display: flex;
   flex-wrap: wrap;

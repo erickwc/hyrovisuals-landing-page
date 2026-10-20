@@ -19,14 +19,22 @@ const json = (status: number, error: string) => new Response(JSON.stringify({ er
 });
 
 export async function onRequestPost({ request, env }: Context): Promise<Response> {
-  const bearer = request.headers.get('authorization');
+  let bearer = request.headers.get('authorization');
+  let buildId: unknown;
+  if (request.headers.get('content-type')?.startsWith('application/x-www-form-urlencoded')) {
+    const form = await request.formData();
+    const token = form.get('access_token');
+    if (typeof token === 'string') bearer = `Bearer ${token}`;
+    buildId = form.get('build_id');
+  } else {
+    try { buildId = (await request.json() as { build_id?: unknown }).build_id; }
+    catch { return json(400, 'invalid_json'); }
+  }
   if (!bearer?.startsWith('Bearer ')) return json(401, 'unauthorized');
   if (!env.HYRO_INSTALLERS || !env.PUBLIC_SUPABASE_URL || !env.PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
     return json(503, 'download_unavailable');
   }
 
-  let buildId: string;
-  try { buildId = (await request.json()).build_id; } catch { return json(400, 'invalid_json'); }
   if (typeof buildId !== 'string' || !/^[0-9a-f-]{36}$/i.test(buildId)) return json(400, 'invalid_build');
 
   const headers = {
