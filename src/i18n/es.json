@@ -111,5 +111,22 @@
 "adminTransfer": "Liberar equipo",
 "adminTransferReason": "Motivo de la transferencia (mínimo 5 caracteres):",
 "adminTransferDone": "Equipo liberado. El cliente puede activar otro.",
-"adminTransferError": "No pudimos liberar el equipo. Revisa el motivo e inténtalo de nuevo."
+"adminTransferError": "No pudimos liberar el equipo. Revisa el motivo e inténtalo de nuevo.",
+  "sandboxTitle": "Prueba el checkout HYRO.",
+  "sandboxSummary": "$20 USD en total · $10 para cada vendedor.",
+  "sandboxNotice": "Prueba de PayPal Sandbox. No se cobra dinero real ni se genera una licencia del producto.",
+  "sandboxPay": "Pagar $20 con PayPal Sandbox",
+  "sandboxBack": "Volver a HYRO",
+  "sandboxReady": "Usa una cuenta de comprador PayPal Sandbox para completar la prueba.",
+  "sandboxWorking": "Verificando tu pago Sandbox…",
+  "sandboxCancelled": "Pago cancelado. Puedes iniciar la prueba de nuevo.",
+  "sandboxSuccess": "Los dos pagos Sandbox están completados. Total: $20 USD.",
+  "sandboxError": "No pudimos iniciar el pago. Inténtalo de nuevo.",
+  "sandboxReview": "No pudimos confirmar ambos pagos. Conserva el número de orden y vuelve a verificar aquí; no inicies otro pago.",
+  "sandboxConfig": "Sandbox todavía no está configurado en este servidor.",
+  "sandboxLogin": "Inicia sesión en tu cuenta HYRO para continuar.",
+  "sandboxOrder": "Orden",
+  "sandboxSeller": "Vendedor",
+  "sandboxNet": "Neto recibido",
+  "sandboxVerify": "Verificar pago"
 }

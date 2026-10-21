@@ -111,5 +111,22 @@
 "adminTransfer": "Release device",
 "adminTransferReason": "Reason for the transfer (at least 5 characters):",
 "adminTransferDone": "Device released. The customer can activate another one.",
-"adminTransferError": "We couldn't release the device. Check the reason and try again."
+"adminTransferError": "We couldn't release the device. Check the reason and try again.",
+  "sandboxTitle": "Try HYRO checkout.",
+  "sandboxSummary": "$20 USD total · $10 for each seller.",
+  "sandboxNotice": "PayPal Sandbox test. No real money is charged and no product license is issued.",
+  "sandboxPay": "Pay $20 with PayPal Sandbox",
+  "sandboxBack": "Back to HYRO",
+  "sandboxReady": "Use a PayPal Sandbox buyer account to complete the test.",
+  "sandboxWorking": "Checking your Sandbox payment…",
+  "sandboxCancelled": "Payment cancelled. You can start the test again.",
+  "sandboxSuccess": "Both Sandbox payments are complete. Total: $20 USD.",
+  "sandboxError": "We could not start checkout. Try again.",
+  "sandboxReview": "We could not confirm both payments. Keep your order number and retry verification here; do not start another payment.",
+  "sandboxConfig": "Sandbox is not configured on this server yet.",
+  "sandboxLogin": "Sign in to your HYRO account to continue.",
+  "sandboxOrder": "Order",
+  "sandboxSeller": "Seller",
+  "sandboxNet": "Net received",
+  "sandboxVerify": "Verify payment"
 }

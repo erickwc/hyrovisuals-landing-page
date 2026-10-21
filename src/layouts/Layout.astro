@@ -4,7 +4,7 @@ import '@fontsource-variable/inter';
 import '@fontsource-variable/space-grotesk';
 import en from '../i18n/en.json';
 interface Props {
-  page?: 'home' | 'account' | 'admin' | 'library' | 'processing';
+  page?: 'home' | 'account' | 'admin' | 'library' | 'processing' | 'sandbox';
 }
 const { page = 'home' } = Astro.props;
 ---
@@ -21,7 +21,7 @@ const { page = 'home' } = Astro.props;
         page === 'account' || page === 'library' || page === 'processing' ? en.accountMetaDescription : page === 'admin' ? en.adminMetaDescription : en.metaDescription
       }
     />
-    <title>{page === 'processing' ? 'Procesando tu compra | HYRO' : page === 'library' ? 'Mi biblioteca | HYRO' : page === 'account' ? en.accountPageTitle : page === 'admin' ? en.adminPageTitle : en.pageTitle}</title>
+    <title>{page === 'sandbox' ? 'HYRO-Checkout | PayPal Sandbox' : page === 'processing' ? 'Procesando tu compra | HYRO' : page === 'library' ? 'Mi biblioteca | HYRO' : page === 'account' ? en.accountPageTitle : page === 'admin' ? en.adminPageTitle : en.pageTitle}</title>
     <script is:inline>
       try {
         const t = localStorage.getItem('hyro-theme');

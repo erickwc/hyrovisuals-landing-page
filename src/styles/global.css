@@ -1761,3 +1761,13 @@ select:focus-visible {
   .library-actions { margin-left: calc(-4.75rem - 0.85rem); }
   .library-product-note { margin-left: calc(-4.75rem - 0.85rem) !important; }
 }
+.sandbox-receipts {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  list-style: none;
+  overflow-wrap: anywhere;
+  color: var(--text);
+}
+.sandbox-receipts[hidden] { display: none; }
+[data-sandbox-pay]:disabled { opacity: 0.6; cursor: wait; }

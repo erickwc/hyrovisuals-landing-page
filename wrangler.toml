@@ -3,6 +3,7 @@ pages_build_output_dir = "./dist"
 compatibility_date = "2026-10-17"
 
 [vars]
+PAYPAL_SANDBOX_ENABLED = "true"
 PUBLIC_SUPABASE_URL = "https://vvotpvgnzktrxsquztpq.supabase.co"
 PUBLIC_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_sK-akhai6qXf3s3uhFRGMA_VI81cBli"
 

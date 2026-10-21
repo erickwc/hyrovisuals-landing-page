@@ -1,0 +1,22 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import en from '../../i18n/en.json';
+---
+
+<Layout page="sandbox">
+  <header class="site-header"><Navbar accountPage /></header>
+  <main class="account-page purchase-processing-page">
+    <section class="purchase-processing page-shell" data-paypal-sandbox aria-labelledby="sandbox-title">
+      <p class="account-eyebrow">HYRO · PAYPAL SANDBOX</p>
+      <h1 id="sandbox-title" data-i18n="sandboxTitle">{en.sandboxTitle}</h1>
+      <p class="purchase-processing-lead" data-i18n="sandboxSummary">{en.sandboxSummary}</p>
+      <p class="purchase-processing-note" data-i18n="sandboxNotice">{en.sandboxNotice}</p>
+      <p class="purchase-processing-status" data-sandbox-status role="status" aria-live="polite"></p>
+      <button class="purchase-button" type="button" data-sandbox-pay data-i18n="sandboxPay">{en.sandboxPay}</button>
+      <ul class="sandbox-receipts" data-sandbox-receipts hidden></ul>
+      <a class="account-back" href="/#compra" data-i18n="sandboxBack">{en.sandboxBack}</a>
+      <noscript>JavaScript is required to use PayPal Sandbox.</noscript>
+    </section>
+  </main>
+</Layout>
