@@ -52,4 +52,4 @@ npm run build
 
 `scripts/paypal-delivery-rollback-check.sql` es una comprobación opcional para ejecutar **solo dentro de BEGIN/migración/ROLLBACK**, nunca como compra real ni con COMMIT. Los identificadores de esa prueba son ficticios.
 
-Para volver a Payhip en esta rama, desactivar ambas banderas públicas y recompilar. `git switch main` conserva la implementación anterior; no se publicó ni fusionó esta rama.
+Para volver a Payhip en esta rama, desactivar ambas banderas públicas y recompilar. `git switch main` conserva la implementación anterior. La rama está respaldada en GitHub, pero no se ha fusionado con `main` ni publicado como sitio de producción.
