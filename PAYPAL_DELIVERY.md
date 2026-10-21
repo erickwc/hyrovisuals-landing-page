@@ -25,23 +25,21 @@ Un reembolso total de cualquiera de las dos capturas o una reversión confirmada
 
 ## Estado al 21 de octubre de 2026
 
-- Código y migración preparados; Live desactivado por defecto. No se han realizado cobros reales.
+- La migración `20261021190157_paypal_live_delivery.sql` está aplicada en `hyro-company`. La función `paypal-checkout` versión 1 está desplegada con autenticación propia y responde `503 live_not_configured` mientras Live permanece desactivado. No se han realizado cobros reales.
 - App **Hyro-Checkout** encontrada en PayPal Live, asociada al correo de Erick. El usuario confirmó la habilitación Multiparty de ambas cuentas. La ausencia de la sección Multiparty/BN Code en la vista consultada no constituye evidencia de falta de aprobación.
-- Se consultó el esquema real de `hyro-company` y se ejecutó la migración junto con comprobaciones de compra, idempotencia y reembolso dentro de una transacción revertida. El resultado final fue `test_rolled_back = true`: no quedaron tablas, pedidos ni licencias de prueba.
+- El webhook Live `0TC71232YL5766314` ya apunta a la función, con aprobación, captura completada, reembolso y reversión. El Client ID y el secreto Live autorizados por el usuario están guardados únicamente en los secretos cifrados de Supabase. También están guardados el ID del webhook y `HYRO_SITE_URL=https://byhyro.com`. `LICENSE_ENCRYPTION_KEY` existente se conserva.
+- Antes de aplicar la migración se ejecutó con comprobaciones de compra, idempotencia y reembolso dentro de una transacción revertida. El resultado fue `test_rolled_back = true`: la prueba no dejó pedidos ni licencias ficticios.
 - Pruebas locales con PostgreSQL en memoria (PGlite), cifrado real y transporte PayPal simulado. Incluyen entrega por webhook con navegador cerrado, aislamiento de usuario y bloqueo de firmas falsas.
 - Se consultó el catálogo real: únicamente está activo Windows `0.2.4` (`hyro-visuals-0.2.4-win-x64.exe`). El instalador Mac debe subirse y registrarse en `product_builds` antes de ofrecerlo.
 
 ## Activación pendiente
 
-1. Usar la habilitación **Multiparty Live** de ambas cuentas, confirmada por el usuario. Obtener el BN Code y las credenciales de la app plataforma correcta para configurar la integración. Validar el consentimiento de los vendedores con esa app al comprobar el flujo, sin tratar de nuevo la aprobación de las cuentas como un requisito pendiente. [Cabeceras de plataforma](https://developer.paypal.com/api/rest/requests/).
-2. Aplicar `supabase/migrations/20261021190157_paypal_live_delivery.sql` al proyecto elegido y registrar la migración. Es aditiva, no sustituye funciones Payhip. La comprobación reversible anterior no la dejó aplicada.
-3. Desplegar `supabase/functions/paypal-checkout/` incluyendo `handler.ts`. El endpoint realiza su propia autenticación: valida el JWT contra Supabase para compradores, y la firma PayPal para notificaciones. Desactivar la verificación JWT de la pasarela **solo para esta función** permite recibir esas notificaciones sin JWT de comprador; la autenticación permanece dentro del código.
-4. Usar la **misma** `LICENSE_ENCRYPTION_KEY` ya configurada en las funciones actuales. No rotarla ni copiar secretos al navegador. Configurar los secretos descritos en `supabase/functions/paypal-checkout/.env.example`, con `HYRO_SITE_URL=https://byhyro.com` (o el origen HTTPS elegido). `SUPABASE_*` se inyectan en Edge Functions.
-5. Registrar en la app PayPal Live un webhook hacia `https://vvotpvgnzktrxsquztpq.supabase.co/functions/v1/paypal-checkout?webhook=1`, con `CHECKOUT.ORDER.APPROVED`, `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.REFUNDED` y `PAYMENT.CAPTURE.REVERSED`. Guardar su ID como `PAYPAL_LIVE_WEBHOOK_ID`.
-6. Con el backend, permisos y webhook comprobados, activar `PAYPAL_LIVE_ENABLED=true`. Compilar el frontend con `PUBLIC_PAYPAL_LIVE_ENABLED=true` y publicar la rama al entorno acordado. La interfaz Live tiene prioridad sobre la bandera Sandbox, pero no activa el backend por sí sola.
-7. Completar una compra real autorizada y confirmar dos cobros de $10, una licencia, clave visible y descarga del instalador desde la cuenta compradora. Comprobar recuperación y reembolso con PayPal Live antes del lanzamiento público.
+1. Obtener el **BN Code Live** de la app plataforma. El usuario indicó que lo enviará. PayPal exige esa cabecera en pagos Multiparty; no sirve el BN de Sandbox. Validar el consentimiento de los vendedores con esa app al comprobar el flujo. [Cabeceras de plataforma](https://developer.paypal.com/api/rest/requests/).
+2. Guardar `PAYPAL_LIVE_BN_CODE`, activar `PAYPAL_LIVE_ENABLED=true` y crear una orden Live sin aprobarla para comprobar que PayPal acepta exactamente los dos destinatarios. La función ya está desplegada con verificación JWT de pasarela desactivada **solo para ella**: compradores se autentican contra Supabase y notificaciones con firma PayPal.
+3. Compilar el frontend con `PUBLIC_PAYPAL_LIVE_ENABLED=true` y publicar la rama al entorno acordado. La interfaz Live tiene prioridad sobre la bandera Sandbox, pero no activa el backend por sí sola.
+4. Completar una compra real autorizada y confirmar dos cobros de $10, una licencia, clave visible y descarga del instalador desde la cuenta compradora. Comprobar recuperación y reembolso con PayPal Live antes del lanzamiento público.
 
-La activación y la compra real no se hicieron en esta tarea. La rama de Git no aísla automáticamente una base de datos o despliegue compartido.
+La activación y la compra real siguen pendientes del BN Code y de la validación Live. La rama de Git no aísla automáticamente una base de datos o despliegue compartido.
 
 ## Verificación local
 
