@@ -26,14 +26,14 @@ Un reembolso total de cualquiera de las dos capturas o una reversión confirmada
 ## Estado al 21 de octubre de 2026
 
 - Código y migración preparados; Live desactivado por defecto. No se han realizado cobros reales.
-- App **Hyro-Checkout** encontrada en PayPal Live, asociada al correo de Erick. El panel no muestra la sección Multiparty/BN Code que sí tenía la plataforma Sandbox; esto no confirma habilitación del reparto Live.
+- App **Hyro-Checkout** encontrada en PayPal Live, asociada al correo de Erick. El usuario confirmó la habilitación Multiparty de ambas cuentas. La ausencia de la sección Multiparty/BN Code en la vista consultada no constituye evidencia de falta de aprobación.
 - Se consultó el esquema real de `hyro-company` y se ejecutó la migración junto con comprobaciones de compra, idempotencia y reembolso dentro de una transacción revertida. El resultado final fue `test_rolled_back = true`: no quedaron tablas, pedidos ni licencias de prueba.
 - Pruebas locales con PostgreSQL en memoria (PGlite), cifrado real y transporte PayPal simulado. Incluyen entrega por webhook con navegador cerrado, aislamiento de usuario y bloqueo de firmas falsas.
 - Se consultó el catálogo real: únicamente está activo Windows `0.2.4` (`hyro-visuals-0.2.4-win-x64.exe`). El instalador Mac debe subirse y registrarse en `product_builds` antes de ofrecerlo.
 
 ## Activación pendiente
 
-1. Obtener confirmación de PayPal para **Multiparty Live**, su BN Code y vincular los vendedores a la plataforma aprobada. Tener una app Live o Payouts no demuestra esa habilitación. [Requisitos oficiales](https://developer.paypal.com/platforms/get-started).
+1. Usar la habilitación **Multiparty Live** de ambas cuentas, confirmada por el usuario. Obtener el BN Code y las credenciales de la app plataforma correcta para configurar la integración. Validar el consentimiento de los vendedores con esa app al comprobar el flujo, sin tratar de nuevo la aprobación de las cuentas como un requisito pendiente. [Cabeceras de plataforma](https://developer.paypal.com/api/rest/requests/).
 2. Aplicar `supabase/migrations/20261021190157_paypal_live_delivery.sql` al proyecto elegido y registrar la migración. Es aditiva, no sustituye funciones Payhip. La comprobación reversible anterior no la dejó aplicada.
 3. Desplegar `supabase/functions/paypal-checkout/` incluyendo `handler.ts`. El endpoint realiza su propia autenticación: valida el JWT contra Supabase para compradores, y la firma PayPal para notificaciones. Desactivar la verificación JWT de la pasarela **solo para esta función** permite recibir esas notificaciones sin JWT de comprador; la autenticación permanece dentro del código.
 4. Usar la **misma** `LICENSE_ENCRYPTION_KEY` ya configurada en las funciones actuales. No rotarla ni copiar secretos al navegador. Configurar los secretos descritos en `supabase/functions/paypal-checkout/.env.example`, con `HYRO_SITE_URL=https://byhyro.com` (o el origen HTTPS elegido). `SUPABASE_*` se inyectan en Edge Functions.
