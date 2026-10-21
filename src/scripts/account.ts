@@ -162,6 +162,7 @@ export function initAccountPage() {
         if (continueTo === 'compra') location.assign('/#compra');
         else if (continueTo === 'compra-pendiente') location.assign('/compra/');
         else if (continueTo === 'paypal-sandbox') location.assign('/compra/sandbox/');
+        else if (continueTo === 'paypal') location.assign('/compra/paypal/');
       }
       else setStatus('accountCheckEmail');
     } catch {
@@ -191,6 +192,7 @@ export function initAccountPage() {
       if (continueTo === 'compra') location.assign('/#compra');
       else if (continueTo === 'compra-pendiente') location.assign('/compra/');
       else if (continueTo === 'paypal-sandbox') location.assign('/compra/sandbox/');
+      else if (continueTo === 'paypal') location.assign('/compra/paypal/');
     } catch {
       setStatus('accountLoginError');
     } finally {

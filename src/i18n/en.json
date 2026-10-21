@@ -128,5 +128,15 @@
   "sandboxOrder": "Order",
   "sandboxSeller": "Seller",
   "sandboxNet": "Net received",
-  "sandboxVerify": "Verify payment"
+  "sandboxVerify": "Verify payment",
+  "paypalTitle": "Your HYRO purchase.",
+  "paypalDescription": "$20 USD. After payment, your license key and available installers will be in your library.",
+  "paypalReady": "Continue to PayPal to pay securely.",
+  "paypalWorking": "Confirming your payment and preparing your license…",
+  "paypalError": "Checkout could not start. Try again.",
+  "paypalReview": "We are unable to confirm delivery yet. Keep this order number and retry verification here. Do not make another payment.",
+  "paypalCancelled": "Payment cancelled. You can try again.",
+  "paypalUnavailable": "PayPal checkout is not available yet.",
+  "paypalVerify": "Verify purchase",
+  "paypalPay": "Pay $20 with PayPal"
 }

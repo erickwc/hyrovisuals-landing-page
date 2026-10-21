@@ -6,6 +6,8 @@ dist/
 .dev.vars.*
 !.dev.vars.example
 .wrangler/
+supabase/functions/**/.env
+supabase/.temp/
 
 artifacts/
 /Videos/

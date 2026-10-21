@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import en from '../../i18n/en.json';
+---
+<Layout page="paypal">
+  <header class="site-header"><Navbar accountPage /></header>
+  <main class="account-page purchase-processing-page">
+    <section class="purchase-processing page-shell" data-paypal-live aria-labelledby="paypal-title">
+      <p class="account-eyebrow">HYRO · PAYPAL</p>
+      <h1 id="paypal-title" data-i18n="paypalTitle">{en.paypalTitle}</h1>
+      <p class="purchase-processing-lead" data-i18n="paypalDescription">{en.paypalDescription}</p>
+      <p class="purchase-processing-status" data-paypal-status role="status" aria-live="polite"></p>
+      <p class="purchase-processing-note" data-paypal-order></p>
+      <button class="purchase-button" type="button" data-paypal-pay data-i18n="paypalPay">{en.paypalPay}</button>
+      <a class="account-back" href="/#compra" data-i18n="sandboxBack">{en.sandboxBack}</a>
+    </section>
+  </main>
+</Layout>

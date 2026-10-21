@@ -11,7 +11,8 @@
     "check": "astro check",
     "format": "prettier --write .",
     "verify:header": "node scripts/verify-header.mjs",
-    "verify:paypal": "node --test scripts/verify-paypal-sandbox.mjs"
+    "verify:paypal": "node --test scripts/verify-paypal-sandbox.mjs",
+    "verify:delivery": "node --test scripts/verify-paypal-delivery.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -26,6 +27,7 @@
     "typescript": "^5.8.2"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.11",
     "@playwright/test": "^1.59.1",
     "prettier": "^3.9.10",
     "prettier-plugin-astro": "^1.1.1"

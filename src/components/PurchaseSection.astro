@@ -13,7 +13,9 @@ const benefits = [
   'purchaseBenefitSupport',
 ] as const;
 const checkoutUrl = 'https://payhip.com/buy?link=X6ucD';
-const sandbox = import.meta.env.PUBLIC_PAYPAL_SANDBOX_ENABLED === 'true';
+const live = import.meta.env.PUBLIC_PAYPAL_LIVE_ENABLED === 'true';
+const sandbox = !live && import.meta.env.PUBLIC_PAYPAL_SANDBOX_ENABLED === 'true';
+const payhip = !live && !sandbox;
 ---
 
 <section
@@ -72,7 +74,7 @@ const sandbox = import.meta.env.PUBLIC_PAYPAL_SANDBOX_ENABLED === 'true';
           </span>
           <p data-i18n="purchaseDeviceNote">{en.purchaseDeviceNote}</p>
         </div>
-        <a class="purchase-button" href={sandbox ? '/compra/sandbox/' : '/cuenta/?continuar=compra'} data-payhip-checkout={sandbox ? undefined : true} data-payhip-url={sandbox ? undefined : checkoutUrl}>
+        <a class="purchase-button" href={live ? '/compra/paypal/' : sandbox ? '/compra/sandbox/' : '/cuenta/?continuar=compra'} data-payhip-checkout={payhip ? true : undefined} data-payhip-url={payhip ? checkoutUrl : undefined}>
           <span data-i18n="purchaseNow">{en.purchaseNow}</span>
           <Icon name="arrow" />
         </a>
