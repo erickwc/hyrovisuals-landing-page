@@ -7,7 +7,7 @@ Rama: `codex/paypal-sandbox-checkout`. `main` y los scripts/webhooks de Payhip n
 | Cuenta | Bruto por compra |
 | --- | --- |
 | erickcaceres1717@gmail.com | $10 USD |
-| gioesbeats@gmail.com | $10 USD |
+| djgioes@gmail.com | $10 USD |
 
 Total $20 USD. PayPal descuenta sus comisiones de cada parte. Los correos, importes, moneda y referencias se fijan en el servidor; el navegador no puede reemplazarlos.
 
@@ -25,7 +25,7 @@ Un reembolso total de cualquiera de las dos capturas o una reversión confirmada
 
 ## Estado al 21 de octubre de 2026
 
-- La migración `20261021190157_paypal_live_delivery.sql` está aplicada en `hyro-company`. La función `paypal-checkout` versión 1 está desplegada con autenticación propia y responde `503 live_not_configured` mientras Live permanece desactivado. No se han realizado cobros reales.
+- La migración `20261021190157_paypal_live_delivery.sql` está aplicada en `hyro-company`. La función `paypal-checkout` está desplegada con autenticación propia y responde `503 live_not_configured` mientras Live permanece desactivado. No se han realizado cobros reales.
 - App **Hyro-Checkout** encontrada en PayPal Live, asociada al correo de Erick. El usuario confirmó la habilitación Multiparty de ambas cuentas. La ausencia de la sección Multiparty/BN Code en la vista consultada no constituye evidencia de falta de aprobación.
 - El webhook Live `0TC71232YL5766314` ya apunta a la función, con aprobación, captura completada, reembolso y reversión. El Client ID y el secreto Live autorizados por el usuario están guardados únicamente en los secretos cifrados de Supabase. También están guardados el ID del webhook y `HYRO_SITE_URL=https://byhyro.com`. `LICENSE_ENCRYPTION_KEY` existente se conserva.
 - Antes de aplicar la migración se ejecutó con comprobaciones de compra, idempotencia y reembolso dentro de una transacción revertida. El resultado fue `test_rolled_back = true`: la prueba no dejó pedidos ni licencias ficticios.
@@ -34,7 +34,7 @@ Un reembolso total de cualquiera de las dos capturas o una reversión confirmada
 
 ## Activación pendiente
 
-1. Obtener el **BN Code Live** de la app plataforma. El usuario indicó que lo enviará. PayPal exige esa cabecera en pagos Multiparty; no sirve el BN de Sandbox. Validar el consentimiento de los vendedores con esa app al comprobar el flujo. [Cabeceras de plataforma](https://developer.paypal.com/api/rest/requests/).
+1. Obtener el **BN Code Live** de la app plataforma: PayPal Developer → Apps & Credentials → Live → app plataforma → App Settings → Reports, última línea. La vista actual de `Hyro-Checkout` no muestra App Settings/Reports; si sigue ausente, solicitar el BN Code al gestor de cuenta de PayPal. PayPal exige esa cabecera en pagos Multiparty; no sirve el BN de Sandbox. Validar el consentimiento de los vendedores con esa app al comprobar el flujo. [Cabeceras de plataforma](https://developer.paypal.com/api/rest/requests/).
 2. Guardar `PAYPAL_LIVE_BN_CODE`, activar `PAYPAL_LIVE_ENABLED=true` y crear una orden Live sin aprobarla para comprobar que PayPal acepta exactamente los dos destinatarios. La función ya está desplegada con verificación JWT de pasarela desactivada **solo para ella**: compradores se autentican contra Supabase y notificaciones con firma PayPal.
 3. Compilar el frontend con `PUBLIC_PAYPAL_LIVE_ENABLED=true` y publicar la rama al entorno acordado. La interfaz Live tiene prioridad sobre la bandera Sandbox, pero no activa el backend por sí sola.
 4. Completar una compra real autorizada y confirmar dos cobros de $10, una licencia, clave visible y descarga del instalador desde la cuenta compradora. Comprobar recuperación y reembolso con PayPal Live antes del lanzamiento público.

@@ -11,7 +11,7 @@ export interface Env {
   LICENSE_ENCRYPTION_KEY?: string;
 }
 // Confirmed recipients. Sandbox credentials and endpoints never enter this flow.
-export const recipients = ['erickcaceres1717@gmail.com', 'gioesbeats@gmail.com'] as const;
+export const recipients = ['erickcaceres1717@gmail.com', 'djgioes@gmail.com'] as const;
 const api = 'https://api-m.paypal.com';
 const uuid = (value: unknown): value is string => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 const paypalId = (value: unknown): value is string => typeof value === 'string' && /^[A-Z0-9]{17}$/.test(value);

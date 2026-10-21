@@ -86,7 +86,9 @@ test('Live payment and delivery: real SQL transaction, mocked PayPal transport',
     await t.test('creates fixed $10 + $10 recipients and binds checkout to the HYRO account',async()=>{
       const response=await handle(request({action:'create',request_id:requestId,amount:'0.01',payee:'attacker'}),env,fetcher);
       assert.equal(response.status,200);assert.equal((await response.json()).order_id,paypalOrder);
-      assert.deepEqual(createdPayload.purchase_units.map(u=>[u.payee.email_address,u.amount.value]),recipients.map(email=>[email,'10.00']));
+      assert.deepEqual(createdPayload.purchase_units.map(u=>[u.payee.email_address,u.amount.value]),[
+        ['erickcaceres1717@gmail.com','10.00'],['djgioes@gmail.com','10.00'],
+      ]);
       assert.equal((await db.query('select count(*)::int as n from licenses')).rows[0].n,0);
       assert.equal(createdPayload.purchase_units[0].custom_id,createdPayload.purchase_units[1].custom_id);
     });
