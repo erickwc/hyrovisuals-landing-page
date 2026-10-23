@@ -161,6 +161,7 @@ export function initAccountPage() {
         const continueTo = new URLSearchParams(location.search).get('continuar');
         if (continueTo === 'compra') location.assign('/#compra');
         else if (continueTo === 'compra-pendiente') location.assign('/compra/');
+        else if (continueTo === 'wompi') location.assign('/checkout/');
       }
       else setStatus('accountCheckEmail');
     } catch {
@@ -189,6 +190,7 @@ export function initAccountPage() {
       const continueTo = new URLSearchParams(location.search).get('continuar');
       if (continueTo === 'compra') location.assign('/#compra');
       else if (continueTo === 'compra-pendiente') location.assign('/compra/');
+      else if (continueTo === 'wompi') location.assign('/checkout/');
     } catch {
       setStatus('accountLoginError');
     } finally {

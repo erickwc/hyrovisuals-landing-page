@@ -11,17 +11,19 @@ import { initAdminPage } from './admin';
 import { initPurchaseCheckout } from './purchase-checkout';
 import { initLibraryPage } from './library';
 import { initPurchaseProcessing } from './purchase-processing';
+import { initWompiCheckout } from './wompi-checkout';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 let cleanup = () => {};
 async function init() {
   cleanup();
-  if (['account', 'admin', 'library', 'processing'].includes(document.body.dataset.page ?? '')) {
+  if (['account', 'admin', 'library', 'processing', 'checkout'].includes(document.body.dataset.page ?? '')) {
     const stopPreferences = initPreferences(() => {
       document.dispatchEvent(new Event('hyro:language'));
     });
     const stopAccount = document.body.dataset.page === 'admin' ? initAdminPage()
       : document.body.dataset.page === 'library' ? initLibraryPage()
-      : document.body.dataset.page === 'processing' ? initPurchaseProcessing() : initAccountPage();
+      : document.body.dataset.page === 'processing' ? initPurchaseProcessing()
+      : document.body.dataset.page === 'checkout' ? initWompiCheckout() : initAccountPage();
     cleanup = () => {
       stopAccount();
       stopPreferences();

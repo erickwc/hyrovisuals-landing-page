@@ -111,5 +111,19 @@
 "adminTransfer": "Release device",
 "adminTransferReason": "Reason for the transfer (at least 5 characters):",
 "adminTransferDone": "Device released. The customer can activate another one.",
-"adminTransferError": "We couldn't release the device. Check the reason and try again."
+"adminTransferError": "We couldn't release the device. Check the reason and try again.",
+"wompiTitle": "Your HYRO checkout.",
+"wompiDescription": "A simple path to your HYRO Visuals license. Review your order here, then complete payment on Wompi's secure page.",
+"wompiSafety": "Card details and security code are entered only on Wompi. HYRO never receives them.",
+"wompiSummary": "ORDER SUMMARY",
+"wompiLicense": "Personal license · one device · updates included",
+"wompiTotal": "Total",
+"wompiPay": "Continue to Wompi",
+"wompiBack": "Back to HYRO",
+"wompiReady": "Ready when you are.",
+"wompiWorking": "Preparing your secure payment…",
+"wompiPending": "We are checking your payment. Keep your receipt and do not pay again while confirmation is pending.",
+"wompiError": "We couldn't prepare checkout. Please retry or use Payhip.",
+"wompiUnavailable": "Wompi checkout is in test setup and is not available yet.",
+"wompiOption": "Try Wompi checkout"
 }

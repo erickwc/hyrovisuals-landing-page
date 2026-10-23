@@ -13,6 +13,7 @@ const benefits = [
   'purchaseBenefitSupport',
 ] as const;
 const checkoutUrl = 'https://payhip.com/buy?link=X6ucD';
+const wompiTest = import.meta.env.PUBLIC_WOMPI_CHECKOUT_ENABLED === 'true';
 ---
 
 <section
@@ -75,6 +76,7 @@ const checkoutUrl = 'https://payhip.com/buy?link=X6ucD';
           <span data-i18n="purchaseNow">{en.purchaseNow}</span>
           <Icon name="arrow" />
         </a>
+        {wompiTest && <a class="purchase-wompi-option" href="/checkout/" data-i18n="wompiOption">{en.wompiOption}</a>}
         <p class="purchase-checkout-status" data-payhip-status role="status" hidden></p>
         <ul
           class="purchase-payment-methods"

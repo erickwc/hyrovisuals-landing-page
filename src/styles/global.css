@@ -1,5 +1,22 @@
 @import 'tailwindcss';
 @import 'lenis/dist/lenis.css';
+.hyro-checkout { min-height: calc(100svh - 6rem); display: flex; align-items: center; }
+.hyro-checkout-grid { width: 100%; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(18rem, .7fr); gap: clamp(3rem, 8vw, 9rem); padding-block: clamp(5rem, 12vh, 10rem); }
+.hyro-checkout-intro { max-width: 49rem; }
+.hyro-checkout-intro h1 { font-family: var(--font-title); font-weight: 400; font-size: clamp(3rem, 7vw, 7rem); line-height: .98; letter-spacing: -.035em; margin: 2rem 0; }
+.hyro-checkout-intro > p:not(.account-eyebrow) { max-width: 36rem; color: var(--secondary); font-size: clamp(1rem, 1.6vw, 1.2rem); line-height: 1.65; }
+.hyro-checkout-divider { width: 3rem; height: 1px; background: var(--border); margin: 3rem 0 1.5rem; }
+.hyro-checkout-intro .hyro-checkout-safe { font-size: .9rem !important; }
+.hyro-checkout-summary { align-self: center; border: 1px solid var(--border); background: var(--surface); padding: clamp(1.5rem, 3vw, 2.5rem); }
+.hyro-checkout-caption { font-family: var(--font-label); font-size: .72rem; letter-spacing: .16em; color: var(--secondary); }
+.hyro-checkout-line { display: flex; justify-content: space-between; gap: 1rem; padding-top: 1.6rem; }
+.hyro-checkout-summary > p { color: var(--secondary); font-size: .85rem; line-height: 1.5; }
+.hyro-checkout-total { border-top: 1px solid var(--border); margin-top: 2rem; padding-block: 1.25rem 1.75rem; }
+.hyro-checkout-message { min-height: 2.8rem; margin: 0 0 1rem; }
+.hyro-checkout-summary .purchase-button { width: 100%; text-align: center; justify-content: center; }
+.hyro-checkout-summary .account-back { display: inline-block; margin-top: 1.5rem; }
+.purchase-wompi-option { display: inline-block; margin-top: 1rem; color: var(--text); text-decoration: underline; text-underline-offset: .25em; }
+@media (max-width: 780px) { .hyro-checkout-grid { grid-template-columns: 1fr; gap: 2.5rem; } }
 @font-face {
   font-family: 'Gelegar Expanded';
   src: url('/fonts/gelegar-expanded.otf') format('opentype');

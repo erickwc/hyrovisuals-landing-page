@@ -1,0 +1,28 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import en from '../../i18n/en.json';
+---
+<Layout page="checkout">
+  <header class="site-header"><Navbar accountPage /></header>
+  <main class="account-page hyro-checkout">
+    <section class="page-shell hyro-checkout-grid" data-wompi-checkout aria-labelledby="checkout-title">
+      <div class="hyro-checkout-intro">
+        <p class="account-eyebrow">HYRO / CHECKOUT</p>
+        <h1 id="checkout-title" data-i18n="wompiTitle">{en.wompiTitle}</h1>
+        <p data-i18n="wompiDescription">{en.wompiDescription}</p>
+        <div class="hyro-checkout-divider"></div>
+        <p class="hyro-checkout-safe" data-i18n="wompiSafety">{en.wompiSafety}</p>
+      </div>
+      <div class="hyro-checkout-summary">
+        <span class="hyro-checkout-caption" data-i18n="wompiSummary">{en.wompiSummary}</span>
+        <div class="hyro-checkout-line"><strong>HYRO Visuals</strong><span>$20.00</span></div>
+        <p data-i18n="wompiLicense">{en.wompiLicense}</p>
+        <div class="hyro-checkout-line hyro-checkout-total"><strong data-i18n="wompiTotal">{en.wompiTotal}</strong><strong>$20.00 USD</strong></div>
+        <p class="hyro-checkout-message" data-wompi-status role="status" aria-live="polite"></p>
+        <button class="purchase-button" type="button" data-wompi-pay data-i18n="wompiPay">{en.wompiPay}</button>
+        <a class="account-back" href="/#compra" data-i18n="wompiBack">{en.wompiBack}</a>
+      </div>
+    </section>
+  </main>
+</Layout>

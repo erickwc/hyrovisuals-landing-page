@@ -111,5 +111,19 @@
 "adminTransfer": "Liberar equipo",
 "adminTransferReason": "Motivo de la transferencia (mínimo 5 caracteres):",
 "adminTransferDone": "Equipo liberado. El cliente puede activar otro.",
-"adminTransferError": "No pudimos liberar el equipo. Revisa el motivo e inténtalo de nuevo."
+"adminTransferError": "No pudimos liberar el equipo. Revisa el motivo e inténtalo de nuevo.",
+"wompiTitle": "Tu compra HYRO.",
+"wompiDescription": "Un camino simple hacia tu licencia de HYRO Visuals. Revisa el pedido aquí y completa el pago en la página segura de Wompi.",
+"wompiSafety": "Los datos y el código de seguridad de tu tarjeta se ingresan solo en Wompi. HYRO nunca los recibe.",
+"wompiSummary": "RESUMEN DEL PEDIDO",
+"wompiLicense": "Licencia personal · un equipo · actualizaciones incluidas",
+"wompiTotal": "Total",
+"wompiPay": "Continuar a Wompi",
+"wompiBack": "Volver a HYRO",
+"wompiReady": "Todo listo para continuar.",
+"wompiWorking": "Preparando tu pago seguro…",
+"wompiPending": "Estamos comprobando tu pago. Conserva el comprobante y no vuelvas a pagar mientras esperas la confirmación.",
+"wompiError": "No pudimos preparar el pago. Inténtalo de nuevo o usa Payhip.",
+"wompiUnavailable": "El checkout Wompi está en preparación y todavía no está disponible.",
+"wompiOption": "Probar checkout Wompi"
 }
