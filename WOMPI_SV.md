@@ -1,35 +1,58 @@
-# Wompi El Salvador — rama de prueba
+# Checkout personalizado Wompi El Salvador
 
-La opción `/checkout/` conserva el estilo, tema claro/oscuro e idiomas ES/EN de HYRO. El pedido se prepara en HYRO; el número de tarjeta y CVV se introducen únicamente en la página alojada por Wompi (`lk.wompi.sv`). El checkout Payhip de `/` sigue siendo la opción principal. Para mostrar el enlace secundario a Wompi se necesita `PUBLIC_WOMPI_CHECKOUT_ENABLED=true` **solo en un entorno de prueba**.
+`/checkout/` ahora incluye el formulario de tarjeta dentro de HYRO: número, vencimiento, CVV, datos de contacto y dirección de facturación. Conserva tema claro/oscuro, ES/EN y el estilo del sitio. Después de enviarlo, Wompi proporciona una URL para completar 3DS; ese paso puede abrir una pantalla de Wompi o del banco. No se implementa un cobro alternativo sin 3DS.
 
-## Preparación en el entorno de prueba
+## Ver el diseño sin credenciales
 
-1. Crear un negocio/aplicativo Wompi El Salvador en **modo desarrollo** en el panel de Wompi. Obtener allí App ID y API Secret. No ponerlos en el chat, en Git ni en variables `PUBLIC_`.
-2. Aplicar la migración `20261023231132_wompi_sv_checkout.sql` en una base de datos de prueba de Supabase. No aplicarla en producción durante esta fase.
-3. Desplegar la función `wompi-checkout` en un proyecto Supabase de prueba con la verificación JWT de plataforma deshabilitada para esta función, porque el webhook de Wompi no lleva JWT. La función valida el JWT del usuario en las acciones de navegador y el HMAC `wompi_hash` del webhook. No desplegarla en producción durante esta fase.
-4. Configurar **secretos de servidor** `WOMPI_ENABLED=true`, `WOMPI_MODE=test`, `WOMPI_APP_ID`, `WOMPI_API_SECRET`, `HYRO_SITE_URL` (origen HTTPS del sitio de prueba), `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY` y `LICENSE_ENCRYPTION_KEY` (clave AES-GCM de 32 bytes en base64 que ya usa la emisión de licencias). `PUBLIC_WOMPI_CHECKOUT_ENABLED=true` se configura solo en el build del sitio de prueba. Supabase URL y publishable key pueden estar también en sus variables públicas habituales; **service role y secretos de Wompi nunca**.
-5. Probar una compra aprobada y una denegada en modo desarrollo. El webhook debe validar firma, enlace, transacción, importe y modo. En desarrollo **no se emiten licencias**: las transacciones simuladas no cobran dinero. Para comprobar emisión de licencias sin dinero, se requiere una base de datos descartable y una prueba controlada de la rutina SQL.
+En la rama `feat/wompi-sv-hosted-checkout`, ejecutar `npm install` y `npm run dev`, y abrir `/checkout/` en la URL local que indique Astro. Sin `PUBLIC_WOMPI_CHECKOUT_ENABLED=true`, se muestra una vista previa con el ingreso y envío de pagos desactivados. No introducir tarjetas reales en vistas previas o pruebas.
 
-Las pruebas locales de lógica se ejecutan con `npm run verify:wompi`; la compilación y revisión de tipos con `npm run build` y `npm run check`.
+Payhip sigue siendo la compra principal. `PUBLIC_WOMPI_CHECKOUT_ENABLED=true` añade un enlace secundario y activa la conexión del formulario; no reemplaza Payhip. El usuario debe iniciar sesión con una cuenta HYRO verificada antes de que se habiliten los campos. No se ha realizado merge ni despliegue.
 
-El paso a producción requiere habilitar el negocio Wompi, confirmar que sus métodos de pago y 3DS estén autorizados, configurar `WOMPI_MODE=live`, revisar cumplimiento y ejecutar una compra real pequeña de extremo a extremo antes de activar el botón público. El API de tokenización y el de transacción directa/3DS de Wompi requieren que el comercio reciba número de tarjeta y CVV; esta rama **no los llama**. Wompi controla la captura de tarjeta y la autenticación adicional dentro de su página alojada.
+## Preparar una prueba con Wompi
 
-## Comportamiento de entrega
+1. Usar un proyecto de Supabase de prueba con el esquema base de HYRO y las migraciones existentes. Aplicar `20261023231132_wompi_sv_checkout.sql` y después `20261023232142_wompi_card_3ds.sql`. Estas migraciones no se han aplicado a producción.
+2. Crear/configurar un negocio Wompi El Salvador en modo **desarrollo** y obtener App ID y API Secret desde su panel. Confirmar con Wompi la habilitación de su API de compra con 3DS y los datos de tarjeta autorizados para pruebas. No enviar credenciales o tarjetas por chat, correo o Git.
+3. Desplegar únicamente la función `wompi-card` en el proyecto de prueba con la verificación JWT de plataforma deshabilitada para ese webhook. El handler comprueba JWT contra Supabase Auth para cada solicitud de navegador y HMAC-SHA256 para cada webhook. Ejemplo, tras validar el proyecto de destino: `supabase functions deploy wompi-card --project-ref TEST_PROJECT_REF --no-verify-jwt`.
+4. Configurar los secretos del ejemplo `supabase/functions/wompi-card/.env.example`: `WOMPI_CARD_ENABLED=true`, `WOMPI_MODE=test`, `WOMPI_CARD_LIVE_ENABLED=false`, App ID, API Secret, origen HTTPS del sitio de prueba y clave de cifrado de licencias AES-GCM (32 bytes en base64). Supabase suministra URL, service role y anon key en el runtime; opcionalmente usar `HYRO_SUPABASE_PUBLISHABLE_KEY` para una clave pública diferente. Ningún secreto va en variables `PUBLIC_`.
+5. Construir el sitio de prueba con `PUBLIC_WOMPI_CHECKOUT_ENABLED=true`, `PUBLIC_SUPABASE_URL` y `PUBLIC_SUPABASE_PUBLISHABLE_KEY` del proyecto de prueba. Confirmar las cabeceras de `public/_headers` en el alojamiento: no caché, no referrer y no incrustación del checkout. La función exige el origen HTTPS configurado.
+6. Completar una transacción de prueba con 3DS. El servidor consulta `/Aplicativo` antes de crear la transacción y exige que el modo de Wompi coincida con `WOMPI_MODE`. Un negocio productivo en un entorno configurado como prueba bloquea la solicitud antes de enviar la tarjeta al endpoint de compra.
+7. Al regresar, HYRO debe mostrar **Pago de prueba confirmado**. No se crea una orden pagada ni una licencia real para una transacción simulada. Probar también cancelación, reintentos y fallo de conexión. La documentación oficial aclara que la simulación de denegación con CVV `111` no aplica a 3DS; no usarla como prueba de rechazo 3DS.
 
-- El servidor obtiene un token OAuth de Wompi, crea `/EnlacePago` por $20 USD con un identificador de checkout, importe no editable, límite de un pago exitoso, retorno y webhook. Solo entrega al navegador una URL HTTPS de `lk.wompi.sv`.
-- Un webhook se acepta únicamente si pasa HMAC-SHA256 sobre el cuerpo sin modificar. Además, el servidor consulta `/EnlacePago/{id}` y `/TransaccionCompra/{id}` para comprobar negocio, enlace, resultado aprobado, $20 y `esReal=true` antes de invocar una función SQL de entrega atómica.
-- La función SQL usa el identificador único de transacción y bloqueos de filas para idempotencia. Solo `service_role` puede llamarla. La licencia se emite únicamente después de pago real confirmado. El correo del pagador se conserva para soporte, pero la licencia pertenece a la cuenta HYRO que inició el checkout.
-- El retorno del navegador es informativo. La página consulta el estado de la orden; los parámetros de URL no activan licencias. Si la confirmación tarda, el comprador conserva el comprobante y evita pagar de nuevo.
-- Los cupones actuales son una función de Payhip. Esta rama no muestra un campo de cupón Wompi ni acepta descuentos introducidos por el navegador. Para llevar cupones a Wompi hace falta un modelo propio de reglas y validación de precio en servidor.
-- La documentación pública de Wompi consultada describe webhooks de pagos exitosos, no un evento de reembolso con contrato verificable. Los reembolsos Wompi requieren una operación de soporte y revocación controlada antes de activar ventas reales.
+## Datos, confirmación e idempotencia
 
-## Fuentes oficiales consultadas
+El backend llama al endpoint documentado en el Swagger oficial `POST /TransaccionCompra/3Ds`, con precio calculado por servidor ($20 USD), identificador `idExterno` propio y destinos de retorno/webhook propios. Países y regiones proceden del endpoint oficial `/api/Regiones` y se validan de nuevo en servidor. Nunca se aceptan precios, URLs o metadatos del navegador para configurar el cobro.
 
-- [Autenticación OAuth](https://docs.wompi.sv/autenticacion/autenticacion)
-- [Crear enlace de pago](https://docs.wompi.sv/metodos-api/enlace-de-pago)
-- [Validar webhook](https://docs.wompi.sv/webhook/validar-webhook)
-- [Consultar enlace](https://docs.wompi.sv/metodos-api/obtener-enlace-de-pago-por-id)
-- [Consultar transacción](https://docs.wompi.sv/metodos-api/obtener-transaccion-compra-por-id)
-- [Modo de prueba](https://docs.wompi.sv/metodos-api/transaccion_prueba)
-- [Tokenización](https://docs.wompi.sv/metodos-api/tokenizacion)
-- [Compra con 3DS](https://docs.wompi.sv/metodos-api/crear-transaccion-compra-3ds)
+PAN y CVV atraviesan el navegador y el backend de HYRO de forma transitoria. El código no los escribe en base de datos, almacenamiento del navegador, logs, URLs ni respuestas. Los campos se vacían tras cada envío y al abandonar la página. Esto no equivale a asegurar que toda la infraestructura esté certificada: antes de recibir tarjetas reales hay que confirmar con Wompi/adquirente los requisitos PCI DSS de captura directa y verificar que el alojamiento, proxies, observabilidad y herramientas de sesión no registren cuerpos de solicitud ni campos de pago. No se usa tokenización ni se guarda una tarjeta para compras futuras.
+
+La tabla `wompi_card_checkouts` guarda únicamente referencias de cuenta/producto, identificador de solicitud/transacción, modo, correo de la cuenta, estado y URL de 3DS. Las tablas tienen RLS y no son legibles o modificables por `anon`/`authenticated`; solo el backend accede a ellas. El navegador recibe únicamente estados y la URL validada de Wompi.
+
+La reserva SQL serializa solicitudes por comprador, admite un solo intento abierto y limita a tres intentos nuevos cada 15 minutos. Repetir el mismo envío, abrir otra pestaña o cambiar el identificador de solicitud no inicia otra transacción mientras exista un intento pendiente. Si la creación tiene un resultado incierto, el intento queda en revisión, sin reintentar el cobro automáticamente. Soporte debe reconciliarlo con Wompi antes de liberar un intento atascado; no borrarlo ni marcarlo rechazado solo por haber pasado tiempo.
+
+El webhook verifica el HMAC `wompi_hash` sobre los bytes originales. Tanto el webhook como la consulta del navegador verifican la transacción mediante `GET /TransaccionCompra/{id}` y comprueban `idExterno`, transacción, importe, aprobación y modo. Los parámetros del retorno no constituyen prueba de pago. Un webhook puede recuperar una transacción cuyo resultado de creación se perdió. La licencia se emite por una rutina SQL atómica únicamente tras una aprobación real confirmada; la unicidad de transacción y los bloqueos impiden duplicar órdenes/licencias. Las claves se cifran como en el flujo existente de HYRO.
+
+Si Wompi devuelve una URL 3DS fuera de un dominio HTTPS `wompi.sv`, el flujo queda bloqueado para revisión. Confirmar el dominio oficial con Wompi antes de ampliar la lista permitida; no añadir un dominio aportado por el comprador.
+
+## Producción y límites pendientes
+
+La activación real requiere autorización de despliegue, habilitación del negocio/3DS y revisión de captura directa con Wompi, además de `WOMPI_MODE=live` y `WOMPI_CARD_LIVE_ENABLED=true` en el servidor. Esa habilitación no se ha realizado. Faltan la prueba con credenciales de desarrollo, el recorrido real por 3DS y la verificación de configuración de infraestructura.
+
+Los cupones existentes siguen en Payhip. Wompi mantiene el precio fijo en servidor; no se añadió un campo de descuentos sin un modelo propio de cupones. El contrato público consultado no define un webhook verificable de reembolsos: deben gestionarse y revocarse mediante soporte antes de habilitar ventas reales. El backend anterior `wompi-checkout` de enlaces alojados se conserva, pero el formulario nuevo usa `wompi-card`.
+
+## Verificaciones locales
+
+La auditoría de dependencias detecta cinco avisos en la cadena de herramientas existente de Astro. Su actualización requiere revisar una migración mayor; queda pendiente antes de aprobar producción. No se aplicó una actualización automática que pudiera afectar Payhip o el resto del sitio.
+
+- `npm run check`: revisión de tipos y Astro.
+- `npm run build`: compilación estática.
+- `npm run verify:wompi`: pruebas del flujo alojado y del formulario 3DS, con transporte Wompi simulado y migraciones SQL ejecutadas en PGlite. No realizan cargos ni contactan la API de pagos. Incluyen firma, importe/referencia, prueba sin licencia real, duplicados, permisos y creación incierta.
+
+## Contratos oficiales consultados
+
+- [Swagger Wompi El Salvador](https://api.wompi.sv/index.html), esquema `CrearTransaccion3dsDto` y `CrearTransaccion3dsOutputDto`.
+- [Compra con 3DS](https://docs.wompi.sv/metodos-api/crear-transaccion-compra-3ds).
+- [Datos del negocio y modo](https://docs.wompi.sv/metodos-api/datos-aplicativo).
+- [Países y regiones](https://docs.wompi.sv/metodos-api/obtener-regiones).
+- [Autenticación OAuth](https://docs.wompi.sv/autenticacion/autenticacion).
+- [Validación del webhook](https://docs.wompi.sv/webhook/validar-webhook).
+- [Consulta de transacción](https://docs.wompi.sv/metodos-api/obtener-transaccion-compra-por-id).
+- [Modo de prueba y límites de simulación 3DS](https://docs.wompi.sv/metodos-api/transaccion_prueba).

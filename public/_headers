@@ -1,0 +1,11 @@
+/checkout
+  Cache-Control: no-store
+  Referrer-Policy: no-referrer
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'; form-action 'none'; base-uri 'self'; object-src 'none'
+
+/checkout/*
+  Cache-Control: no-store
+  Referrer-Policy: no-referrer
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'; form-action 'none'; base-uri 'self'; object-src 'none'
