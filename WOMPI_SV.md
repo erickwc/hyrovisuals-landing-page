@@ -8,6 +8,14 @@ En la rama `feat/wompi-sv-hosted-checkout`, ejecutar `npm install` y `npm run de
 
 Payhip sigue siendo la compra principal. `PUBLIC_WOMPI_CHECKOUT_ENABLED=true` añade un enlace secundario y activa la conexión del formulario; no reemplaza Payhip. El usuario debe iniciar sesión con una cuenta HYRO verificada antes de que se habiliten los campos. No se ha realizado merge ni despliegue.
 
+## Estado del entorno de prueba (23 de octubre de 2026)
+
+Se creó el proyecto aislado de Supabase **hyro-wompi-test** (`qykcpdvmyejtnekmvzld`). Se aplicó el esquema de arranque exclusivo de pruebas [`supabase/testing/wompi-test-bootstrap.sql`](supabase/testing/wompi-test-bootstrap.sql) y las dos migraciones Wompi. Se desplegó `wompi-card` solo en ese proyecto y se configuraron allí las credenciales de desarrollo, la clave de licencias, el origen HTTPS de prueba y los destinos de regreso de Auth. Los secretos no están en Git. La función confirmó modo `test` y obtuvo las regiones de Wompi usando una sesión real del proyecto de pruebas. El negocio Wompi indicó `estaProductivo: false`.
+
+La página estática de prueba se compiló contra este proyecto con el formulario activado. El recorrido de navegador inició sesión con una cuenta sintética confirmada, llegó a `/checkout/`, habilitó el formulario y mostró **MODO DE PRUEBA · SIN COBRO REAL**. No se observó ninguna solicitud al proyecto de producción. La contraseña de esa cuenta está solo en `.env.wompi-account`, excluido de Git; no la compartas por chat. Puedes abrir la vista temporal en `https://appropriate-seat-bringing-exchanges.trycloudflare.com/checkout/` mientras el túnel siga activo. Es una URL de prueba que puede dejar de funcionar o cambiar; no es un despliegue permanente.
+
+**Falta la única prueba externa del pago completo:** Wompi no publica un número de tarjeta autorizado para probar su flujo 3DS en la documentación consultada. Usa exclusivamente una tarjeta o datos de prueba autorizados por Wompi en el entorno de desarrollo para completar 3DS y comprobar el estado `test_paid`. No introduzcas una tarjeta real hasta verificar con Wompi y el adquirente los requisitos para captura directa. El modo de prueba no emite licencia real. No se ha activado producción ni modificado Payhip.
+
 ## Preparar una prueba con Wompi
 
 1. Usar un proyecto de Supabase de prueba con el esquema base de HYRO y las migraciones existentes. Aplicar `20261023231132_wompi_sv_checkout.sql` y después `20261023232142_wompi_card_3ds.sql`. Estas migraciones no se han aplicado a producción.
@@ -34,7 +42,7 @@ Si Wompi devuelve una URL 3DS fuera de un dominio HTTPS `wompi.sv`, el flujo que
 
 ## Producción y límites pendientes
 
-La activación real requiere autorización de despliegue, habilitación del negocio/3DS y revisión de captura directa con Wompi, además de `WOMPI_MODE=live` y `WOMPI_CARD_LIVE_ENABLED=true` en el servidor. Esa habilitación no se ha realizado. Faltan la prueba con credenciales de desarrollo, el recorrido real por 3DS y la verificación de configuración de infraestructura.
+La activación real requiere autorización de despliegue, habilitación del negocio/3DS y revisión de captura directa con Wompi, además de `WOMPI_MODE=live` y `WOMPI_CARD_LIVE_ENABLED=true` en el servidor. Esa habilitación no se ha realizado. Se validaron las credenciales de desarrollo; faltan el recorrido completo por 3DS con datos de tarjeta autorizados por Wompi y la verificación de configuración de infraestructura antes de producción.
 
 Los cupones existentes siguen en Payhip. Wompi mantiene el precio fijo en servidor; no se añadió un campo de descuentos sin un modelo propio de cupones. El contrato público consultado no define un webhook verificable de reembolsos: deben gestionarse y revocarse mediante soporte antes de habilitar ventas reales. El backend anterior `wompi-checkout` de enlaces alojados se conserva, pero el formulario nuevo usa `wompi-card`.
 
