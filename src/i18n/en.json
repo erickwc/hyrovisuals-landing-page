@@ -77,6 +77,7 @@
 "accountCheckEmail": "Check your email to confirm your account, then log in.",
 "accountLoginError": "We couldn't sign you in. Check your email and password, and confirm your email if needed.",
 "accountRegisterError": "We couldn't create your account. Please try again.",
+"accountEmailRateLimit": "The confirmation email limit has been reached. Try again later or use an existing test account.",
 "accountSignOutError": "We couldn't sign you out. Please try again.",
 "accountConfigError": "Account access is not configured yet. Please try again later.",
 "accountSignedInTitle": "You're signed in",

@@ -77,6 +77,7 @@
 "accountCheckEmail": "Revisa tu correo para confirmar la cuenta y luego inicia sesión.",
 "accountLoginError": "No pudimos iniciar sesión. Revisa tu correo y contraseña, y confirma tu correo si hace falta.",
 "accountRegisterError": "No pudimos crear tu cuenta. Inténtalo de nuevo.",
+"accountEmailRateLimit": "Se alcanzó el límite de correos de confirmación. Inténtalo más tarde o usa una cuenta de prueba existente.",
 "accountSignOutError": "No pudimos cerrar la sesión. Inténtalo de nuevo.",
 "accountConfigError": "El acceso a cuentas aún no está configurado. Inténtalo más tarde.",
 "accountSignedInTitle": "Sesión iniciada",

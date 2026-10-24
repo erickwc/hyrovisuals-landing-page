@@ -10,6 +10,7 @@ type StatusKey =
   | 'accountCheckEmail'
   | 'accountLoginError'
   | 'accountRegisterError'
+  | 'accountEmailRateLimit'
   | 'accountSignOutError'
   | 'accountConfigError';
 
@@ -164,8 +165,9 @@ export function initAccountPage() {
         else if (continueTo === 'wompi') location.assign('/checkout/');
       }
       else setStatus('accountCheckEmail');
-    } catch {
-      setStatus('accountRegisterError');
+    } catch (error) {
+      const code = error && typeof error === 'object' && 'code' in error ? error.code : null;
+      setStatus(code === 'over_email_send_rate_limit' ? 'accountEmailRateLimit' : 'accountRegisterError');
     } finally {
       setBusy(false);
     }
