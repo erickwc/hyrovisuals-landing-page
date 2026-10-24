@@ -6,7 +6,7 @@
 
 En la rama `feat/wompi-sv-hosted-checkout`, ejecutar `npm install` y `npm run dev`, y abrir `/checkout/` en la URL local que indique Astro. Sin `PUBLIC_WOMPI_CHECKOUT_ENABLED=true`, se muestra una vista previa con el ingreso y envío de pagos desactivados. No introducir tarjetas reales en vistas previas o pruebas.
 
-Payhip sigue siendo la compra principal. `PUBLIC_WOMPI_CHECKOUT_ENABLED=true` añade un enlace secundario y activa la conexión del formulario; no reemplaza Payhip. El usuario debe iniciar sesión con una cuenta HYRO verificada antes de que se habiliten los campos. No se ha realizado merge ni despliegue.
+Payhip sigue siendo la compra principal. `PUBLIC_WOMPI_CHECKOUT_ENABLED=true` añade un enlace secundario y activa la conexión del formulario; no reemplaza Payhip. El usuario debe iniciar sesión con una cuenta HYRO verificada antes de que se habiliten los campos. No se ha realizado merge ni despliegue a producción.
 
 ## Estado del entorno de prueba (23 de octubre de 2026)
 
