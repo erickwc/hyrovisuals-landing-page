@@ -1,24 +1,15 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import ThemeToggle from '../../components/ThemeToggle.astro';
-import Icon from '../../components/Icon.astro';
 ---
 <Layout page="checkout">
-  <header class="site-header checkout-header">
-    <div class="checkout-header-inner">
-      <a class="checkout-brand brand" href="/" aria-label="HYRO, volver al inicio"><span class="brand-crop"><img src="/images/hyro-logo.png" alt="Hyro" width="5339" height="724" /></span></a>
-      <div class="checkout-controls">
-        <ThemeToggle />
-        <a class="account-link" href="/cuenta/" aria-label="Mi cuenta"><Icon name="user" /></a>
-      </div>
-    </div>
-  </header>
   <main id="main" class="hyro-payment" data-whop-checkout>
     <div class="payment-layout">
       <div class="payment-information">
         <header class="payment-heading">
-          <a href="/">← Volver a la página principal</a>
-          <h1>Finalizar compra</h1>
+          <button class="payment-back" type="button" data-checkout-back aria-label="Volver atrás">
+            <span class="payment-back-default">HYRO</span>
+            <span class="payment-back-hover" aria-hidden="true">← Volver atrás</span>
+          </button>
         </header>
         <section class="payment-summary" aria-label="Resumen del pedido">
           <p class="payment-price"><span data-price-amount>—</span> <span data-price-currency></span></p>
@@ -39,14 +30,15 @@ import Icon from '../../components/Icon.astro';
   </main>
 </Layout>
 <style>
-  .checkout-header { border-bottom: 1px solid var(--border); }
-  .checkout-header-inner { width: min(920px, calc(100% - 40px)); min-height: var(--nav-height); display: flex; align-items: center; justify-content: space-between; margin: auto; }
-  .checkout-controls { display: flex; align-items: center; gap: 10px; }
-  .hyro-payment { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 44px 0 72px; min-height: calc(100svh - var(--nav-height)); }
+  .hyro-payment { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 44px 0 72px; min-height: 100svh; }
   .payment-heading { margin-bottom: 22px; }
-  .payment-heading a, .payment-library { font-size: 13px; color: var(--secondary); }
-  .payment-heading a:hover, .payment-library:hover { color: var(--text); }
-  .payment-heading h1 { font-family: var(--font-body); font-size: clamp(21px, 2vw, 24px); line-height: 1.25; font-weight: 600; letter-spacing: -.025em; margin: 14px 0 0; }
+  .payment-back { display: inline-flex; min-height: 28px; align-items: center; padding: 0; border: 0; background: transparent; color: var(--secondary); font: 500 14px/1.4 var(--font-body); cursor: pointer; }
+  .payment-back:hover, .payment-back:focus-visible { color: var(--text); }
+  .payment-back-hover { display: none; }
+  .payment-back:hover .payment-back-default, .payment-back:focus-visible .payment-back-default { display: none; }
+  .payment-back:hover .payment-back-hover, .payment-back:focus-visible .payment-back-hover { display: inline; }
+  .payment-library { font-size: 13px; color: var(--secondary); }
+  .payment-library:hover { color: var(--text); }
   .payment-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 80px; align-items: start; }
   .payment-summary { padding-top: 0; }
   .payment-price { font-size: clamp(35px,4vw,48px); line-height: 1.1; letter-spacing: -.04em; font-weight: 600; margin: 0; }
@@ -63,5 +55,5 @@ import Icon from '../../components/Icon.astro';
   .payment-status { font-size: 14px; color: var(--secondary); }
   .payment-status:empty { display: none; }
   .payment-retry { padding: 14px 24px; margin-top: 20px; background: var(--button-bg); color: var(--button-text); border-radius: 5px; cursor: pointer; }
-  @media(max-width: 760px) { .hyro-payment,.checkout-header-inner { width: calc(100% - 32px); } .hyro-payment { padding-top: 28px; } .payment-heading { margin-bottom: 20px; } .payment-layout { grid-template-columns: 1fr; gap: 32px; } .payment-form { padding-top: 0; } }
+  @media(max-width: 760px) { .hyro-payment { width: calc(100% - 32px); padding-top: 28px; } .payment-heading { margin-bottom: 20px; } .payment-layout { grid-template-columns: 1fr; gap: 32px; } .payment-form { padding-top: 0; } }
 </style>

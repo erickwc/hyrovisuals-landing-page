@@ -8,6 +8,7 @@ export function initWhopCheckout() {
   if (!root) return () => {};
   const status = root.querySelector<HTMLElement>('[data-whop-status]')!;
   const retry = root.querySelector<HTMLButtonElement>('[data-whop-retry]')!;
+  const backButton = root.querySelector<HTMLButtonElement>('[data-checkout-back]');
   const priceAmount = root.querySelector<HTMLElement>('[data-price-amount]');
   const priceCurrency = root.querySelector<HTMLElement>('[data-price-currency]');
   const productDescription = root.querySelector<HTMLElement>('[data-product-description]');
@@ -82,6 +83,10 @@ export function initWhopCheckout() {
       status.textContent = 'La conexión de pago está tardando más de lo normal. Inténtalo de nuevo en unos momentos.';
       retry.hidden = false;
     }
+  };
+  const goBack = () => {
+    if (document.referrer.startsWith(location.origin) && history.length > 1) history.back();
+    else location.assign('/');
   };
   const observer = new MutationObserver(restyle);
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'lang'] });
@@ -170,7 +175,8 @@ export function initWhopCheckout() {
     }
   };
   retry.addEventListener('click', start);
+  backButton?.addEventListener('click', goBack);
   void start();
-  return () => { cancelled = true; clearTimeout(retryTimer); observer.disconnect(); handle?.destroy(); retry.removeEventListener('click', start); };
+  return () => { cancelled = true; clearTimeout(retryTimer); observer.disconnect(); handle?.destroy(); retry.removeEventListener('click', start); backButton?.removeEventListener('click', goBack); };
 }
 
