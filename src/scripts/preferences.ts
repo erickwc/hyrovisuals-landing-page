@@ -19,7 +19,7 @@ export function initPreferences(onLanguage: () => void) {
   const select = document.querySelector<HTMLSelectElement>('#language');
   const themeButton = document.querySelector<HTMLButtonElement>(
     '[data-theme-toggle]',
-  )!;
+  );
   const menu = document.querySelector<HTMLButtonElement>('.menu-toggle');
   const links = document.querySelector('.nav-links');
   const system = matchMedia('(prefers-color-scheme: dark)');
@@ -30,7 +30,7 @@ export function initPreferences(onLanguage: () => void) {
     lang = navigator.language.toLowerCase().startsWith('es') ? 'es' : 'en';
   let dictionary = lang === 'es' ? es : en;
   const labels = () => {
-    themeButton.setAttribute(
+    themeButton?.setAttribute(
       'aria-label',
       dictionary[
         document.documentElement.dataset.theme === 'dark'
@@ -113,7 +113,7 @@ export function initPreferences(onLanguage: () => void) {
     },
     { signal },
   );
-  themeButton.addEventListener(
+  themeButton?.addEventListener(
     'click',
     () => {
       const theme =
