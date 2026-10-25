@@ -22,8 +22,7 @@ import Icon from '../../components/Icon.astro';
           <p>HYRO Visuals · Licencia personal para un equipo a la vez.</p>
         </header>
         <section class="payment-summary" aria-label="Resumen del pedido">
-          <p class="payment-kind">01 / 01 · Pago único</p>
-          <p class="payment-price">20,00 <span>US$</span></p>
+          <p class="payment-price">15,00 <span>US$</span></p>
           <p class="payment-delivery">Tu clave de activación y la descarga de Windows estarán en tu biblioteca cuando se confirme el pago.</p>
           <a class="payment-library" href="/biblioteca/">Mi biblioteca ↗</a>
         </section>
@@ -48,7 +47,6 @@ import Icon from '../../components/Icon.astro';
   .payment-heading p { color: var(--secondary); font-size: 14px; line-height: 1.6; }
   .payment-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 80px; align-items: start; }
   .payment-summary { padding-top: 0; }
-  .payment-kind { margin-top: 0; color: var(--secondary); font-size: 12px; letter-spacing: .09em; text-transform: uppercase; }
   .payment-price { font-size: clamp(35px,4vw,48px); line-height: 1.1; letter-spacing: -.04em; font-weight: 600; margin: 10px 0 0; }
   .payment-price span { font-size: 17px; letter-spacing: 0; font-weight: 500; }
   .payment-delivery { max-width: 370px; font-size: 13px; color: var(--secondary); line-height: 1.65; margin-top: 15px; }
