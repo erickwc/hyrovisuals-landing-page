@@ -48,7 +48,7 @@ import Icon from '../../components/Icon.astro';
   .payment-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 80px; align-items: start; }
   .payment-summary { padding-top: 0; }
   .payment-price { font-size: clamp(35px,4vw,48px); line-height: 1.1; letter-spacing: -.04em; font-weight: 600; margin: 10px 0 0; }
-  .payment-price span { font-size: 17px; letter-spacing: 0; font-weight: 500; }
+  .payment-price [data-price-currency] { font-size: 17px; letter-spacing: 0; font-weight: 500; }
   .payment-delivery { max-width: 370px; font-size: 13px; color: var(--secondary); line-height: 1.65; margin-top: 15px; }
   .payment-library { display: inline-block; margin-top: 18px; }
   .payment-form, #hyro-whop-checkout { min-width: 0; width: 100%; }

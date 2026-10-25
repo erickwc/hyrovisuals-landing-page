@@ -45,7 +45,11 @@ export function initWhopCheckout() {
         minimumFractionDigits: 2, maximumFractionDigits: 2,
       }).format(planPrice.amount);
       if (priceCurrency) priceCurrency.textContent = planPrice.currency === 'USD' ? 'US$' : planPrice.currency;
-      if (productDescription) productDescription.textContent = `HYRO Visuals · ${planPrice.description}`;
+      const deliveryNotice = 'Tu clave de activación y la descarga de Windows estarán en tu biblioteca cuando se confirme el pago.';
+      const productCopy = planPrice.description.trim().startsWith(deliveryNotice)
+        ? planPrice.description.trim().slice(deliveryNotice.length).trim()
+        : planPrice.description.trim();
+      if (productDescription) productDescription.textContent = `HYRO Visuals${productCopy ? ` · ${productCopy}` : ''}`;
       const { data: product, error: productError } = await supabase.from('products').select('id').eq('slug', 'hyro-visuals').eq('is_active', true).single();
       if (productError || !product) throw new Error('unavailable');
       const { data: owned, error: ownedError } = await supabase.from('licenses').select('id').eq('product_id', product.id).eq('status', 'active').maybeSingle();
