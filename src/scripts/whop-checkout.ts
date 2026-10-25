@@ -8,6 +8,9 @@ export function initWhopCheckout() {
   if (!root) return () => {};
   const status = root.querySelector<HTMLElement>('[data-whop-status]')!;
   const retry = root.querySelector<HTMLButtonElement>('[data-whop-retry]')!;
+  const priceAmount = root.querySelector<HTMLElement>('[data-price-amount]');
+  const priceCurrency = root.querySelector<HTMLElement>('[data-price-currency]');
+  const productDescription = root.querySelector<HTMLElement>('[data-product-description]');
   let cancelled = false;
   let handle: CheckoutHandle | undefined;
   const appearance = () => {
@@ -32,6 +35,17 @@ export function initWhopCheckout() {
       if (!supabase) throw new Error('unavailable');
       const { data: auth, error } = await supabase.auth.getUser();
       if (error || !auth.user) { location.replace('/cuenta/?continuar=compra'); return; }
+      const { data: planPrice, error: priceError } = await supabase.functions.invoke('whop-plan-price');
+      if (priceError || typeof planPrice?.amount !== 'number' || typeof planPrice?.currency !== 'string'
+        || typeof planPrice?.description !== 'string' || !planPrice.description.trim()) {
+        throw new Error('price_unavailable');
+      }
+      const locale = document.documentElement.lang === 'es' ? 'es-SV' : 'en-US';
+      if (priceAmount) priceAmount.textContent = new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 2, maximumFractionDigits: 2,
+      }).format(planPrice.amount);
+      if (priceCurrency) priceCurrency.textContent = planPrice.currency === 'USD' ? 'US$' : planPrice.currency;
+      if (productDescription) productDescription.textContent = `HYRO Visuals · ${planPrice.description}`;
       const { data: product, error: productError } = await supabase.from('products').select('id').eq('slug', 'hyro-visuals').eq('is_active', true).single();
       if (productError || !product) throw new Error('unavailable');
       const { data: owned, error: ownedError } = await supabase.from('licenses').select('id').eq('product_id', product.id).eq('status', 'active').maybeSingle();
