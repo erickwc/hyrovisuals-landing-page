@@ -40,7 +40,7 @@ export function initWhopCheckout() {
         || typeof planPrice?.description !== 'string' || !planPrice.description.trim()) {
         throw new Error('price_unavailable');
       }
-      const locale = document.documentElement.lang === 'es' ? 'es-SV' : 'en-US';
+      const locale = document.documentElement.lang === 'es' ? 'es-ES' : 'en-US';
       if (priceAmount) priceAmount.textContent = new Intl.NumberFormat(locale, {
         minimumFractionDigits: 2, maximumFractionDigits: 2,
       }).format(planPrice.amount);

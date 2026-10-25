@@ -10,7 +10,7 @@ const respond = (origin: string, status: number, body: object) => new Response(J
     'content-type': 'application/json',
     'access-control-allow-origin': origin,
     'access-control-allow-headers': 'authorization, apikey, content-type, x-client-info',
-    'access-control-allow-methods': 'GET, OPTIONS',
+    'access-control-allow-methods': 'GET, POST, OPTIONS',
     'cache-control': 'no-store',
     'vary': 'Origin',
   },
@@ -19,13 +19,13 @@ const respond = (origin: string, status: number, body: object) => new Response(J
 Deno.serve(async (request: Request) => {
   const origin = corsOrigin(request.headers.get('origin'));
   if (request.method === 'OPTIONS') return respond(origin, 200, {});
-  if (request.method !== 'GET') return respond(origin, 405, { error: 'method_not_allowed' });
+  if (request.method !== 'GET' && request.method !== 'POST') return respond(origin, 405, { error: 'method_not_allowed' });
 
   const apiKey = Deno.env.get('WHOP_API_KEY');
   if (!apiKey) return respond(origin, 503, { error: 'price_unavailable' });
 
   try {
-    const upstream = await fetch('https://api.whop.com/api/v1/plans/plan_yKbcCAPF4EaHb', {
+    const upstream = await fetch('https://api.whop.com/api/v1/variants/plan_yKbcCAPF4EaHb', {
       headers: { authorization: `Bearer ${apiKey}`, 'Api-Version-Date': '2026-10-24' },
       signal: AbortSignal.timeout(8000),
     });
