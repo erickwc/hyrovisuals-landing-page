@@ -84,7 +84,7 @@ export function initWhopCheckout() {
       if (!win.WhopElements) throw new Error('unavailable');
       handle?.destroy();
       handle = win.WhopElements().checkout.create({
-        plan: 'plan_Alosf0V6ZsprM', quantity: 1,
+        plan: 'plan_yKbcCAPF4EaHb', quantity: 1,
         appearance: appearance(), locale: document.documentElement.lang === 'es' ? 'es' : 'en',
         metadata: { hyro_intent: intent.id },
         returnUrl: `${location.origin}/compra/?intent=${encodeURIComponent(intent.id)}`,

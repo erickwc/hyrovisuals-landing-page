@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { handle } from '../supabase/functions/whop-webhook/handler.ts';
 const env = { WHOP_WEBHOOK_SECRET:'ws_test_secret', WHOP_API_KEY:'test', SUPABASE_URL:'https://db.example', SUPABASE_SERVICE_ROLE_KEY:'server', LICENSE_ENCRYPTION_KEY:Buffer.alloc(32,9).toString('base64') };
-const payment = { id:'pay_example', company:{id:'biz_XOirHolBiKU66x'}, plan:{id:'plan_Alosf0V6ZsprM'}, status:'paid', substatus:'succeeded', total:20, currency:'usd', metadata:{hyro_intent:'11111111-1111-4111-8111-111111111111'}, user:{email:'buyer@example.com'} };
+const payment = { id:'pay_example', company:{id:'biz_XOirHolBiKU66x'}, plan:{id:'plan_yKbcCAPF4EaHb'}, status:'paid', substatus:'succeeded', total:20, currency:'usd', metadata:{hyro_intent:'11111111-1111-4111-8111-111111111111'}, user:{email:'buyer@example.com'} };
 function signed(event, time = Math.floor(Date.now()/1000)) {
   const body=JSON.stringify(event); const id='msg_example';
   return new Request('https://db.example/webhook',{method:'POST',body,headers:{'webhook-id':id,'webhook-timestamp':String(time),'webhook-signature':'v1,'+createHmac('sha256',env.WHOP_WEBHOOK_SECRET).update(`${id}.${time}.${body}`).digest('base64')}});

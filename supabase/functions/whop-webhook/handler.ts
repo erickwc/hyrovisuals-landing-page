@@ -1,6 +1,6 @@
 const encoder = new TextEncoder();
 const COMPANY = 'biz_XOirHolBiKU66x';
-const PLAN = 'plan_Alosf0V6ZsprM';
+const PLAN = 'plan_yKbcCAPF4EaHb';
 const hex = (bytes: Uint8Array) => [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
 const json = (status: number, body: object) => new Response(JSON.stringify(body), {
   status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
