@@ -10,48 +10,21 @@ export function initWhopCheckout() {
   const retry = root.querySelector<HTMLButtonElement>('[data-whop-retry]')!;
   let cancelled = false;
   let handle: CheckoutHandle | undefined;
-  const narrow = matchMedia('(max-width: 1071px)');
   const appearance = () => {
-    const css = getComputedStyle(document.documentElement);
-    const token = (name: string) => css.getPropertyValue(name).trim();
-    const background = token('--background'), surface = token('--surface'), color = token('--text'), border = token('--border');
-    const field = { backgroundColor: surface, color, borderColor: border, borderRadius: '5px', boxShadow: 'none', minHeight: '40px', height: '40px', fontSize: '14px' };
+    const background = getComputedStyle(document.documentElement).getPropertyValue('--background').trim();
     return {
       theme: { appearance: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light', accentColor: 'gray', grayColor: 'gray' },
-      variables: { '--radius': '5px', '--font-family': 'Inter, Arial, sans-serif' },
       classes: {
-        'whop-Checkout': { backgroundColor: background, color, padding: '0px', fontFamily: 'Inter, Arial, sans-serif' },
-        'whop-CheckoutLayout': { gap: narrow.matches ? '24px' : '56px', width: '100%', maxWidth: 'none', padding: '0px' },
-        'whop-CheckoutCollection': { width: narrow.matches ? '100%' : '58%', minWidth: '0px', padding: '0px', backgroundColor: background },
-        'whop-CheckoutDetails': { width: narrow.matches ? '100%' : '42%', height: 'fit-content', minHeight: '0px', minWidth: '0px', padding: narrow.matches ? '20px' : '28px', backgroundColor: surface, border: `1px solid ${border}`, borderRadius: '6px', boxShadow: 'none' },
-        'whop-CheckoutItemHeadline': { color: token('--secondary'), fontSize: '14px', lineHeight: '1.7' },
-        'whop-CheckoutItemDescription': { color: token('--secondary'), fontSize: '14px', lineHeight: '1.7' },
-        'whop-CheckoutSummary': { color, backgroundColor: surface, textAlign: 'left' },
-        'whop-CheckoutItem': { color, textAlign: 'left', fontSize: '20px', fontWeight: '600' },
-        'whop-CheckoutPrice': { color, textAlign: 'left' },
-        'whop-CheckoutTotal': { color, fontSize: '32px', fontWeight: '600' },
-        'whop-CheckoutPriceContext': { color: token('--secondary') },
-        'whop-CheckoutPayButton': { backgroundColor: token('--button-bg'), color: token('--button-text'), borderRadius: '5px', minHeight: '50px', fontSize: '15px', fontWeight: '600', boxShadow: 'none' },
-        'whop-EmailInput': field,
-        'whop-AddressFieldInput': field,
-        'whop-AddressFieldSelect': field,
-        'whop-CardFieldInput': field,
-        'whop-CheckoutRequirementInput': field,
-        'whop-AddressGroup': { borderColor: border, borderRadius: '5px', backgroundColor: surface },
-        'whop-PaymentMethods': { borderColor: border, borderRadius: '5px', backgroundColor: background },
-        'whop-PaymentMethodDetail': { backgroundColor: background, color },
-        'whop-PaymentMethodRow': { backgroundColor: background, color },
-        'whop-PaymentMethodRowSelected': { backgroundColor: background, color },
-        'whop-EmailLabel': { color: token('--secondary'), fontSize: '13px' },
-        'whop-CardLabel': { color: token('--secondary'), fontSize: '13px' },
-        'whop-CheckoutTerms': { color: token('--secondary'), fontSize: '12px', lineHeight: '1.7' },
+        'whop-Checkout': { padding: '0px', backgroundColor: background },
+        'whop-CheckoutLayout': { width: '100%', padding: '0px', gap: '0px' },
+        'whop-CheckoutDetails': { display: 'none', width: '0px', height: '0px', minHeight: '0px', padding: '0px', opacity: '0', overflow: 'hidden', visibility: 'hidden' },
+        'whop-CheckoutCollection': { width: '100%', minWidth: '0px', padding: '0px', backgroundColor: background },
       },
     };
   };
   const restyle = () => handle?.update({ appearance: appearance(), locale: document.documentElement.lang === 'es' ? 'es' : 'en' });
   const observer = new MutationObserver(restyle);
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'lang'] });
-  narrow.addEventListener('change', restyle);
   const start = async () => {
     retry.hidden = true;
     try {
@@ -99,6 +72,6 @@ export function initWhopCheckout() {
   };
   retry.addEventListener('click', start);
   void start();
-  return () => { cancelled = true; observer.disconnect(); narrow.removeEventListener('change', restyle); handle?.destroy(); retry.removeEventListener('click', start); };
+  return () => { cancelled = true; observer.disconnect(); handle?.destroy(); retry.removeEventListener('click', start); };
 }
 
