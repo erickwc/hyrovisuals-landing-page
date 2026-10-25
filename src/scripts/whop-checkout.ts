@@ -10,20 +10,22 @@ export function initWhopCheckout() {
   const retry = root.querySelector<HTMLButtonElement>('[data-whop-retry]')!;
   let cancelled = false;
   let handle: CheckoutHandle | undefined;
-  const narrow = matchMedia('(max-width: 760px)');
+  const narrow = matchMedia('(max-width: 1071px)');
   const appearance = () => {
     const css = getComputedStyle(document.documentElement);
     const token = (name: string) => css.getPropertyValue(name).trim();
     const background = token('--background'), surface = token('--surface'), color = token('--text'), border = token('--border');
-    const field = { backgroundColor: surface, color, borderColor: border, borderRadius: '5px', boxShadow: 'none', minHeight: '48px', fontSize: '15px' };
+    const field = { backgroundColor: surface, color, borderColor: border, borderRadius: '5px', boxShadow: 'none', minHeight: '40px', height: '40px', fontSize: '14px' };
     return {
       theme: { appearance: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light', accentColor: 'gray', grayColor: 'gray' },
       variables: { '--radius': '5px', '--font-family': 'Inter, Arial, sans-serif' },
       classes: {
         'whop-Checkout': { backgroundColor: background, color, padding: '0px', fontFamily: 'Inter, Arial, sans-serif' },
-        'whop-CheckoutLayout': { display: 'flex', flexDirection: narrow.matches ? 'column' : 'row', alignItems: 'flex-start', gap: narrow.matches ? '24px' : '56px', width: '100%', maxWidth: 'none', padding: '0px' },
-        'whop-CheckoutCollection': { order: '1', width: narrow.matches ? '100%' : '58%', minWidth: '0px', padding: '0px', backgroundColor: background },
-        'whop-CheckoutDetails': { order: narrow.matches ? '0' : '2', width: narrow.matches ? '100%' : '42%', minWidth: '0px', padding: narrow.matches ? '20px' : '28px', backgroundColor: surface, border: `1px solid ${border}`, borderRadius: '6px', boxShadow: 'none' },
+        'whop-CheckoutLayout': { gap: narrow.matches ? '24px' : '56px', width: '100%', maxWidth: 'none', padding: '0px' },
+        'whop-CheckoutCollection': { width: narrow.matches ? '100%' : '58%', minWidth: '0px', padding: '0px', backgroundColor: background },
+        'whop-CheckoutDetails': { width: narrow.matches ? '100%' : '42%', height: 'fit-content', minHeight: '0px', minWidth: '0px', padding: narrow.matches ? '20px' : '28px', backgroundColor: surface, border: `1px solid ${border}`, borderRadius: '6px', boxShadow: 'none' },
+        'whop-CheckoutItemHeadline': { color: token('--secondary'), fontSize: '14px', lineHeight: '1.7' },
+        'whop-CheckoutItemDescription': { color: token('--secondary'), fontSize: '14px', lineHeight: '1.7' },
         'whop-CheckoutSummary': { color, backgroundColor: surface, textAlign: 'left' },
         'whop-CheckoutItem': { color, textAlign: 'left', fontSize: '20px', fontWeight: '600' },
         'whop-CheckoutPrice': { color, textAlign: 'left' },
