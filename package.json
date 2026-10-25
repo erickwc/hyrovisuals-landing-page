@@ -10,7 +10,8 @@
     "astro": "astro",
     "check": "astro check",
     "format": "prettier --write .",
-    "verify:header": "node scripts/verify-header.mjs"
+    "verify:header": "node scripts/verify-header.mjs",
+    "verify:whop": "node --experimental-strip-types --test scripts/verify-whop.mjs && node scripts/verify-whop-db.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -25,6 +26,7 @@
     "typescript": "^5.8.2"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.11",
     "@playwright/test": "^1.59.1",
     "prettier": "^3.9.10",
     "prettier-plugin-astro": "^1.1.1"

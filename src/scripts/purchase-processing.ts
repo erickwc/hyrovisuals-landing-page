@@ -8,6 +8,12 @@ export function initPurchaseProcessing() {
   const back = root.querySelector<HTMLElement>('[data-processing-back]');
   const say = (message: string) => { if (status) status.textContent = message; };
   const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+  const returnParams = new URL(location.href).searchParams;
+  if (['failed', 'canceled'].includes(returnParams.get('status') ?? '')) {
+    say('El pago no se completó. Puedes volver al producto e intentarlo de nuevo.');
+    if (back) back.hidden = false;
+    return () => controller.abort();
+  }
 
   void (async () => {
     if (!supabase) { say('No pudimos consultar tu compra. Vuelve a intentarlo más tarde.'); return; }
@@ -19,9 +25,11 @@ export function initPurchaseProcessing() {
       return;
     }
     let intentId: string | null = null;
+    const returnedIntent = returnParams.get('intent');
+    if (returnedIntent && /^[0-9a-f-]{36}$/i.test(returnedIntent)) intentId = returnedIntent;
     try {
       const cached = sessionStorage.getItem('hyro:checkout-intent-id');
-      if (cached && /^[0-9a-f-]{36}$/i.test(cached)) intentId = cached;
+      if (!intentId && cached && /^[0-9a-f-]{36}$/i.test(cached)) intentId = cached;
     } catch { /* Storage is optional for older checkouts. */ }
     let productId: string | null = null;
     try {

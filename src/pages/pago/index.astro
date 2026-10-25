@@ -1,0 +1,26 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+---
+<Layout page="checkout">
+  <header class="site-header"><Navbar accountPage /></header>
+  <main class="account-page" data-whop-checkout>
+    <div class="account-layout page-shell">
+      <div class="account-intro">
+        <p class="account-eyebrow">HYRO VISUALS</p>
+        <h1 class="account-title">Completa tu compra</h1>
+        <p class="account-intro-copy">Licencia personal · un equipo a la vez.</p>
+        <p class="account-intro-copy">Al confirmarse el pago, encontrarás tu clave de activación y los instaladores disponibles en tu biblioteca.</p>
+        <a class="account-back" href="/#compra">Volver al producto</a>
+      </div>
+      <section class="account-panel" aria-label="Pago seguro">
+        <div class="account-panel-inner">
+          <p data-whop-status role="status" aria-live="polite">Preparando tu pago seguro…</p>
+          <div id="hyro-whop-checkout"></div>
+          <button class="account-submit" type="button" data-whop-retry hidden>Volver a intentar</button>
+          <a class="account-back" href="/biblioteca/">Ir a mi biblioteca</a>
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>
