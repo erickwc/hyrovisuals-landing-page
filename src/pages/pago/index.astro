@@ -14,20 +14,20 @@ import Icon from '../../components/Icon.astro';
     </div>
   </header>
   <main id="main" class="hyro-payment" data-whop-checkout>
-    <header class="payment-heading">
-      <a href="/">← Volver a la página principal</a>
-      <h1>Finalizar compra</h1>
-      <p>HYRO Visuals · Licencia personal para un equipo a la vez.</p>
-    </header>
     <div class="payment-layout">
-      <section class="payment-summary" aria-label="Resumen del pedido">
-        <div class="product-ident"><span class="product-mark" aria-hidden="true">H</span><div><strong>HYRO Visual</strong><span>Licencia personal · Windows</span></div></div>
-        <p class="payment-kind">01 / 01 · Pago único</p>
-        <p class="payment-price">20,00 <span>US$</span></p>
-        <div class="payment-total"><span>Total a pagar hoy</span><strong>20,00 US$</strong></div>
-        <p class="payment-delivery">Tu clave de activación y la descarga de Windows estarán en tu biblioteca cuando se confirme el pago.</p>
-        <a class="payment-library" href="/biblioteca/">Mi biblioteca ↗</a>
-      </section>
+      <div class="payment-information">
+        <header class="payment-heading">
+          <a href="/">← Volver a la página principal</a>
+          <h1>Finalizar compra</h1>
+          <p>HYRO Visuals · Licencia personal para un equipo a la vez.</p>
+        </header>
+        <section class="payment-summary" aria-label="Resumen del pedido">
+          <p class="payment-kind">01 / 01 · Pago único</p>
+          <p class="payment-price">20,00 <span>US$</span></p>
+          <p class="payment-delivery">Tu clave de activación y la descarga de Windows estarán en tu biblioteca cuando se confirme el pago.</p>
+          <a class="payment-library" href="/biblioteca/">Mi biblioteca ↗</a>
+        </section>
+      </div>
       <section class="payment-form" aria-label="Pago seguro">
         <p class="payment-status" data-whop-status role="status" aria-live="polite">Preparando tu pago seguro…</p>
         <div id="hyro-whop-checkout"></div>
@@ -47,22 +47,16 @@ import Icon from '../../components/Icon.astro';
   .payment-heading h1 { font-family: var(--font-body); font-size: clamp(27px, 3vw, 36px); line-height: 1.2; font-weight: 600; letter-spacing: -.035em; margin: 18px 0 10px; }
   .payment-heading p { color: var(--secondary); font-size: 14px; line-height: 1.6; }
   .payment-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 80px; align-items: start; }
-  .payment-summary { padding-top: 7px; }
-  .product-ident { display: flex; align-items: center; gap: 12px; }
-  .product-ident strong, .product-ident span { display: block; }
-  .product-ident strong { font-size: 15px; font-weight: 600; }
-  .product-ident span { font-size: 13px; color: var(--secondary); margin-top: 3px; }
-  .product-mark { width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 5px; color: var(--text) !important; font-size: 22px !important; font-weight: 800; margin: 0 !important; }
-  .payment-kind { margin-top: 42px; color: var(--secondary); font-size: 12px; letter-spacing: .09em; text-transform: uppercase; }
-  .payment-price { font-size: clamp(35px,4vw,48px); line-height: 1.1; letter-spacing: -.04em; font-weight: 600; margin: 10px 0 30px; }
+  .payment-summary { padding-top: 0; }
+  .payment-kind { margin-top: 0; color: var(--secondary); font-size: 12px; letter-spacing: .09em; text-transform: uppercase; }
+  .payment-price { font-size: clamp(35px,4vw,48px); line-height: 1.1; letter-spacing: -.04em; font-weight: 600; margin: 10px 0 0; }
   .payment-price span { font-size: 17px; letter-spacing: 0; font-weight: 500; }
-  .payment-total { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 22px 0; border-top: 1px solid var(--border); font-size: 14px; }
-  .payment-total strong { white-space: nowrap; }
   .payment-delivery { max-width: 370px; font-size: 13px; color: var(--secondary); line-height: 1.65; margin-top: 15px; }
   .payment-library { display: inline-block; margin-top: 18px; }
   .payment-form, #hyro-whop-checkout { min-width: 0; width: 100%; }
+  .payment-form { padding-top: 40px; }
   .payment-status { font-size: 14px; color: var(--secondary); }
   .payment-status:empty { display: none; }
   .payment-retry { padding: 14px 24px; margin-top: 20px; background: var(--button-bg); color: var(--button-text); border-radius: 5px; cursor: pointer; }
-  @media(max-width: 760px) { .hyro-payment,.checkout-header-inner { width: calc(100% - 32px); } .hyro-payment { padding-top: 28px; } .payment-heading { margin-bottom: 28px; } .payment-layout { grid-template-columns: 1fr; gap: 32px; } .payment-kind { margin-top: 26px; } .payment-price { margin-bottom: 20px; } }
+  @media(max-width: 760px) { .hyro-payment,.checkout-header-inner { width: calc(100% - 32px); } .hyro-payment { padding-top: 28px; } .payment-heading { margin-bottom: 28px; } .payment-layout { grid-template-columns: 1fr; gap: 32px; } .payment-form { padding-top: 0; } }
 </style>

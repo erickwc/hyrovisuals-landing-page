@@ -19,6 +19,7 @@ export function initWhopCheckout() {
         'whop-CheckoutLayout': { width: '100%', padding: '0px', gap: '0px' },
         'whop-CheckoutDetails': { display: 'none', width: '0px', height: '0px', minHeight: '0px', padding: '0px', opacity: '0', overflow: 'hidden', visibility: 'hidden' },
         'whop-CheckoutCollection': { width: '100%', minWidth: '0px', padding: '0px', backgroundColor: background },
+        'whop-EmailSignIn': { display: 'none' },
       },
     };
   };
