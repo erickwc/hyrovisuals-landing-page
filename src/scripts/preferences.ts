@@ -16,12 +16,12 @@ const save = (key: string, value: string) => {
 export function initPreferences(onLanguage: () => void) {
   const controller = new AbortController();
   const signal = controller.signal;
-  const select = document.querySelector<HTMLSelectElement>('#language')!;
+  const select = document.querySelector<HTMLSelectElement>('#language');
   const themeButton = document.querySelector<HTMLButtonElement>(
     '[data-theme-toggle]',
   )!;
-  const menu = document.querySelector<HTMLButtonElement>('.menu-toggle')!;
-  const links = document.querySelector('.nav-links')!;
+  const menu = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const links = document.querySelector('.nav-links');
   const system = matchMedia('(prefers-color-scheme: dark)');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   let themeTransition: ViewTransition | undefined;
@@ -38,7 +38,7 @@ export function initPreferences(onLanguage: () => void) {
           : 'themeDark'
       ],
     );
-    menu.setAttribute(
+    if (menu) menu.setAttribute(
       'aria-label',
       dictionary[
         menu.getAttribute('aria-expanded') === 'true' ? 'menuClose' : 'menuOpen'
@@ -48,7 +48,7 @@ export function initPreferences(onLanguage: () => void) {
   const translate = () => {
     dictionary = lang === 'es' ? es : en;
     document.documentElement.lang = lang!;
-    select.value = lang!;
+    if (select) select.value = lang!;
     const page = document.body.dataset.page;
     document.title = page === 'account'
       ? dictionary.accountPageTitle
@@ -102,7 +102,7 @@ export function initPreferences(onLanguage: () => void) {
     });
   };
   translate();
-  select.addEventListener(
+  select?.addEventListener(
     'change',
     () => {
       document.dispatchEvent(new Event('hyro:before-language'));
@@ -133,21 +133,21 @@ export function initPreferences(onLanguage: () => void) {
     { signal },
   );
   const close = () => {
-    links.classList.remove('is-open');
-    menu.setAttribute('aria-expanded', 'false');
+    links?.classList.remove('is-open');
+    menu?.setAttribute('aria-expanded', 'false');
     labels();
   };
-  menu.addEventListener(
+  menu?.addEventListener(
     'click',
     () => {
       const open = menu.getAttribute('aria-expanded') !== 'true';
-      links.classList.toggle('is-open', open);
+      links?.classList.toggle('is-open', open);
       menu.setAttribute('aria-expanded', String(open));
       labels();
     },
     { signal },
   );
-  links.addEventListener('click', close, { signal });
+  links?.addEventListener('click', close, { signal });
   document.addEventListener(
     'keydown',
     (event) => {
