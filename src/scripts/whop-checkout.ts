@@ -11,6 +11,8 @@ export function initWhopCheckout() {
   const priceAmount = root.querySelector<HTMLElement>('[data-price-amount]');
   const priceCurrency = root.querySelector<HTMLElement>('[data-price-currency]');
   const productDescription = root.querySelector<HTMLElement>('[data-product-description]');
+  const productDescriptionHeading = root.querySelector<HTMLElement>('[data-product-description-heading]');
+  const productFeatures = root.querySelector<HTMLUListElement>('[data-product-features]');
   let cancelled = false;
   let handle: CheckoutHandle | undefined;
   const appearance = () => {
@@ -49,7 +51,17 @@ export function initWhopCheckout() {
       const productCopy = planPrice.description.trim().startsWith(deliveryNotice)
         ? planPrice.description.trim().slice(deliveryNotice.length).trim()
         : planPrice.description.trim();
-      if (productDescription) productDescription.textContent = `HYRO Visuals${productCopy ? ` · ${productCopy}` : ''}`;
+      const featureParts = productCopy.split(/\s*✓\s*/).map((part: string) => part.trim()).filter(Boolean);
+      const descriptionTitle = featureParts.length > 1 ? featureParts.shift()! : 'HYRO Visuals';
+      if (productDescriptionHeading) productDescriptionHeading.textContent = descriptionTitle;
+      if (productFeatures) {
+        productFeatures.replaceChildren(...featureParts.map((feature: string) => {
+          const item = document.createElement('li');
+          item.textContent = feature;
+          return item;
+        }));
+      }
+      if (productDescription) productDescription.hidden = false;
       const { data: product, error: productError } = await supabase.from('products').select('id').eq('slug', 'hyro-visuals').eq('is_active', true).single();
       if (productError || !product) throw new Error('unavailable');
       const { data: owned, error: ownedError } = await supabase.from('licenses').select('id').eq('product_id', product.id).eq('status', 'active').maybeSingle();
