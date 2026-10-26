@@ -19,52 +19,26 @@ export function initAnimations(reduced: boolean) {
         mask: 'lines',
         autoSplit: true,
         onSplit(self) {
-          return gsap.from(self.lines, {
-            y: 10,
-            autoAlpha: 0,
-            filter: 'blur(6px)',
-            duration: slow * 0.98,
-            stagger: 0.08,
-            ease,
-          });
+          return gsap.from(self.lines, { yPercent: 110, duration: slow, ease });
         },
       });
       splits.push(split);
     });
     timeline
+      .from('[data-anim="line"]', { scaleY: 0, duration: slow, stagger }, 0)
       .from(
-        '[data-anim="line"]',
-        { autoAlpha: 0, duration: slow * 0.75, stagger: stagger * 0.5 },
-        0,
-      )
-      .from(
-        '[data-anim="label"]',
-        {
-          y: 4,
-          autoAlpha: 0,
-          filter: 'blur(2px)',
-          duration: base * 0.9,
-        },
-        base * 0.2,
-      )
-      .from(
-        '[data-anim="description"]',
-        { y: 6, autoAlpha: 0, duration: base * 1.05 },
-        base * 0.32,
-      )
-      .from(
-        '[data-anim="button"]',
-        { autoAlpha: 0, duration: base * 0.9 },
-        base * 0.48,
+        '[data-anim="label"],[data-anim="description"],[data-anim="button"]',
+        { y: number('--reveal-y'), autoAlpha: 0, duration: base, stagger },
+        base / 2,
       )
       .from(
         '[data-anim="visual"]',
         {
-          scale: 0.996,
-          autoAlpha: 0,
-          duration: slow * 0.92,
+          scale: number('--visual-scale'),
+          clipPath: 'inset(0 50% 0 50%)',
+          duration: slow,
         },
-        base * 0.42,
+        base,
       );
     gsap.to('[data-anim="dots"]', {
       opacity: number('--dot-pulse-opacity'),
@@ -75,10 +49,10 @@ export function initAnimations(reduced: boolean) {
       stagger,
     });
     gsap.from('[data-anim="feature"]', {
-      y: 7,
+      y: number('--reveal-y'),
       autoAlpha: 0,
       stagger,
-      duration: base * 0.75,
+      duration: base,
       ease,
       scrollTrigger: { trigger: '.features', start: 'top 92%', once: true },
     });
@@ -91,18 +65,18 @@ export function initAnimations(reduced: boolean) {
         },
       })
       .from('[data-anim="purchase-copy"]', {
-        y: 8,
+        y: 24,
         autoAlpha: 0,
-        duration: base * 0.75,
-        stagger: 0.075,
+        duration: base,
+        stagger: 0.09,
         ease,
       })
       .from(
         '[data-anim="purchase-benefit"]',
         {
-          y: 5,
+          y: 16,
           autoAlpha: 0,
-          duration: base * 0.65,
+          duration: base * 0.8,
           stagger: 0.055,
           ease,
         },
@@ -110,7 +84,7 @@ export function initAnimations(reduced: boolean) {
       )
       .from(
         '[data-anim="purchase-card"]',
-        { y: 8, autoAlpha: 0, duration: slow * 0.65, ease },
+        { y: 24, autoAlpha: 0, duration: slow, ease },
         0.16,
       );
     const mobile = matchMedia('(max-width: 767px)').matches;
