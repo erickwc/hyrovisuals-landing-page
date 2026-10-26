@@ -64,9 +64,9 @@
   --space-2xl: 3rem;
   --space-3xl: 4.5rem;
   --space-4xl: 6rem;
-  --gap-label-title: var(--space-md);
-  --gap-title-copy: var(--space-md);
-  --gap-copy-button: var(--space-lg);
+  --gap-label-title: 0.5rem;
+  --gap-title-copy: 0.75rem;
+  --gap-copy-button: 2rem;
   --gap-button-visual: var(--space-xl);
   --gap-visual-features: var(--space-lg);
   --gap-features-availability: var(--space-lg);
@@ -617,10 +617,11 @@ select:focus-visible {
 }
 .section-label {
   font-family: var(--font-label);
-  font-size: var(--text-label);
+  font-size: var(--text-small);
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: var(--label-tracking);
-  color: var(--secondary);
+  letter-spacing: var(--feature-tracking);
+  color: color-mix(in srgb, var(--secondary) 72%, var(--text));
   margin: 0 0 var(--gap-label-title);
 }
 .hero-title {
@@ -654,9 +655,12 @@ select:focus-visible {
   max-width: var(--description-width);
   min-height: var(--description-min-height);
   margin: var(--gap-title-copy) auto var(--gap-copy-button);
-  font-size: var(--text-description);
+  font-family: var(--font-label);
+  font-size: var(--text-small);
+  font-weight: 400;
+  letter-spacing: 0.035em;
   line-height: 1.5;
-  color: var(--secondary);
+  color: color-mix(in srgb, var(--secondary) 72%, var(--text));
   text-wrap: pretty;
 }
 .primary-button {
@@ -672,8 +676,8 @@ select:focus-visible {
   background: var(--button-bg);
   color: var(--button-text);
   font-family: var(--font-label);
-  font-size: var(--text-body);
-  font-weight: 600;
+  font-size: var(--text-small);
+  font-weight: 400;
   letter-spacing: var(--feature-tracking);
   text-transform: uppercase;
 }
@@ -1787,9 +1791,9 @@ select:focus-visible {
 @media (min-width: 64rem) {
   :root {
     --hero-top: clamp(3.5rem, 5vw, 5rem);
-    --gap-label-title: 1.25rem;
-    --gap-title-copy: var(--space-lg);
-    --gap-copy-button: var(--space-xl);
+    --gap-label-title: 0.45rem;
+    --gap-title-copy: 0.65rem;
+    --gap-copy-button: 1.5rem;
     --gap-button-visual: 2.75rem;
     --gap-visual-features: 0;
     --gap-features-availability: var(--space-xl);
