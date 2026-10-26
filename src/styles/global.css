@@ -437,17 +437,17 @@ select:focus-visible {
   white-space: nowrap;
   font-size: var(--text-small);
 }
-.account-trigger .icon:first-child {
-  width: 1.05rem;
-  height: 1.05rem;
-}
-.account-trigger .icon:last-child {
-  width: 0.9rem;
-  height: 0.9rem;
-  transition: transform 180ms ease;
-}
-.account-trigger[aria-expanded='true'] .icon {
-  transform: rotate(180deg);
+.account-avatar {
+  width: 1.35rem;
+  height: 1.35rem;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1;
 }
 .account-dropdown {
   position: absolute;
@@ -464,21 +464,27 @@ select:focus-visible {
 }
 .account-dropdown a,
 .account-dropdown button {
-  width: 100%;
+  width: calc(100% + 0.7rem);
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  padding: 0.7rem 0.75rem;
+  margin-inline: -0.35rem;
+  padding: 0.7rem 1.1rem;
   border: 0;
-  border-radius: calc(var(--radius-md) - 0.25rem);
+  border-radius: 0;
   background: transparent;
   color: var(--text);
   text-align: start;
   font: inherit;
   font-size: var(--text-small);
+  text-transform: uppercase;
   cursor: pointer;
   transition:
     background-color 180ms ease;
+}
+.account-dropdown a + a,
+.account-dropdown button {
+  border-top: 1px solid var(--border);
 }
 .account-dropdown a:hover,
 .account-dropdown button:hover {

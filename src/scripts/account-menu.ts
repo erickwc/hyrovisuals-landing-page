@@ -15,6 +15,7 @@ export function initAccountMenu() {
     '[data-account-trigger]',
   );
   const name = root.querySelector<HTMLElement>('[data-account-name]');
+  const initial = root.querySelector<HTMLElement>('[data-account-initial]');
   const dropdown = root.querySelector<HTMLElement>('[data-account-dropdown]');
   const signOut = root.querySelector<HTMLButtonElement>(
     '[data-account-signout]',
@@ -41,6 +42,7 @@ export function initAccountMenu() {
         typeof metadataName === 'string' && metadataName.trim()
           ? metadataName.trim()
           : (user.email?.split('@')[0] ?? dictionary().accountNav);
+      if (initial) initial.textContent = name.textContent?.trim().charAt(0).toLocaleUpperCase() ?? '';
     }
     close();
     if (!signedIn && status) status.hidden = true;
