@@ -27,6 +27,7 @@ export function initPreferences(onLanguage: () => void) {
   const links = document.querySelector('.nav-links');
   const system = matchMedia('(prefers-color-scheme: dark)');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let languageCloseTimer: number | undefined;
   let themeTransition: ViewTransition | undefined;
   let lang = readSaved('hyro-language');
   if (lang !== 'en' && lang !== 'es')
@@ -110,13 +111,26 @@ export function initPreferences(onLanguage: () => void) {
   };
   translate();
   const closeLanguageMenu = () => {
-    languageDropdown?.setAttribute('hidden', '');
     languageToggle?.setAttribute('aria-expanded', 'false');
+    if (languageDropdown && !languageDropdown.hidden) {
+      languageDropdown.classList.add('dropdown-closing');
+      window.clearTimeout(languageCloseTimer);
+      languageCloseTimer = window.setTimeout(() => {
+        if (languageDropdown.classList.contains('dropdown-closing')) {
+          languageDropdown.setAttribute('hidden', '');
+          languageDropdown.classList.remove('dropdown-closing');
+        }
+      }, 150);
+    }
   };
   languageToggle?.addEventListener('click', () => {
     const open = languageToggle.getAttribute('aria-expanded') !== 'true';
     languageToggle.setAttribute('aria-expanded', String(open));
-    if (open) languageDropdown?.removeAttribute('hidden');
+    if (open) {
+      window.clearTimeout(languageCloseTimer);
+      languageDropdown?.classList.remove('dropdown-closing');
+      languageDropdown?.removeAttribute('hidden');
+    }
     else closeLanguageMenu();
   }, { signal });
   languageOptions.forEach((option) => option.addEventListener('click', () => {

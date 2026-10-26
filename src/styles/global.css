@@ -491,6 +491,10 @@ select:focus-visible {
   animation: dropdown-appear 150ms ease-out both;
   transform-origin: top right;
 }
+.account-dropdown.dropdown-closing {
+  animation: dropdown-disappear 130ms ease-in both;
+  pointer-events: none;
+}
 @keyframes dropdown-appear {
   from {
     opacity: 0;
@@ -499,6 +503,12 @@ select:focus-visible {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+@keyframes dropdown-disappear {
+  to {
+    opacity: 0;
+    transform: translateY(-0.15rem) scale(0.99);
   }
 }
 .account-dropdown-identity {

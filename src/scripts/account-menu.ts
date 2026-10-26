@@ -22,12 +22,22 @@ export function initAccountMenu() {
     '[data-account-signout]',
   );
   let status: HTMLElement | null = null;
+  let closeTimer: number | undefined;
 
   const dictionary = (): Dictionary =>
     document.documentElement.lang === 'es' ? es : en;
   const close = (restoreFocus = false) => {
-    dropdown?.setAttribute('hidden', '');
     trigger?.setAttribute('aria-expanded', 'false');
+    if (dropdown && !dropdown.hidden) {
+      dropdown.classList.add('dropdown-closing');
+      window.clearTimeout(closeTimer);
+      closeTimer = window.setTimeout(() => {
+        if (dropdown.classList.contains('dropdown-closing')) {
+          dropdown.setAttribute('hidden', '');
+          dropdown.classList.remove('dropdown-closing');
+        }
+      }, 150);
+    }
     if (restoreFocus) trigger?.focus();
   };
   const setUser = (
@@ -68,7 +78,11 @@ export function initAccountMenu() {
     () => {
       const open = trigger.getAttribute('aria-expanded') !== 'true';
       trigger.setAttribute('aria-expanded', String(open));
-      if (open) dropdown?.removeAttribute('hidden');
+      if (open) {
+        window.clearTimeout(closeTimer);
+        dropdown?.classList.remove('dropdown-closing');
+        dropdown?.removeAttribute('hidden');
+      }
       else close();
     },
     { signal },
