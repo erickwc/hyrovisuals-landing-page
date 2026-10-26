@@ -304,16 +304,16 @@ select:focus-visible {
 }
 .nav-links {
   display: flex;
-  gap: var(--space-2xl);
+  gap: var(--space-lg);
   align-items: center;
 }
 .nav-links a {
   text-transform: uppercase;
   font-family: var(--font-label);
-  font-size: var(--text-small);
+  font-size: 0.6875rem;
   font-weight: 400;
   letter-spacing: var(--feature-tracking);
-  color: var(--secondary);
+  color: color-mix(in srgb, var(--secondary) 72%, var(--text));
 }
 .nav-links a:hover {
   color: var(--text);
@@ -353,14 +353,15 @@ select:focus-visible {
   height: 1.05rem;
 }
 .language-control {
-  display: flex;
+  width: var(--control-height);
+  display: grid;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  border: var(--line-width) solid var(--border);
+  gap: 0;
+  border: var(--line-width) solid transparent;
   border-radius: var(--radius-full);
   height: var(--control-height);
-  padding-inline: var(--space-sm);
+  padding-inline: 0;
   background: transparent;
   color: var(--text);
   font: inherit;
@@ -370,17 +371,16 @@ select:focus-visible {
     background-color 220ms ease;
 }
 .language-control:hover {
-  border-color: color-mix(in srgb, white 42%, var(--border));
-  background: color-mix(in srgb, white 12%, transparent);
+  border-color: color-mix(in srgb, white 36%, transparent);
+  background: color-mix(in srgb, white 8%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, white 5%, transparent);
 }
 .language-control .icon {
   width: 1.05rem;
   height: 1.05rem;
 }
 .language-control span {
-  color: var(--text);
-  padding: 0;
-  font-size: var(--text-small);
+  display: none;
 }
 .theme-toggle,
 .menu-toggle {
@@ -401,6 +401,13 @@ select:focus-visible {
 .menu-toggle:hover {
   border-color: color-mix(in srgb, white 42%, var(--border));
   background: color-mix(in srgb, white 12%, transparent);
+}
+.theme-toggle {
+  border-color: transparent;
+}
+.theme-toggle:hover {
+  border-color: color-mix(in srgb, white 36%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, white 5%, transparent);
 }
 .language-control:focus-visible,
 .account-link:focus-visible,
@@ -463,7 +470,7 @@ select:focus-visible {
   width: max-content;
   min-width: 13rem;
   padding: 0;
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--text) 14%, var(--background));
   border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--background);
@@ -473,7 +480,7 @@ select:focus-visible {
   display: grid;
   gap: 0.25rem;
   padding: 0.8rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid color-mix(in srgb, var(--text) 13%, var(--background));
 }
 .account-dropdown-identity .account-name {
   color: var(--text);
@@ -496,7 +503,7 @@ select:focus-visible {
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: var(--text);
+  color: color-mix(in srgb, var(--secondary) 70%, var(--text));
   text-align: start;
   font: inherit;
   font-size: var(--text-small);
@@ -507,7 +514,7 @@ select:focus-visible {
 }
 .account-dropdown a + a,
 .account-dropdown button {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid color-mix(in srgb, var(--text) 13%, var(--background));
 }
 .account-dropdown a:hover,
 .account-dropdown button:hover {
@@ -521,11 +528,15 @@ select:focus-visible {
   background: #f3f3f3;
 }
 :root[data-theme='light'] .account-link:hover,
-:root[data-theme='light'] .language-control:hover,
-:root[data-theme='light'] .theme-toggle:hover,
 :root[data-theme='light'] .menu-toggle:hover {
   border-color: color-mix(in srgb, var(--text) 22%, var(--border));
   background: #fff;
+}
+:root[data-theme='light'] .language-control:hover,
+:root[data-theme='light'] .theme-toggle:hover {
+  border-color: color-mix(in srgb, var(--text) 22%, transparent);
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--text) 4%, transparent);
 }
 .account-dropdown .icon {
   width: 1.05rem;
@@ -1844,8 +1855,7 @@ select:focus-visible {
     gap: var(--space-xs);
   }
   .language-control {
-    padding-inline: 0.45rem;
-    gap: 0.3rem;
+    padding-inline: 0;
   }
   .account-trigger {
     max-width: 7.5rem;
