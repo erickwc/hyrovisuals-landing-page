@@ -437,7 +437,11 @@ select:focus-visible {
   white-space: nowrap;
   font-size: var(--text-small);
 }
-.account-trigger .icon {
+.account-trigger .icon:first-child {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+.account-trigger .icon:last-child {
   width: 0.9rem;
   height: 0.9rem;
   transition: transform 180ms ease;
