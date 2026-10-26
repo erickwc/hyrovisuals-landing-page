@@ -413,8 +413,8 @@ select:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0 0.75rem;
-  border: 1px solid var(--border);
+  padding: 0 0.2rem;
+  border: 1px solid transparent;
   border-radius: var(--radius-full);
   background: transparent;
   color: var(--text);
@@ -428,8 +428,9 @@ select:focus-visible {
 }
 .account-trigger:hover,
 .account-trigger[aria-expanded='true'] {
-  border-color: color-mix(in srgb, white 42%, var(--border));
-  background: color-mix(in srgb, white 12%, transparent);
+  border-color: transparent;
+  background: transparent;
+  color: var(--secondary);
 }
 .account-name {
   overflow: hidden;
@@ -438,14 +439,14 @@ select:focus-visible {
   font-size: var(--text-small);
 }
 .account-avatar {
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 1.75rem;
+  height: 1.75rem;
   display: grid;
   flex: 0 0 auto;
   place-items: center;
   border: 1px solid var(--border);
   border-radius: 50%;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 500;
   line-height: 1;
 }
@@ -499,8 +500,6 @@ select:focus-visible {
   background: #f3f3f3;
 }
 :root[data-theme='light'] .account-link:hover,
-:root[data-theme='light'] .account-trigger:hover,
-:root[data-theme='light'] .account-trigger[aria-expanded='true'],
 :root[data-theme='light'] .language-control:hover,
 :root[data-theme='light'] .theme-toggle:hover,
 :root[data-theme='light'] .menu-toggle:hover {
@@ -1829,7 +1828,7 @@ select:focus-visible {
   }
   .account-trigger {
     max-width: 7.5rem;
-    padding-inline: 0.55rem;
+    padding-inline: 0.2rem;
   }
   .menu-toggle {
     display: grid;
