@@ -11,6 +11,7 @@ export function initAccountMenu() {
   const controller = new AbortController();
   const { signal } = controller;
   const login = root.querySelector<HTMLAnchorElement>('[data-account-login]');
+  const accountOnlyLinks = document.querySelectorAll<HTMLElement>('[data-account-only]');
   const trigger = root.querySelector<HTMLButtonElement>(
     '[data-account-trigger]',
   );
@@ -45,6 +46,9 @@ export function initAccountMenu() {
   ) => {
     const signedIn = Boolean(user);
     if (login) login.hidden = signedIn;
+    accountOnlyLinks.forEach((link) => {
+      link.hidden = !signedIn;
+    });
     if (trigger) trigger.hidden = !signedIn;
     if (name && user) {
       const metadataName =

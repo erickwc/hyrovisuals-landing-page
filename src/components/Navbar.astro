@@ -42,6 +42,14 @@ const links = [
         {en[key]}
       </a>
     ))}
+    <a
+      href={`${accountPage ? '/' : ''}#compra`}
+      data-i18n="navStore"
+      data-account-only
+      hidden
+    >
+      {en.navStore}
+    </a>
   </div>
   <div class="nav-controls">
     <LanguageSelector />
