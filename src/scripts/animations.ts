@@ -19,26 +19,52 @@ export function initAnimations(reduced: boolean) {
         mask: 'lines',
         autoSplit: true,
         onSplit(self) {
-          return gsap.from(self.lines, { yPercent: 110, duration: slow, ease });
+          return gsap.from(self.lines, {
+            y: 10,
+            autoAlpha: 0,
+            filter: 'blur(6px)',
+            duration: slow * 0.72,
+            stagger: 0.08,
+            ease,
+          });
         },
       });
       splits.push(split);
     });
     timeline
-      .from('[data-anim="line"]', { scaleY: 0, duration: slow, stagger }, 0)
       .from(
-        '[data-anim="label"],[data-anim="description"],[data-anim="button"]',
-        { y: number('--reveal-y'), autoAlpha: 0, duration: base, stagger },
-        base / 2,
+        '[data-anim="line"]',
+        { autoAlpha: 0, duration: slow * 0.55, stagger: stagger * 0.5 },
+        0,
+      )
+      .from(
+        '[data-anim="label"]',
+        {
+          y: 4,
+          autoAlpha: 0,
+          filter: 'blur(2px)',
+          duration: base * 0.65,
+        },
+        base * 0.28,
+      )
+      .from(
+        '[data-anim="description"]',
+        { y: 6, autoAlpha: 0, duration: base * 0.75 },
+        base * 0.42,
+      )
+      .from(
+        '[data-anim="button"]',
+        { autoAlpha: 0, duration: base * 0.65 },
+        base * 0.55,
       )
       .from(
         '[data-anim="visual"]',
         {
-          scale: number('--visual-scale'),
-          clipPath: 'inset(0 50% 0 50%)',
-          duration: slow,
+          scale: 0.996,
+          autoAlpha: 0,
+          duration: slow * 0.62,
         },
-        base,
+        base * 0.62,
       );
     gsap.to('[data-anim="dots"]', {
       opacity: number('--dot-pulse-opacity'),
@@ -49,10 +75,10 @@ export function initAnimations(reduced: boolean) {
       stagger,
     });
     gsap.from('[data-anim="feature"]', {
-      y: number('--reveal-y'),
+      y: 7,
       autoAlpha: 0,
       stagger,
-      duration: base,
+      duration: base * 0.75,
       ease,
       scrollTrigger: { trigger: '.features', start: 'top 92%', once: true },
     });
@@ -65,18 +91,18 @@ export function initAnimations(reduced: boolean) {
         },
       })
       .from('[data-anim="purchase-copy"]', {
-        y: 24,
+        y: 8,
         autoAlpha: 0,
-        duration: base,
-        stagger: 0.09,
+        duration: base * 0.75,
+        stagger: 0.075,
         ease,
       })
       .from(
         '[data-anim="purchase-benefit"]',
         {
-          y: 16,
+          y: 5,
           autoAlpha: 0,
-          duration: base * 0.8,
+          duration: base * 0.65,
           stagger: 0.055,
           ease,
         },
@@ -84,7 +110,7 @@ export function initAnimations(reduced: boolean) {
       )
       .from(
         '[data-anim="purchase-card"]',
-        { y: 24, autoAlpha: 0, duration: slow, ease },
+        { y: 8, autoAlpha: 0, duration: slow * 0.65, ease },
         0.16,
       );
     const mobile = matchMedia('(max-width: 767px)').matches;
