@@ -652,13 +652,13 @@ select:focus-visible {
   color: transparent;
 }
 .hero-description {
-  max-width: var(--description-width);
+  max-width: 42rem;
   min-height: var(--description-min-height);
   margin: var(--gap-title-copy) auto var(--gap-copy-button);
   font-family: var(--font-label);
-  font-size: var(--text-small);
+  font-size: var(--text-description);
   font-weight: 400;
-  letter-spacing: 0.035em;
+  letter-spacing: 0.01em;
   line-height: 1.5;
   color: color-mix(in srgb, var(--secondary) 72%, var(--text));
   text-wrap: pretty;
