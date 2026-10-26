@@ -300,7 +300,9 @@ select:focus-visible {
 }
 .nav-links a {
   text-transform: uppercase;
+  font-family: var(--font-label);
   font-size: var(--text-small);
+  font-weight: 600;
   letter-spacing: var(--feature-tracking);
   color: var(--secondary);
 }
