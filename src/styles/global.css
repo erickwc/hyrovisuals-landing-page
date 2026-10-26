@@ -65,8 +65,8 @@
   --space-3xl: 4.5rem;
   --space-4xl: 6rem;
   --gap-label-title: 1rem;
-  --gap-title-copy: 1rem;
-  --gap-copy-button: 1.25rem;
+  --gap-title-copy: 0.25rem;
+  --gap-copy-button: 1.5rem;
   --gap-button-visual: 1.75rem;
   --gap-visual-features: var(--space-lg);
   --gap-features-availability: var(--space-lg);
@@ -1792,8 +1792,8 @@ select:focus-visible {
   :root {
     --hero-top: clamp(3.5rem, 5vw, 5rem);
     --gap-label-title: 1rem;
-    --gap-title-copy: 1rem;
-    --gap-copy-button: 1.25rem;
+    --gap-title-copy: 0.25rem;
+    --gap-copy-button: 1.5rem;
     --gap-button-visual: 1.75rem;
     --gap-visual-features: 0;
     --gap-features-availability: var(--space-xl);
