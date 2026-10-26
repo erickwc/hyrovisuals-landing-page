@@ -12,7 +12,7 @@ export function initWhopCheckout() {
   const priceAmount = root.querySelector<HTMLElement>('[data-price-amount]');
   const priceCurrency = root.querySelector<HTMLElement>('[data-price-currency]');
   const productDescription = root.querySelector<HTMLElement>('[data-product-description]');
-  const productDescriptionHeading = root.querySelector<HTMLElement>('[data-product-description-heading]');
+  const productDescriptionCopy = root.querySelector<HTMLElement>('[data-product-description-copy]');
   const productFeatures = root.querySelector<HTMLUListElement>('[data-product-features]');
   let cancelled = false;
   let starting = false;
@@ -31,11 +31,6 @@ export function initWhopCheckout() {
         'whop-CheckoutLayout': { width: '100%', padding: '0px', gap: '0px' },
         'whop-CheckoutDetails': { display: 'none', width: '0px', height: '0px', minHeight: '0px', padding: '0px', opacity: '0', overflow: 'hidden', visibility: 'hidden' },
         'whop-CheckoutCollection': { width: '100%', minWidth: '0px', padding: '0px', backgroundColor: background },
-        'whop-CheckoutExpressButtons': {
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
-          gap: '8px',
-        },
         'whop-EmailSignIn': { display: 'none' },
       },
     };
@@ -118,16 +113,35 @@ export function initWhopCheckout() {
       }).format(planPrice.amount);
       if (priceCurrency) priceCurrency.textContent = planPrice.currency === 'USD' ? 'US$' : planPrice.currency;
       const deliveryNotice = 'Tu clave de activación y la descarga de Windows estarán en tu biblioteca cuando se confirme el pago.';
-      const productCopy = planPrice.description.trim().startsWith(deliveryNotice)
-        ? planPrice.description.trim().slice(deliveryNotice.length).trim()
-        : planPrice.description.trim();
-      const featureParts = productCopy.split(/\s*✓\s*/).map((part: string) => part.trim()).filter(Boolean);
-      const descriptionTitle = featureParts.length > 1 ? featureParts.shift()! : 'HYRO Visuals';
-      if (productDescriptionHeading) productDescriptionHeading.textContent = descriptionTitle;
+      const descriptionText = planPrice.description.trim().replace(deliveryNotice, '').trim();
+      const checkmarkParts = descriptionText.split(/\s*✓\s*/).map((part: string) => part.trim()).filter(Boolean);
+      const descriptionIntro = checkmarkParts.shift() ?? '';
+      const titleMatch = /¿Qué incluye HYRO Visuals\??/i.exec(descriptionIntro);
+      const introText = titleMatch
+        ? descriptionIntro.slice(0, titleMatch.index).trim()
+        : descriptionIntro;
+      const features = checkmarkParts.length
+        ? checkmarkParts
+        : descriptionText.split(/\r?\n/).map((part: string) => part.trim()).filter((part: string) => /^[-•]/.test(part)).map((part: string) => part.replace(/^[-•]\s*/, ''));
+      if (productDescriptionCopy) productDescriptionCopy.textContent = introText;
       if (productFeatures) {
-        productFeatures.replaceChildren(...featureParts.map((feature: string) => {
+        productFeatures.replaceChildren(...features.map((feature: string) => {
           const item = document.createElement('li');
-          item.textContent = feature;
+          const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          icon.setAttribute('viewBox', '0 0 24 24');
+          icon.setAttribute('fill', 'none');
+          icon.setAttribute('stroke', 'currentColor');
+          icon.setAttribute('stroke-width', '1.5');
+          icon.setAttribute('stroke-linecap', 'round');
+          icon.setAttribute('stroke-linejoin', 'round');
+          icon.setAttribute('aria-hidden', 'true');
+          icon.classList.add('payment-feature-check');
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('d', 'm4.5 12.75 6 6 9-13.5');
+          icon.append(path);
+          const text = document.createElement('span');
+          text.textContent = feature;
+          item.append(icon, text);
           return item;
         }));
       }

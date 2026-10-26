@@ -10,21 +10,23 @@ import Layout from '../../layouts/Layout.astro';
             <svg class="payment-back-arrow" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
             </svg>
-            <img class="payment-back-mark" src="/images/hyro-mark.png" alt="" width="28" height="28" />
-            <span class="payment-back-label" aria-hidden="true">
-              <span class="payment-back-default">HYRO</span>
-              <span class="payment-back-hover">Volver atrás</span>
+            <span class="payment-back-brand">
+              <img class="payment-back-mark" src="/images/hyro-mark.png" alt="" width="28" height="28" />
+              <span class="payment-back-label" aria-hidden="true">
+                <span class="payment-back-default">HYRO LLC</span>
+                <span class="payment-back-hover">Volver atrás</span>
+              </span>
             </span>
           </button>
         </header>
         <section class="payment-summary" aria-label="Resumen del pedido">
           <p class="payment-price"><span data-price-amount>—</span> <span data-price-currency></span></p>
           <div class="payment-product-description" data-product-description hidden>
-            <h2 data-product-description-heading></h2>
+            <h2>¿Qué incluye HYRO Visuals?</h2>
+            <p data-product-description-copy></p>
             <ul data-product-features></ul>
           </div>
           <p class="payment-delivery">Tu clave de activación y la descarga de Windows estarán en tu biblioteca cuando se confirme el pago.</p>
-          <a class="payment-library" href="/biblioteca/">Mi biblioteca ↗</a>
         </section>
       </div>
       <section class="payment-form" aria-label="Pago seguro">
@@ -36,36 +38,37 @@ import Layout from '../../layouts/Layout.astro';
   </main>
 </Layout>
 <style>
-  .hyro-payment { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 44px 0 72px; min-height: 100svh; }
+  .hyro-payment { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 72px 0 72px; min-height: 100svh; }
   .payment-heading { margin-bottom: 22px; }
-  .payment-back { display: inline-flex; min-height: 32px; align-items: center; gap: 9px; padding: 2px 0; border: 0; border-radius: 0; background: transparent; color: var(--text); font: 500 13px/1.4 var(--font-body); cursor: pointer; }
+  .payment-back { display: inline-flex; min-height: 32px; align-items: center; gap: 20px; padding: 2px 0; border: 0; border-radius: 0; background: transparent; color: var(--text); font: 500 13px/1.4 var(--font-body); cursor: pointer; }
   .payment-back-arrow { display: inline-block; width: 18px; height: 18px; flex: 0 0 18px; color: var(--secondary); transition: transform .28s ease, color .2s ease; }
   .payment-back:hover .payment-back-arrow, .payment-back:focus-visible .payment-back-arrow { transform: translateX(-3px); color: var(--text); }
-  .payment-back-mark { display: block; width: 28px; height: 28px; border-radius: 8px; object-fit: cover; }
+  .payment-back-brand { display: inline-flex; align-items: center; gap: 6px; }
+  .payment-back-mark { display: block; width: 28px; height: 28px; box-sizing: border-box; border: 1px solid color-mix(in srgb, var(--border) 56%, transparent); border-radius: 8px; object-fit: cover; }
   .payment-back-label { position: relative; display: inline-grid; align-items: center; min-width: 90px; height: 1.2em; }
   .payment-back-default, .payment-back-hover { grid-area: 1 / 1; white-space: nowrap; transition: opacity .24s ease, transform .24s ease; }
   .payment-back-default { opacity: 1; transform: translateY(0); }
   .payment-back-hover { opacity: 0; transform: translateY(4px); }
   .payment-back:hover .payment-back-default, .payment-back:focus-visible .payment-back-default { opacity: 0; transform: translateY(-4px); }
   .payment-back:hover .payment-back-hover, .payment-back:focus-visible .payment-back-hover { opacity: 1; transform: translateY(0); }
-  .payment-library { font-size: 13px; color: var(--secondary); }
-  .payment-library:hover { color: var(--text); }
   .payment-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 80px; align-items: start; }
-  .payment-summary { padding-top: 0; }
+  .payment-summary { padding: 22px; border: 1px solid color-mix(in srgb, var(--border) 55%, transparent); border-radius: 14px; background: var(--surface); }
   .payment-price { font-size: clamp(35px,4vw,48px); line-height: 1.1; letter-spacing: -.04em; font-weight: 600; margin: 0; }
   .payment-price [data-price-currency] { font-size: 17px; letter-spacing: 0; font-weight: 500; }
   .payment-product-description { margin-top: 22px; color: var(--secondary); }
   .payment-product-description[hidden] { display: none; }
   .payment-product-description h2 { color: var(--text); font-size: 15px; line-height: 1.45; font-weight: 600; margin: 0 0 10px; }
-  .payment-product-description ul { list-style: disc; padding-left: 19px; margin: 0; }
-  .payment-product-description li { font-size: 13px; line-height: 1.65; padding-left: 3px; }
+  .payment-product-description [data-product-description-copy] { color: var(--secondary); font-size: 13px; line-height: 1.6; margin: 0 0 12px; }
+  .payment-product-description [data-product-description-copy]:empty { display: none; }
+  .payment-product-description ul { display: grid; gap: 7px; list-style: none; padding: 0; margin: 0; }
+  .payment-product-description li { display: grid; grid-template-columns: 16px minmax(0,1fr); align-items: start; gap: 8px; color: var(--secondary); font-size: 13px; line-height: 1.55; }
+  .payment-feature-check { width: 16px; height: 16px; margin-top: 1px; color: var(--text); }
   .payment-delivery { max-width: 370px; font-size: 13px; color: var(--secondary); line-height: 1.65; margin-top: 15px; }
-  .payment-library { display: inline-block; margin-top: 18px; }
   .payment-form, #hyro-whop-checkout { min-width: 0; width: 100%; }
   .payment-form { padding-top: 0; }
   .payment-status { font-size: 14px; color: var(--secondary); }
   .payment-status:empty { display: none; }
   .payment-retry { padding: 14px 24px; margin-top: 20px; background: var(--button-bg); color: var(--button-text); border-radius: 5px; cursor: pointer; }
-  @media(max-width: 760px) { .hyro-payment { width: calc(100% - 32px); padding-top: 28px; } .payment-heading { margin-bottom: 20px; } .payment-layout { grid-template-columns: 1fr; gap: 32px; } }
+  @media(max-width: 760px) { .hyro-payment { width: calc(100% - 32px); padding-top: 44px; } .payment-heading { margin-bottom: 20px; } .payment-layout { grid-template-columns: 1fr; gap: 32px; } .payment-summary { padding: 20px; } }
   @media(prefers-reduced-motion: reduce) { .payment-back, .payment-back-arrow, .payment-back-default, .payment-back-hover { transition: none; } }
 </style>
