@@ -306,7 +306,7 @@ select:focus-visible {
   text-transform: uppercase;
   font-family: var(--font-label);
   font-size: var(--text-small);
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: var(--feature-tracking);
   color: var(--secondary);
 }
@@ -355,7 +355,7 @@ select:focus-visible {
   border: var(--line-width) solid var(--border);
   border-radius: var(--radius-full);
   height: var(--control-height);
-  padding-inline: var(--space-xs);
+  padding-inline: var(--space-sm);
   background: transparent;
   color: var(--text);
   font: inherit;
