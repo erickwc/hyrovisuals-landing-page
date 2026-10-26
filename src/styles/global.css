@@ -66,8 +66,8 @@
   --space-4xl: 6rem;
   --gap-label-title: 0.75rem;
   --gap-title-copy: 1rem;
-  --gap-copy-button: 2.25rem;
-  --gap-button-visual: var(--space-xl);
+  --gap-copy-button: 1.5rem;
+  --gap-button-visual: 1.75rem;
   --gap-visual-features: var(--space-lg);
   --gap-features-availability: var(--space-lg);
   --page-gutter: clamp(1.25rem, 4.4vw, 4.5rem);
@@ -75,7 +75,7 @@
   --nav-height: 5.5rem;
   --hero-top: 2.75rem;
   --copy-width: 86rem;
-  --description-width: 42rem;
+  --description-width: 38rem;
   --description-min-height: 4rem;
   --radius-sm: 0.6rem;
   --radius-visual: 0.6rem;
@@ -652,7 +652,7 @@ select:focus-visible {
   color: transparent;
 }
 .hero-description {
-  max-width: 42rem;
+  max-width: var(--description-width);
   min-height: var(--description-min-height);
   margin: var(--gap-title-copy) auto var(--gap-copy-button);
   font-family: var(--font-label);
@@ -1793,8 +1793,8 @@ select:focus-visible {
     --hero-top: clamp(3.5rem, 5vw, 5rem);
     --gap-label-title: 0.65rem;
     --gap-title-copy: 0.85rem;
-    --gap-copy-button: 1.75rem;
-    --gap-button-visual: 2.75rem;
+    --gap-copy-button: 1.25rem;
+    --gap-button-visual: 1.75rem;
     --gap-visual-features: 0;
     --gap-features-availability: var(--space-xl);
   }
@@ -1883,7 +1883,7 @@ select:focus-visible {
   :root {
     --hero-top: var(--space-xl);
     --title-size: clamp(1.4rem, 6.2vw, 3.25rem);
-    --text-description: 0.9375rem;
+    --text-description: 1rem;
     --text-label: 0.7rem;
     --nav-height: 4.9rem;
     --logo-width: 5.5rem;
