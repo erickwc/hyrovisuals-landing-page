@@ -7,7 +7,9 @@ import Layout from '../../layouts/Layout.astro';
       <div class="payment-information">
         <header class="payment-heading">
           <button class="payment-back" type="button" data-checkout-back aria-label="Volver atrás">
-            <span class="payment-back-arrow" aria-hidden="true">←</span>
+            <svg class="payment-back-arrow" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            </svg>
             <img class="payment-back-mark" src="/images/hyro-mark.png" alt="" width="28" height="28" />
             <span class="payment-back-label" aria-hidden="true">
               <span class="payment-back-default">HYRO</span>
@@ -36,10 +38,8 @@ import Layout from '../../layouts/Layout.astro';
 <style>
   .hyro-payment { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 44px 0 72px; min-height: 100svh; }
   .payment-heading { margin-bottom: 22px; }
-  .payment-back { display: inline-flex; min-height: 40px; align-items: center; gap: 9px; padding: 5px 13px 5px 8px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); font: 600 13px/1 var(--font-body); cursor: pointer; transition: background-color .2s ease, border-color .2s ease, transform .2s ease; }
-  .payment-back:hover, .payment-back:focus-visible { border-color: var(--text-muted, var(--secondary)); background: var(--surface-hover, var(--surface)); }
-  .payment-back:active { transform: scale(.98); }
-  .payment-back-arrow { display: inline-block; color: var(--secondary); font-size: 18px; line-height: 1; transition: transform .28s ease, color .2s ease; }
+  .payment-back { display: inline-flex; min-height: 32px; align-items: center; gap: 9px; padding: 2px 0; border: 0; border-radius: 0; background: transparent; color: var(--text); font: 500 13px/1.4 var(--font-body); cursor: pointer; }
+  .payment-back-arrow { display: inline-block; width: 18px; height: 18px; flex: 0 0 18px; color: var(--secondary); transition: transform .28s ease, color .2s ease; }
   .payment-back:hover .payment-back-arrow, .payment-back:focus-visible .payment-back-arrow { transform: translateX(-3px); color: var(--text); }
   .payment-back-mark { display: block; width: 28px; height: 28px; border-radius: 8px; object-fit: cover; }
   .payment-back-label { position: relative; display: inline-grid; align-items: center; min-width: 90px; height: 1.2em; }
