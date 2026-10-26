@@ -263,6 +263,7 @@ select:focus-visible {
   top: 0;
   z-index: 50;
   background: var(--background);
+  border-bottom: var(--line-width) solid var(--border);
 }
 .icon {
   width: var(--icon-size);
@@ -439,8 +440,8 @@ select:focus-visible {
   font-size: var(--text-small);
 }
 .account-avatar {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: var(--control-height);
+  height: var(--control-height);
   display: grid;
   flex: 0 0 auto;
   place-items: center;
