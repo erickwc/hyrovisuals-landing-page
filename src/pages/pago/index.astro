@@ -51,8 +51,9 @@ import Layout from '../../layouts/Layout.astro';
   .payment-back-hover { opacity: 0; transform: translateY(4px); }
   .payment-back:hover .payment-back-default, .payment-back:focus-visible .payment-back-default { opacity: 0; transform: translateY(-4px); }
   .payment-back:hover .payment-back-hover, .payment-back:focus-visible .payment-back-hover { opacity: 1; transform: translateY(0); }
-  .payment-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 80px; align-items: start; }
-  .payment-summary { padding: 22px; border: 1px solid color-mix(in srgb, var(--border) 55%, transparent); border-radius: 14px; background: var(--surface); }
+  .payment-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 80px; align-items: stretch; }
+  .payment-information { box-sizing: border-box; min-height: calc(100svh - 144px); padding: 22px; border: 1px solid color-mix(in srgb, var(--border) 55%, transparent); border-radius: 14px; background: var(--surface); }
+  .payment-summary { padding: 0; border: 0; background: transparent; }
   .payment-price { font-size: clamp(35px,4vw,48px); line-height: 1.1; letter-spacing: -.04em; font-weight: 600; margin: 0; }
   .payment-price [data-price-currency] { font-size: 17px; letter-spacing: 0; font-weight: 500; }
   .payment-product-description { margin-top: 22px; color: var(--secondary); }
@@ -69,6 +70,6 @@ import Layout from '../../layouts/Layout.astro';
   .payment-status { font-size: 14px; color: var(--secondary); }
   .payment-status:empty { display: none; }
   .payment-retry { padding: 14px 24px; margin-top: 20px; background: var(--button-bg); color: var(--button-text); border-radius: 5px; cursor: pointer; }
-  @media(max-width: 760px) { .hyro-payment { width: calc(100% - 32px); padding-top: 44px; } .payment-heading { margin-bottom: 20px; } .payment-layout { grid-template-columns: 1fr; gap: 32px; } .payment-summary { padding: 20px; } }
+  @media(max-width: 760px) { .hyro-payment { width: calc(100% - 32px); padding-top: 44px; } .payment-heading { margin-bottom: 20px; } .payment-layout { grid-template-columns: 1fr; gap: 32px; } .payment-information { min-height: 0; padding: 20px; } }
   @media(prefers-reduced-motion: reduce) { .payment-back, .payment-back-arrow, .payment-back-default, .payment-back-hover { transition: none; } }
 </style>
