@@ -46,15 +46,49 @@ const links = [
   <div class="nav-controls">
     <LanguageSelector />
     <ThemeToggle />
-    <a
-      class="account-link"
-      href="/cuenta/"
-      aria-label={en.accountNav}
-      data-i18n-aria="accountNav"
-      aria-current={accountPage ? 'page' : undefined}
-    >
-      <Icon name="user" />
-    </a>
+    <div class="account-menu" data-account-menu>
+      <a
+        class="account-link"
+        href="/cuenta/"
+        aria-label={en.accountNav}
+        data-i18n-aria="accountNav"
+        data-account-login
+        aria-current={accountPage ? 'page' : undefined}
+      >
+        <Icon name="user" />
+      </a>
+      <button
+        class="account-trigger"
+        type="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls="account-dropdown"
+        data-account-trigger
+        hidden
+      >
+        <span class="account-name" data-account-name></span>
+        <Icon name="chevron" />
+      </button>
+      <div
+        class="account-dropdown"
+        id="account-dropdown"
+        data-account-dropdown
+        hidden
+      >
+        <a href="/biblioteca/" role="menuitem" data-i18n="accountMenuProducts">
+          <Icon name="products" />
+          <span>{en.accountMenuProducts}</span>
+        </a>
+        <a href="/cuenta/" role="menuitem" data-i18n="accountMenuSettings">
+          <Icon name="settings" />
+          <span>{en.accountMenuSettings}</span>
+        </a>
+        <button type="button" role="menuitem" data-account-signout>
+          <Icon name="logout" />
+          <span data-i18n="accountMenuSignOut">{en.accountMenuSignOut}</span>
+        </button>
+      </div>
+    </div>
     <button
       type="button"
       class="menu-toggle"

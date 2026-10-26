@@ -12,10 +12,13 @@ import { initPurchaseCheckout } from './purchase-checkout';
 import { initLibraryPage } from './library';
 import { initPurchaseProcessing } from './purchase-processing';
 import { initWhopCheckout } from './whop-checkout';
+import { initAccountMenu } from './account-menu';
+import { initLicenseChoice } from './license-choice';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 let cleanup = () => {};
 async function init() {
   cleanup();
+  const stopAccountMenu = initAccountMenu();
   if (['account', 'admin', 'library', 'processing', 'checkout'].includes(document.body.dataset.page ?? '')) {
     const stopPreferences = initPreferences(() => {
       document.dispatchEvent(new Event('hyro:language'));
@@ -27,6 +30,7 @@ async function init() {
     cleanup = () => {
       stopAccount();
       stopPreferences();
+      stopAccountMenu();
     };
     document.documentElement.dataset.hyroReady = 'true';
     return;
@@ -36,6 +40,7 @@ async function init() {
   let stopCarousel = () => {};
   let stopReflection = () => {};
   const stopCheckout = initPurchaseCheckout();
+  const stopLicenseChoice = initLicenseChoice();
   let lenis: Lenis | undefined;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const stopPreferences = initPreferences(() => {
@@ -66,6 +71,8 @@ async function init() {
     stopCarousel();
     stopReflection();
     stopCheckout();
+    stopLicenseChoice();
+    stopAccountMenu();
     lenis?.destroy();
     gsap.ticker.remove(tick);
     reduced.removeEventListener('change', motion);

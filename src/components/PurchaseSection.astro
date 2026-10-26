@@ -70,11 +70,16 @@ const benefits = [
           </span>
           <p data-i18n="purchaseDeviceNote">{en.purchaseDeviceNote}</p>
         </div>
-        <a class="purchase-button" href="/pago/">
+        <button class="purchase-button" type="button" data-license-dialog-open>
           <span data-i18n="purchaseNow">{en.purchaseNow}</span>
           <Icon name="arrow" />
-        </a>
-        <p class="purchase-checkout-status" data-payhip-status role="status" hidden></p>
+        </button>
+        <p
+          class="purchase-checkout-status"
+          data-payhip-status
+          role="status"
+          hidden
+        ></p>
         <ul
           class="purchase-payment-methods"
           data-i18n-aria="purchasePaymentMethods"
@@ -126,4 +131,79 @@ const benefits = [
       </div>
     </div>
   </div>
+  <dialog
+    class="license-dialog"
+    data-license-dialog
+    aria-labelledby="license-choice-title"
+  >
+    <form method="dialog" class="license-dialog-top">
+      <h2 id="license-choice-title" data-i18n="licenseChoiceTitle">
+        {en.licenseChoiceTitle}
+      </h2>
+      <button
+        class="license-dialog-close"
+        type="submit"
+        aria-label={en.licenseClose}
+        data-i18n-aria="licenseClose"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </form>
+    <p class="license-dialog-description" data-i18n="licenseChoiceDescription">
+      {en.licenseChoiceDescription}
+    </p>
+    <div
+      class="license-options"
+      role="radiogroup"
+      aria-labelledby="license-choice-title"
+    >
+      <button
+        type="button"
+        class="license-option"
+        role="radio"
+        aria-checked="false"
+        data-license-option="personal"
+      >
+        <span class="license-option-indicator" aria-hidden="true"></span>
+        <span class="license-option-copy">
+          <strong data-i18n="licensePersonal">{en.licensePersonal}</strong>
+          <span data-i18n="licensePersonalDescription">
+            {en.licensePersonalDescription}
+          </span>
+        </span>
+      </button>
+      <button
+        type="button"
+        class="license-option"
+        role="radio"
+        aria-checked="false"
+        data-license-option="teams"
+      >
+        <span class="license-option-indicator" aria-hidden="true"></span>
+        <span class="license-option-copy">
+          <strong data-i18n="licenseTeams">{en.licenseTeams}</strong>
+          <span data-i18n="licenseTeamsDescription">
+            {en.licenseTeamsDescription}
+          </span>
+        </span>
+      </button>
+    </div>
+    <p
+      class="license-pending"
+      data-license-pending
+      data-i18n="licenseTeamsPending"
+      hidden
+    >
+      {en.licenseTeamsPending}
+    </p>
+    <a
+      class="license-continue"
+      href="/pago/"
+      data-license-continue
+      data-i18n="licenseContinue"
+      aria-disabled="true"
+    >
+      {en.licenseContinue}
+    </a>
+  </dialog>
 </section>

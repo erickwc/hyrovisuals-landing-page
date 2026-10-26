@@ -16,7 +16,8 @@ const save = (key: string, value: string) => {
 export function initPreferences(onLanguage: () => void) {
   const controller = new AbortController();
   const signal = controller.signal;
-  const select = document.querySelector<HTMLSelectElement>('#language');
+  const languageToggle = document.querySelector<HTMLButtonElement>('[data-language-toggle]');
+  const languageCurrent = document.querySelector<HTMLElement>('[data-language-current]');
   const themeButton = document.querySelector<HTMLButtonElement>(
     '[data-theme-toggle]',
   );
@@ -30,6 +31,7 @@ export function initPreferences(onLanguage: () => void) {
     lang = navigator.language.toLowerCase().startsWith('es') ? 'es' : 'en';
   let dictionary = lang === 'es' ? es : en;
   const labels = () => {
+    languageToggle?.setAttribute('aria-label', dictionary[lang === 'es' ? 'languageToEn' : 'languageToEs']);
     themeButton?.setAttribute(
       'aria-label',
       dictionary[
@@ -48,7 +50,7 @@ export function initPreferences(onLanguage: () => void) {
   const translate = () => {
     dictionary = lang === 'es' ? es : en;
     document.documentElement.lang = lang!;
-    if (select) select.value = lang!;
+    if (languageCurrent) languageCurrent.textContent = lang!.toUpperCase();
     const page = document.body.dataset.page;
     document.title = page === 'account'
       ? dictionary.accountPageTitle
@@ -102,11 +104,11 @@ export function initPreferences(onLanguage: () => void) {
     });
   };
   translate();
-  select?.addEventListener(
-    'change',
+  languageToggle?.addEventListener(
+    'click',
     () => {
       document.dispatchEvent(new Event('hyro:before-language'));
-      lang = select.value;
+      lang = lang === 'es' ? 'en' : 'es';
       save('hyro-language', lang);
       translate();
       onLanguage();

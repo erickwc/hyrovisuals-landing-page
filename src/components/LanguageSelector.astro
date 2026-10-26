@@ -5,17 +5,14 @@ import en from '../i18n/en.json';
 
 <div class="language-control">
   <Icon name="globe" />
-  <select
+  <button
     id="language"
-    aria-label={en.languageLabel}
-    data-i18n-aria="languageLabel"
+    class="language-toggle"
+    type="button"
+    aria-label={en.languageToEs}
+    data-language-toggle
+    data-i18n-aria="languageToEs"
   >
-    <option value="en" lang="en">
-      EN
-    </option>
-    <option value="es" lang="es">
-      ES
-    </option>
-  </select>
-  <Icon name="chevron" />
+    <span data-language-current>EN</span>
+  </button>
 </div>
