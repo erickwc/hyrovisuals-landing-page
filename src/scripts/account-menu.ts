@@ -15,6 +15,7 @@ export function initAccountMenu() {
     '[data-account-trigger]',
   );
   const name = root.querySelector<HTMLElement>('[data-account-name]');
+  const email = root.querySelector<HTMLElement>('[data-account-email]');
   const initial = root.querySelector<HTMLElement>('[data-account-initial]');
   const dropdown = root.querySelector<HTMLElement>('[data-account-dropdown]');
   const signOut = root.querySelector<HTMLButtonElement>(
@@ -42,11 +43,25 @@ export function initAccountMenu() {
         typeof metadataName === 'string' && metadataName.trim()
           ? metadataName.trim()
           : (user.email?.split('@')[0] ?? dictionary().accountNav);
-      if (initial) initial.textContent = name.textContent?.trim().charAt(0).toLocaleUpperCase() ?? '';
+      if (initial) {
+        const parts = name.textContent.trim().split(/\s+/).filter(Boolean);
+        initial.textContent = parts.length > 1
+          ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toLocaleUpperCase()
+          : parts[0]?.slice(0, 2).toLocaleUpperCase() ?? '';
+      }
     }
+    if (email) email.textContent = user?.email ?? '';
     close();
     if (!signedIn && status) status.hidden = true;
   };
+
+  const updateHeaderDivider = () => {
+    document
+      .querySelector<HTMLElement>('.site-header')
+      ?.toggleAttribute('data-scrolled', window.scrollY > 2);
+  };
+  updateHeaderDivider();
+  window.addEventListener('scroll', updateHeaderDivider, { passive: true, signal });
 
   trigger?.addEventListener(
     'click',

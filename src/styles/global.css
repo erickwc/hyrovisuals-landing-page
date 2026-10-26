@@ -263,7 +263,11 @@ select:focus-visible {
   top: 0;
   z-index: 50;
   background: var(--background);
-  border-bottom: var(--line-width) solid var(--border);
+  border-bottom: var(--line-width) solid transparent;
+  transition: border-color 220ms ease;
+}
+.site-header[data-scrolled] {
+  border-bottom-color: color-mix(in srgb, var(--text) 6%, var(--background));
 }
 .icon {
   width: var(--icon-size);
@@ -462,8 +466,24 @@ select:focus-visible {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: #101010;
+  background: var(--background);
   box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 25%);
+}
+.account-dropdown-identity {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+.account-dropdown-identity .account-name {
+  color: var(--text);
+  font-size: var(--text-small);
+  font-weight: 500;
+}
+.account-email {
+  color: var(--secondary);
+  font-size: 0.7rem;
+  overflow-wrap: anywhere;
 }
 .account-dropdown a,
 .account-dropdown button {
@@ -494,7 +514,7 @@ select:focus-visible {
   background: color-mix(in srgb, white 10%, #101010);
 }
 :root[data-theme='light'] .account-dropdown {
-  background: #fff;
+  background: var(--background);
 }
 :root[data-theme='light'] .account-dropdown a:hover,
 :root[data-theme='light'] .account-dropdown button:hover {

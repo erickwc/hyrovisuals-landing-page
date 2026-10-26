@@ -67,7 +67,6 @@ const links = [
         hidden
       >
         <span class="account-avatar" aria-hidden="true" data-account-initial></span>
-        <span class="account-name" data-account-name></span>
       </button>
       <div
         class="account-dropdown"
@@ -75,6 +74,10 @@ const links = [
         data-account-dropdown
         hidden
       >
+        <div class="account-dropdown-identity">
+          <span class="account-name" data-account-name></span>
+          <span class="account-email" data-account-email></span>
+        </div>
         <a href="/biblioteca/" role="menuitem">
           <Icon name="products" />
           <span data-i18n="accountMenuProducts">{en.accountMenuProducts}</span>
