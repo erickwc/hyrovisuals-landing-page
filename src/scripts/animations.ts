@@ -23,7 +23,7 @@ export function initAnimations(reduced: boolean) {
             y: 10,
             autoAlpha: 0,
             filter: 'blur(6px)',
-            duration: slow * 0.72,
+            duration: slow * 0.98,
             stagger: 0.08,
             ease,
           });
@@ -34,7 +34,7 @@ export function initAnimations(reduced: boolean) {
     timeline
       .from(
         '[data-anim="line"]',
-        { autoAlpha: 0, duration: slow * 0.55, stagger: stagger * 0.5 },
+        { autoAlpha: 0, duration: slow * 0.75, stagger: stagger * 0.5 },
         0,
       )
       .from(
@@ -43,28 +43,28 @@ export function initAnimations(reduced: boolean) {
           y: 4,
           autoAlpha: 0,
           filter: 'blur(2px)',
-          duration: base * 0.65,
+          duration: base * 0.9,
         },
-        base * 0.28,
+        base * 0.2,
       )
       .from(
         '[data-anim="description"]',
-        { y: 6, autoAlpha: 0, duration: base * 0.75 },
-        base * 0.42,
+        { y: 6, autoAlpha: 0, duration: base * 1.05 },
+        base * 0.32,
       )
       .from(
         '[data-anim="button"]',
-        { autoAlpha: 0, duration: base * 0.65 },
-        base * 0.55,
+        { autoAlpha: 0, duration: base * 0.9 },
+        base * 0.48,
       )
       .from(
         '[data-anim="visual"]',
         {
           scale: 0.996,
           autoAlpha: 0,
-          duration: slow * 0.62,
+          duration: slow * 0.92,
         },
-        base * 0.62,
+        base * 0.42,
       );
     gsap.to('[data-anim="dots"]', {
       opacity: number('--dot-pulse-opacity'),
