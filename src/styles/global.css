@@ -709,6 +709,18 @@ select:focus-visible {
   margin-top: var(--gap-button-visual);
   z-index: 1;
 }
+.visual-viewport {
+  overflow-x: auto;
+  border-radius: var(--radius-visual);
+  scrollbar-width: none;
+}
+.visual-viewport::-webkit-scrollbar {
+  display: none;
+}
+.visual-viewport:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
 .visual-frame {
   position: relative;
   width: 100%;
@@ -1923,23 +1935,39 @@ select:focus-visible {
     display: flex;
   }
   .features {
-    grid-template-columns: 1fr;
-    row-gap: var(--space-md);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-md) var(--space-xs);
   }
   .feature-item + .feature-item:before {
     display: none;
   }
   .feature-item {
-    padding-block: var(--space-lg);
+    padding: var(--space-sm) var(--space-xs);
   }
   .hero-description {
     max-width: var(--description-width);
   }
+  .primary-button {
+    gap: 0.65rem;
+    max-width: 100%;
+    padding-inline: 1rem;
+  }
+  .primary-button .icon {
+    flex: none;
+  }
   .visual-stage {
     width: calc(100% - var(--space-md) * 2);
   }
+  .visual-frame {
+    min-width: 44rem;
+  }
   .section-label {
     letter-spacing: var(--feature-tracking);
+  }
+}
+@media (max-width: 22rem) {
+  .features {
+    grid-template-columns: 1fr;
   }
 }
 @media (prefers-reduced-motion: reduce) {

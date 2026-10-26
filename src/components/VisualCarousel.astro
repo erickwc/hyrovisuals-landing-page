@@ -7,34 +7,39 @@ import en from '../i18n/en.json';
   <div class="dot-field dots-left" aria-hidden="true" data-anim="dots"></div>
   <div class="dot-field dots-right" aria-hidden="true" data-anim="dots"></div>
   <div
-    class="visual-frame"
-    data-anim="visual"
+    class="visual-viewport"
     role="region"
     aria-label={en.visualLabel}
     data-i18n-aria="visualLabel"
+    tabindex="0"
   >
-    <img
-      class="visual-poster"
-      src="/media/poster.jpg"
-      width="2560"
-      height="254"
-      alt=""
-      fetchpriority="high"
-    />
-    {[1, 2, 3, 4].map((n) => (
-      <video
-        class="visual-video"
-        data-video={n}
-        muted
-        playsinline
-        autoplay
-        loop
-        preload={n === 1 ? 'auto' : 'metadata'}
-        aria-hidden="true"
-      >
-        <source src={`/media/video-${n}.mp4`} type="video/mp4" />
-      </video>
-    ))}
+    <div
+      class="visual-frame"
+      data-anim="visual"
+    >
+      <img
+        class="visual-poster"
+        src="/media/poster.jpg"
+        width="2560"
+        height="254"
+        alt=""
+        fetchpriority="high"
+      />
+      {[1, 2, 3, 4].map((n) => (
+        <video
+          class="visual-video"
+          data-video={n}
+          muted
+          playsinline
+          autoplay
+          loop
+          preload={n === 1 ? 'auto' : 'metadata'}
+          aria-hidden="true"
+        >
+          <source src={`/media/video-${n}.mp4`} type="video/mp4" />
+        </video>
+      ))}
+    </div>
   </div>
   <button
     class="motion-control"
