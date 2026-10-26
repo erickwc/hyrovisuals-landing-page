@@ -61,8 +61,8 @@ import Layout from '../../layouts/Layout.astro';
   .payment-product-description [data-product-description-copy] { color: var(--secondary); font-size: 13px; line-height: 1.6; margin: 0 0 12px; }
   .payment-product-description [data-product-description-copy]:empty { display: none; }
   .payment-product-description ul { display: grid; gap: 7px; list-style: none; padding: 0; margin: 0; }
-  .payment-product-description li { display: grid; grid-template-columns: 16px minmax(0,1fr); align-items: start; gap: 8px; color: var(--secondary); font-size: 13px; line-height: 1.55; }
-  .payment-feature-check { width: 16px; height: 16px; margin-top: 1px; color: var(--text); }
+  :global(.payment-product-description li) { display: grid; grid-template-columns: 16px minmax(0,1fr); align-items: start; gap: 8px; color: var(--secondary); font-size: 13px; line-height: 1.55; }
+  :global(.payment-feature-check) { display: block; width: 16px; height: 16px; margin-top: 1px; color: var(--text); }
   .payment-delivery { max-width: 370px; font-size: 13px; color: var(--secondary); line-height: 1.65; margin-top: 15px; }
   .payment-form, #hyro-whop-checkout { min-width: 0; width: 100%; }
   .payment-form { padding-top: 0; }
