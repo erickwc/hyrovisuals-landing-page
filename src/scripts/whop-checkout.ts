@@ -114,7 +114,19 @@ export function initWhopCheckout() {
       if (priceCurrency) priceCurrency.textContent = planPrice.currency === 'USD' ? 'US$' : planPrice.currency;
       const deliveryNotice = 'Tu clave de activación y la descarga de Windows estarán en tu biblioteca cuando se confirme el pago.';
       const descriptionText = planPrice.description.trim().replace(deliveryNotice, '').trim();
-      const checkmarkParts = descriptionText.split(/\s*✓\s*/).map((part: string) => part.trim()).filter(Boolean);
+      const finalCopyMatch = /Una vez confirmado el pago,[\s\S]*$/i.exec(descriptionText);
+      const lastFeatureMarker = Math.max(
+        descriptionText.lastIndexOf('✓'),
+        descriptionText.lastIndexOf('\n-'),
+        descriptionText.lastIndexOf('\n•'),
+      );
+      const finalCopy = finalCopyMatch && lastFeatureMarker >= 0 && finalCopyMatch.index > lastFeatureMarker
+        ? finalCopyMatch[0].trim()
+        : '';
+      const benefitsText = finalCopy
+        ? descriptionText.slice(0, finalCopyMatch!.index).trim()
+        : descriptionText;
+      const checkmarkParts = benefitsText.split(/\s*✓\s*/).map((part: string) => part.trim()).filter(Boolean);
       const descriptionIntro = checkmarkParts.shift() ?? '';
       const titleMatch = /¿Qué incluye HYRO Visuals\??/i.exec(descriptionIntro);
       const introText = titleMatch
@@ -122,8 +134,8 @@ export function initWhopCheckout() {
         : descriptionIntro;
       const features = checkmarkParts.length
         ? checkmarkParts
-        : descriptionText.split(/\r?\n/).map((part: string) => part.trim()).filter((part: string) => /^[-•]/.test(part)).map((part: string) => part.replace(/^[-•]\s*/, ''));
-      if (productDescriptionCopy) productDescriptionCopy.textContent = introText;
+        : benefitsText.split(/\r?\n/).map((part: string) => part.trim()).filter((part: string) => /^[-•]/.test(part)).map((part: string) => part.replace(/^[-•]\s*/, ''));
+      if (productDescriptionCopy) productDescriptionCopy.textContent = finalCopy || introText;
       if (productFeatures) {
         productFeatures.replaceChildren(...features.map((feature: string) => {
           const item = document.createElement('li');
