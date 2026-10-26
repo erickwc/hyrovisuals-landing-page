@@ -15,8 +15,11 @@ export function initLicenseChoice() {
   const { signal } = controller;
   let selected: 'personal' | 'teams' = 'personal';
 
-  if (price && supabase) {
-    void supabase.functions.invoke('whop-plan-price').then(({ data, error }) => {
+  if (price) {
+    if (!supabase) {
+      price.textContent = document.documentElement.lang === 'es' ? 'Ver precio al pagar' : 'See price at checkout';
+    } else {
+      void supabase.functions.invoke('whop-plan-price').then(({ data, error }) => {
       if (!price.isConnected) return;
       if (error || typeof data?.amount !== 'number' || !Number.isFinite(data.amount)
         || typeof data?.currency !== 'string') {
@@ -29,9 +32,10 @@ export function initLicenseChoice() {
         maximumFractionDigits: 2,
       }).format(data.amount);
       price.textContent = `${amount} ${data.currency === 'USD' ? 'US$' : data.currency}`;
-    }).catch(() => {
-      if (price.isConnected) price.textContent = document.documentElement.lang === 'es' ? 'Ver precio al pagar' : 'See price at checkout';
-    });
+      }).catch(() => {
+        if (price.isConnected) price.textContent = document.documentElement.lang === 'es' ? 'Ver precio al pagar' : 'See price at checkout';
+      });
+    }
   }
 
   const select = (option: HTMLButtonElement) => {
