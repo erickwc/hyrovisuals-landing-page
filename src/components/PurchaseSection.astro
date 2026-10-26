@@ -6,11 +6,6 @@ const benefits = [
   'purchaseBenefitSpectrums',
   'purchaseBenefitCustom',
   'purchaseBenefitUpdates',
-  'purchaseBenefitDownload',
-  'purchaseBenefitUsage',
-  'purchaseBenefitPlatforms',
-  'purchaseBenefitGuide',
-  'purchaseBenefitSupport',
 ] as const;
 ---
 
@@ -19,14 +14,8 @@ const benefits = [
   class="purchase-section"
   aria-labelledby="purchase-heading"
 >
-  <div class="purchase-dots purchase-dots-top" aria-hidden="true"></div>
-  <div class="purchase-dots purchase-dots-bottom" aria-hidden="true"></div>
   <div class="purchase-layout page-shell">
     <div class="purchase-copy">
-      <p class="purchase-label" data-anim="purchase-copy">
-        <span class="purchase-label-dot" aria-hidden="true"></span>
-        <span data-i18n="purchaseLabel">{en.purchaseLabel}</span>
-      </p>
       <h2
         id="purchase-heading"
         class="purchase-heading"
@@ -45,165 +34,50 @@ const benefits = [
       <ul class="purchase-benefits">
         {benefits.map((key) => (
           <li data-anim="purchase-benefit">
-            <span class="purchase-check" aria-hidden="true">
-              <Icon name="check" />
-            </span>
             <span data-i18n={key}>{en[key]}</span>
           </li>
         ))}
       </ul>
     </div>
 
-    <div class="purchase-card" data-anim="purchase-card">
-      <div class="purchase-card-content">
-        <div class="purchase-license">
-          <span class="purchase-license-mark" aria-hidden="true"></span>
-          <div class="purchase-license-copy">
-            <h3 data-i18n="purchaseLicense">{en.purchaseLicense}</h3>
-            <p data-i18n="purchaseFullAccess">{en.purchaseFullAccess}</p>
-          </div>
-          <strong class="purchase-price">$20 USD</strong>
-        </div>
-        <div class="purchase-device-note">
-          <span class="purchase-device-icon" aria-hidden="true">
-            <Icon name="device" />
+    <div class="purchase-choice" data-anim="purchase-card" data-license-choice>
+      <h3 data-i18n="licenseChoiceTitle">{en.licenseChoiceTitle}</h3>
+      <div class="purchase-license-options" role="radiogroup" aria-label={en.licenseChoiceTitle} data-i18n-aria="licenseChoiceTitle">
+        <button class="purchase-license-option is-selected" type="button" role="radio" aria-checked="true" data-license-option="personal">
+          <span class="purchase-license-indicator" aria-hidden="true"></span>
+          <span class="purchase-license-detail">
+            <strong data-i18n="licensePersonal">{en.licensePersonal}</strong>
+            <small data-i18n="licensePersonalDescription">{en.licensePersonalDescription}</small>
           </span>
-          <p data-i18n="purchaseDeviceNote">{en.purchaseDeviceNote}</p>
-        </div>
-        <button class="purchase-button" type="button" data-license-dialog-open>
-          <span data-i18n="purchaseNow">{en.purchaseNow}</span>
-          <Icon name="arrow" />
+          <span class="purchase-license-price" data-license-price>$20 USD</span>
         </button>
-        <p
-          class="purchase-checkout-status"
-          data-payhip-status
-          role="status"
-          hidden
-        ></p>
-        <ul
-          class="purchase-payment-methods"
-          data-i18n-aria="purchasePaymentMethods"
-          aria-label={en.purchasePaymentMethods}
-        >
-          <li class="payment-method payment-visa">
-            <img
-              src="/images/payment/visa.png"
-              alt="Visa"
-              width="600"
-              height="203"
-            />
-          </li>
-          <li class="payment-method payment-mastercard" aria-label="Mastercard">
-            <span aria-hidden="true"></span>
-            <span aria-hidden="true"></span>
-          </li>
-          <li class="payment-method payment-paypal">
-            <img
-              src="/images/payment/paypal.png"
-              alt="PayPal"
-              width="600"
-              height="148"
-            />
-          </li>
-          <li class="payment-method payment-google">
-            <img
-              src="/images/payment/google-pay.png"
-              alt="Google Pay"
-              width="600"
-              height="225"
-            />
-          </li>
-          <li class="payment-method payment-apple">
-            <img
-              src="/images/payment/apple-pay.png"
-              alt="Apple Pay"
-              width="600"
-              height="250"
-            />
-          </li>
-        </ul>
-        <div class="purchase-secure">
-          <Icon name="lock" />
-          <span data-i18n="purchaseSecurePayment">
-            {en.purchaseSecurePayment}
+        <button class="purchase-license-option" type="button" role="radio" aria-checked="false" data-license-option="teams">
+          <span class="purchase-license-indicator" aria-hidden="true"></span>
+          <span class="purchase-license-detail">
+            <strong data-i18n="licenseTeams">{en.licenseTeams}</strong>
+            <small data-i18n="licenseTeamsDescription">{en.licenseTeamsDescription}</small>
           </span>
-        </div>
+          <span class="purchase-license-soon" data-i18n="licenseTeamsSoon">{en.licenseTeamsSoon}</span>
+        </button>
+      </div>
+      <div class="purchase-license-message" aria-live="polite">
+        <p data-license-message="personal" data-i18n="purchaseDeviceNote">{en.purchaseDeviceNote}</p>
+        <p data-license-message="teams" data-i18n="licenseTeamsPending" hidden>{en.licenseTeamsPending}</p>
+      </div>
+      <a class="purchase-button" href="/pago/" data-license-continue>
+        <span data-i18n="purchaseNow">{en.purchaseNow}</span>
+        <Icon name="arrow" />
+      </a>
+      <div class="purchase-footer">
+        <ul class="purchase-payment-methods" data-i18n-aria="purchasePaymentMethods" aria-label={en.purchasePaymentMethods}>
+          <li class="payment-method payment-visa"><img src="/images/payment/visa.png" alt="Visa" width="600" height="203" /></li>
+          <li class="payment-method payment-mastercard" aria-label="Mastercard"><span aria-hidden="true"></span><span aria-hidden="true"></span></li>
+          <li class="payment-method payment-paypal"><img src="/images/payment/paypal.png" alt="PayPal" width="600" height="148" /></li>
+          <li class="payment-method payment-google"><img src="/images/payment/google-pay.png" alt="Google Pay" width="600" height="225" /></li>
+          <li class="payment-method payment-apple"><img src="/images/payment/apple-pay.png" alt="Apple Pay" width="600" height="250" /></li>
+        </ul>
+        <div class="purchase-secure"><Icon name="lock" /><span data-i18n="purchaseSecurePayment">{en.purchaseSecurePayment}</span></div>
       </div>
     </div>
   </div>
-  <dialog
-    class="license-dialog"
-    data-license-dialog
-    aria-labelledby="license-choice-title"
-  >
-    <form method="dialog" class="license-dialog-top">
-      <h2 id="license-choice-title" data-i18n="licenseChoiceTitle">
-        {en.licenseChoiceTitle}
-      </h2>
-      <button
-        class="license-dialog-close"
-        type="submit"
-        aria-label={en.licenseClose}
-        data-i18n-aria="licenseClose"
-      >
-        <span aria-hidden="true">×</span>
-      </button>
-    </form>
-    <p class="license-dialog-description" data-i18n="licenseChoiceDescription">
-      {en.licenseChoiceDescription}
-    </p>
-    <div
-      class="license-options"
-      role="radiogroup"
-      aria-labelledby="license-choice-title"
-    >
-      <button
-        type="button"
-        class="license-option"
-        role="radio"
-        aria-checked="false"
-        data-license-option="personal"
-      >
-        <span class="license-option-indicator" aria-hidden="true"></span>
-        <span class="license-option-copy">
-          <strong data-i18n="licensePersonal">{en.licensePersonal}</strong>
-          <span data-i18n="licensePersonalDescription">
-            {en.licensePersonalDescription}
-          </span>
-        </span>
-      </button>
-      <button
-        type="button"
-        class="license-option"
-        role="radio"
-        aria-checked="false"
-        data-license-option="teams"
-      >
-        <span class="license-option-indicator" aria-hidden="true"></span>
-        <span class="license-option-copy">
-          <strong data-i18n="licenseTeams">{en.licenseTeams}</strong>
-          <span data-i18n="licenseTeamsDescription">
-            {en.licenseTeamsDescription}
-          </span>
-        </span>
-      </button>
-    </div>
-    <p
-      class="license-pending"
-      data-license-pending
-      data-i18n="licenseTeamsPending"
-      hidden
-    >
-      {en.licenseTeamsPending}
-    </p>
-    <a
-      class="license-continue"
-      href="/pago/"
-      data-license-continue
-      data-i18n="licenseContinue"
-      aria-disabled="true"
-    >
-      {en.licenseContinue}
-    </a>
-  </dialog>
 </section>

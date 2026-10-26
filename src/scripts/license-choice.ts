@@ -1,54 +1,57 @@
-export function initLicenseChoice() {
-  const dialog = document.querySelector<HTMLDialogElement>(
-    '[data-license-dialog]',
-  );
-  if (!dialog) return () => {};
+import { supabase } from '../lib/supabase';
 
-  const opener = document.querySelector<HTMLButtonElement>(
-    '[data-license-dialog-open]',
-  );
+export function initLicenseChoice() {
+  const choice = document.querySelector<HTMLElement>('[data-license-choice]');
+  if (!choice) return () => {};
+
   const options = Array.from(
-    dialog.querySelectorAll<HTMLButtonElement>('[data-license-option]'),
+    choice.querySelectorAll<HTMLButtonElement>('[data-license-option]'),
   );
-  const pending = dialog.querySelector<HTMLElement>('[data-license-pending]');
-  const proceed = dialog.querySelector<HTMLAnchorElement>(
-    '[data-license-continue]',
-  );
+  const proceed = choice.querySelector<HTMLAnchorElement>('[data-license-continue]');
+  const personalMessage = choice.querySelector<HTMLElement>('[data-license-message="personal"]');
+  const teamsMessage = choice.querySelector<HTMLElement>('[data-license-message="teams"]');
+  const price = choice.querySelector<HTMLElement>('[data-license-price]');
   const controller = new AbortController();
   const { signal } = controller;
-  let selected: 'personal' | 'teams' | null = null;
+  let selected: 'personal' | 'teams' = 'personal';
 
-  opener?.addEventListener(
-    'click',
-    () => {
-      selected = null;
-      options.forEach((option) => {
-        option.setAttribute('aria-checked', 'false');
-        option.classList.remove('is-selected');
-      });
-      if (pending) pending.hidden = true;
-      if (proceed) proceed.setAttribute('aria-disabled', 'true');
-      dialog.showModal();
-    },
-    { signal },
-  );
+  if (price && supabase) {
+    void supabase.functions.invoke('whop-plan-price').then(({ data, error }) => {
+      if (!price.isConnected) return;
+      if (error || typeof data?.amount !== 'number' || !Number.isFinite(data.amount)
+        || typeof data?.currency !== 'string') {
+        price.textContent = document.documentElement.lang === 'es' ? 'Ver precio al pagar' : 'See price at checkout';
+        return;
+      }
+      const locale = document.documentElement.lang === 'es' ? 'es-ES' : 'en-US';
+      const amount = new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(data.amount);
+      price.textContent = `${amount} ${data.currency === 'USD' ? 'US$' : data.currency}`;
+    }).catch(() => {
+      if (price.isConnected) price.textContent = document.documentElement.lang === 'es' ? 'Ver precio al pagar' : 'See price at checkout';
+    });
+  }
+
+  const select = (option: HTMLButtonElement) => {
+    selected = option.dataset.licenseOption === 'teams' ? 'teams' : 'personal';
+    options.forEach((entry) => {
+      const active = entry === option;
+      entry.setAttribute('aria-checked', String(active));
+      entry.classList.toggle('is-selected', active);
+    });
+    const isPersonal = selected === 'personal';
+    if (personalMessage) personalMessage.hidden = !isPersonal;
+    if (teamsMessage) teamsMessage.hidden = isPersonal;
+    if (proceed) {
+      proceed.setAttribute('aria-disabled', String(!isPersonal));
+      proceed.tabIndex = isPersonal ? 0 : -1;
+    }
+  };
 
   options.forEach((option, index) => {
-    option.addEventListener(
-      'click',
-      () => {
-        selected = option.dataset.licenseOption as 'personal' | 'teams';
-        options.forEach((entry) => {
-          const active = entry === option;
-          entry.setAttribute('aria-checked', String(active));
-          entry.classList.toggle('is-selected', active);
-        });
-        const isPersonal = selected === 'personal';
-        if (pending) pending.hidden = isPersonal;
-        if (proceed) proceed.setAttribute('aria-disabled', String(!isPersonal));
-      },
-      { signal },
-    );
+    option.addEventListener('click', () => select(option), { signal });
     option.addEventListener(
       'keydown',
       (event) => {
@@ -60,27 +63,15 @@ export function initLicenseChoice() {
         else return;
         event.preventDefault();
         options[next].focus();
-        options[next].click();
+        select(options[next]);
       },
       { signal },
     );
   });
 
-  proceed?.addEventListener(
-    'click',
-    (event) => {
-      if (selected !== 'personal') event.preventDefault();
-    },
-    { signal },
-  );
-
-  dialog.addEventListener(
-    'click',
-    (event) => {
-      if (event.target === dialog) dialog.close();
-    },
-    { signal },
-  );
+  proceed?.addEventListener('click', (event) => {
+    if (selected !== 'personal') event.preventDefault();
+  }, { signal });
 
   return () => controller.abort();
 }
