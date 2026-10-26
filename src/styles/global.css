@@ -9,6 +9,7 @@
 }
 :root {
   --background: #f3f3ef;
+  --checkout-left-background: #f8f8f6;
   --checkout-right-background: #fff;
   --surface: #fafaf8;
   --text: #171817;
@@ -124,6 +125,7 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
   --background: #080808;
+  --checkout-left-background: color-mix(in srgb, var(--background) 88%, var(--text));
   --checkout-right-background: var(--background);
   --surface: #10110f;
   --text: #f8f8f6;
@@ -199,7 +201,7 @@ body {
   body[data-page='checkout'] {
     background: linear-gradient(
       90deg,
-      color-mix(in srgb, var(--background) 96%, var(--text)) 0 50%,
+      var(--checkout-left-background) 0 50%,
       var(--checkout-right-background) 50% 100%
     );
   }

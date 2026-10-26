@@ -23,7 +23,7 @@ export function initWhopCheckout() {
   let handle: CheckoutHandle | undefined;
   let sdkLoad: Promise<void> | undefined;
   const appearance = () => {
-    const background = getComputedStyle(document.documentElement).getPropertyValue('--background').trim();
+    const background = getComputedStyle(document.documentElement).getPropertyValue('--checkout-right-background').trim();
     return {
       theme: { appearance: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light', accentColor: 'gray', grayColor: 'gray' },
       classes: {
