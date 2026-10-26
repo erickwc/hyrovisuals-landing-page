@@ -617,7 +617,7 @@ select:focus-visible {
 }
 .section-label {
   font-family: var(--font-label);
-  font-size: 1rem;
+  font-size: var(--text-small);
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: var(--feature-tracking);
