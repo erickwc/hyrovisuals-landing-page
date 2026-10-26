@@ -23,10 +23,9 @@ import Layout from '../../layouts/Layout.astro';
           <p class="payment-price"><span data-price-amount>—</span> <span data-price-currency></span></p>
           <div class="payment-product-description" data-product-description hidden>
             <h2>¿Qué incluye HYRO Visuals?</h2>
-            <p data-product-description-copy></p>
             <ul data-product-features></ul>
+            <p data-product-description-copy></p>
           </div>
-          <p class="payment-delivery">Tu clave de activación y la descarga de Windows estarán en tu biblioteca cuando se confirme el pago.</p>
         </section>
       </div>
       <section class="payment-form" aria-label="Pago seguro">
@@ -59,12 +58,11 @@ import Layout from '../../layouts/Layout.astro';
   .payment-product-description { margin-top: 22px; color: var(--secondary); }
   .payment-product-description[hidden] { display: none; }
   .payment-product-description h2 { color: var(--text); font-size: 15px; line-height: 1.45; font-weight: 600; margin: 0 0 10px; }
-  .payment-product-description [data-product-description-copy] { color: var(--secondary); font-size: 13px; line-height: 1.6; margin: 0 0 12px; }
+  .payment-product-description [data-product-description-copy] { color: var(--secondary); font-size: 13px; line-height: 1.6; margin: 12px 0 0; }
   .payment-product-description [data-product-description-copy]:empty { display: none; }
   .payment-product-description ul { display: grid; gap: 7px; list-style: none; padding: 0; margin: 0; }
   :global(.payment-product-description li) { display: grid; grid-template-columns: 16px minmax(0,1fr); align-items: start; gap: 8px; color: var(--secondary); font-size: 13px; line-height: 1.55; }
   :global(.payment-feature-check) { display: block; width: 16px; height: 16px; margin-top: 1px; color: var(--text); }
-  .payment-delivery { max-width: 370px; font-size: 13px; color: var(--secondary); line-height: 1.65; margin-top: 15px; }
   .payment-form, #hyro-whop-checkout { min-width: 0; width: 100%; }
   .payment-form { padding-top: 22px; }
   .payment-status { font-size: 14px; color: var(--secondary); }
