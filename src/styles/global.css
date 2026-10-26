@@ -49,7 +49,7 @@
   --text-small: 0.75rem;
   --text-label: 0.8125rem;
   --text-body: 0.875rem;
-  --text-description: 1rem;
+  --text-description: 1.25rem;
   --title-size: clamp(1.4rem, 5.4vw, 5.25rem);
   --title-weight: 400;
   --title-leading: 1.06;
@@ -617,7 +617,7 @@ select:focus-visible {
 }
 .section-label {
   font-family: var(--font-label);
-  font-size: var(--text-small);
+  font-size: 1rem;
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: var(--feature-tracking);
@@ -676,7 +676,7 @@ select:focus-visible {
   background: var(--button-bg);
   color: var(--button-text);
   font-family: var(--font-label);
-  font-size: var(--text-small);
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: var(--feature-tracking);
   text-transform: uppercase;
@@ -1883,7 +1883,7 @@ select:focus-visible {
   :root {
     --hero-top: var(--space-xl);
     --title-size: clamp(1.4rem, 6.2vw, 3.25rem);
-    --text-description: 1rem;
+    --text-description: 1.25rem;
     --text-label: 0.7rem;
     --nav-height: 4.9rem;
     --logo-width: 5.5rem;
