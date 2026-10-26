@@ -304,13 +304,13 @@ select:focus-visible {
 }
 .nav-links {
   display: flex;
-  gap: var(--space-md);
+  gap: 1.35rem;
   align-items: center;
 }
 .nav-links a {
   text-transform: uppercase;
   font-family: var(--font-label);
-  font-size: 0.6875rem;
+  font-size: var(--text-small);
   font-weight: 400;
   letter-spacing: var(--feature-tracking);
   color: color-mix(in srgb, var(--secondary) 72%, var(--text));
@@ -320,11 +320,23 @@ select:focus-visible {
 }
 .nav-controls {
   display: flex;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   align-items: center;
 }
 .account-menu {
   position: relative;
+}
+.language-menu {
+  position: relative;
+}
+.language-dropdown {
+  min-width: 8.5rem;
+}
+.language-dropdown button:first-child {
+  border-top: 0;
+}
+.language-dropdown button[aria-checked='true'] {
+  color: var(--text);
 }
 .account-link {
   display: inline-flex;

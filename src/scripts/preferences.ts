@@ -18,6 +18,8 @@ export function initPreferences(onLanguage: () => void) {
   const signal = controller.signal;
   const languageToggle = document.querySelector<HTMLButtonElement>('[data-language-toggle]');
   const languageCurrent = document.querySelector<HTMLElement>('[data-language-current]');
+  const languageDropdown = document.querySelector<HTMLElement>('[data-language-dropdown]');
+  const languageOptions = document.querySelectorAll<HTMLButtonElement>('[data-language-option]');
   const themeButton = document.querySelector<HTMLButtonElement>(
     '[data-theme-toggle]',
   );
@@ -51,6 +53,9 @@ export function initPreferences(onLanguage: () => void) {
     dictionary = lang === 'es' ? es : en;
     document.documentElement.lang = lang!;
     if (languageCurrent) languageCurrent.textContent = lang!.toUpperCase();
+    languageOptions.forEach((option) => {
+      option.setAttribute('aria-checked', String(option.dataset.languageOption === lang));
+    });
     const page = document.body.dataset.page;
     document.title = page === 'account'
       ? dictionary.accountPageTitle
@@ -104,17 +109,30 @@ export function initPreferences(onLanguage: () => void) {
     });
   };
   translate();
-  languageToggle?.addEventListener(
-    'click',
-    () => {
+  const closeLanguageMenu = () => {
+    languageDropdown?.setAttribute('hidden', '');
+    languageToggle?.setAttribute('aria-expanded', 'false');
+  };
+  languageToggle?.addEventListener('click', () => {
+    const open = languageToggle.getAttribute('aria-expanded') !== 'true';
+    languageToggle.setAttribute('aria-expanded', String(open));
+    if (open) languageDropdown?.removeAttribute('hidden');
+    else closeLanguageMenu();
+  }, { signal });
+  languageOptions.forEach((option) => option.addEventListener('click', () => {
+      const nextLanguage = option.dataset.languageOption;
+      if (nextLanguage !== 'en' && nextLanguage !== 'es') return;
       document.dispatchEvent(new Event('hyro:before-language'));
-      lang = lang === 'es' ? 'en' : 'es';
+      lang = nextLanguage;
       save('hyro-language', lang);
       translate();
+      closeLanguageMenu();
       onLanguage();
-    },
-    { signal },
-  );
+    }, { signal }));
+  document.addEventListener('click', (event) => {
+    if (!document.querySelector('[data-language-menu]')?.contains(event.target as Node))
+      closeLanguageMenu();
+  }, { signal });
   themeButton?.addEventListener(
     'click',
     () => {
@@ -153,7 +171,10 @@ export function initPreferences(onLanguage: () => void) {
   document.addEventListener(
     'keydown',
     (event) => {
-      if (event.key === 'Escape') close();
+      if (event.key === 'Escape') {
+        close();
+        closeLanguageMenu();
+      }
     },
     { signal },
   );

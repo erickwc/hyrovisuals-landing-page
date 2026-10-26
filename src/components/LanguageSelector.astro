@@ -3,14 +3,29 @@ import Icon from './Icon.astro';
 import en from '../i18n/en.json';
 ---
 
-<button
-  class="language-control"
-  type="button"
-  id="language"
-  aria-label={en.languageToEs}
-  data-language-toggle
-  data-i18n-aria="languageToEs"
->
-  <Icon name="language" />
-  <span data-language-current>EN</span>
-</button>
+<div class="language-menu" data-language-menu>
+  <button
+    class="language-control"
+    type="button"
+    id="language"
+    aria-label={en.languageLabel}
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="language-dropdown"
+    data-language-toggle
+    data-i18n-aria="languageLabel"
+  >
+    <Icon name="language" />
+    <span data-language-current aria-hidden="true">EN</span>
+  </button>
+  <div
+    class="account-dropdown language-dropdown"
+    id="language-dropdown"
+    role="menu"
+    data-language-dropdown
+    hidden
+  >
+    <button type="button" role="menuitemradio" aria-checked="false" data-language-option="es">Español</button>
+    <button type="button" role="menuitemradio" aria-checked="false" data-language-option="en">English</button>
+  </div>
+</div>
