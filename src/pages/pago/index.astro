@@ -38,12 +38,12 @@ import Layout from '../../layouts/Layout.astro';
   </main>
 </Layout>
 <style>
-  .hyro-payment { --checkout-left-bg: color-mix(in srgb, var(--background) 92%, var(--text)); width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 72px 0 72px; min-height: 100svh; }
+  .hyro-payment { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 72px 0 72px; min-height: 100svh; }
   .payment-heading { margin-bottom: 22px; }
-  .payment-back { display: inline-flex; min-height: 32px; align-items: center; gap: 20px; padding: 2px 0; border: 0; border-radius: 0; background: transparent; color: var(--text); font: 500 13px/1.4 var(--font-body); cursor: pointer; }
+  .payment-back { display: inline-flex; min-height: 32px; align-items: center; gap: 12px; padding: 2px 0; border: 0; border-radius: 0; background: transparent; color: var(--text); font: 500 13px/1.4 var(--font-body); cursor: pointer; }
   .payment-back-arrow { display: inline-block; width: 18px; height: 18px; flex: 0 0 18px; color: var(--secondary); transition: transform .28s ease, color .2s ease; }
   .payment-back:hover .payment-back-arrow, .payment-back:focus-visible .payment-back-arrow { transform: translateX(-3px); color: var(--text); }
-  .payment-back-brand { display: inline-flex; align-items: center; gap: 6px; }
+  .payment-back-brand { display: inline-flex; align-items: center; gap: 3px; }
   .payment-back-mark { display: block; width: 28px; height: 28px; box-sizing: border-box; border: 1px solid color-mix(in srgb, var(--border) 56%, transparent); border-radius: 8px; object-fit: cover; }
   .payment-back-label { position: relative; display: inline-grid; align-items: center; min-width: 90px; height: 1.2em; }
   .payment-back-default, .payment-back-hover { grid-area: 1 / 1; white-space: nowrap; transition: opacity .24s ease, transform .24s ease; }
@@ -51,7 +51,7 @@ import Layout from '../../layouts/Layout.astro';
   .payment-back-hover { opacity: 0; transform: translateY(4px); }
   .payment-back:hover .payment-back-default, .payment-back:focus-visible .payment-back-default { opacity: 0; transform: translateY(-4px); }
   .payment-back:hover .payment-back-hover, .payment-back:focus-visible .payment-back-hover { opacity: 1; transform: translateY(0); }
-  .payment-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 80px; align-items: stretch; }
+  .payment-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 128px; align-items: stretch; }
   .payment-information { box-sizing: border-box; min-height: calc(100svh - 144px); padding: 22px; background: transparent; }
   .payment-summary { padding: 0; border: 0; background: transparent; }
   .payment-price { font-size: clamp(35px,4vw,48px); line-height: 1.1; letter-spacing: -.04em; font-weight: 600; margin: 0; }
@@ -66,10 +66,10 @@ import Layout from '../../layouts/Layout.astro';
   :global(.payment-feature-check) { display: block; width: 16px; height: 16px; margin-top: 1px; color: var(--text); }
   .payment-delivery { max-width: 370px; font-size: 13px; color: var(--secondary); line-height: 1.65; margin-top: 15px; }
   .payment-form, #hyro-whop-checkout { min-width: 0; width: 100%; }
-  .payment-form { padding-top: 0; }
+  .payment-form { padding-top: 22px; }
   .payment-status { font-size: 14px; color: var(--secondary); }
   .payment-status:empty { display: none; }
   .payment-retry { padding: 14px 24px; margin-top: 20px; background: var(--button-bg); color: var(--button-text); border-radius: 5px; cursor: pointer; }
-  @media(max-width: 760px) { .hyro-payment { width: calc(100% - 32px); padding-top: 44px; } .payment-heading { margin-bottom: 20px; } .payment-layout { grid-template-columns: 1fr; gap: 32px; } .payment-information { min-height: 0; padding: 20px; } }
+  @media(max-width: 760px) { .hyro-payment { width: calc(100% - 32px); padding-top: 44px; } .payment-heading { margin-bottom: 20px; } .payment-layout { grid-template-columns: 1fr; gap: 32px; } .payment-information { min-height: 0; padding: 20px; } .payment-form { padding-top: 0; } }
   @media(prefers-reduced-motion: reduce) { .payment-back, .payment-back-arrow, .payment-back-default, .payment-back-hover { transition: none; } }
 </style>
