@@ -946,6 +946,7 @@ select:focus-visible {
   margin: 0;
   border-top: 1px solid var(--border);
 }
+.purchase-benefits[hidden] { display: none; }
 .purchase-benefits li {
   display: flex;
   align-items: center;
@@ -2532,6 +2533,12 @@ select:focus-visible {
   justify-content: space-between;
   gap: 1.5rem;
 }
+.producer-heading-copy p {
+  margin: 0.9rem 0 0;
+  color: var(--secondary);
+  font-size: clamp(0.95rem, 1.3vw, 1.12rem);
+  line-height: 1.45;
+}
 .producer-controls {
   display: flex;
   gap: 0.5rem;
@@ -2552,8 +2559,10 @@ select:focus-visible {
   background: color-mix(in srgb, var(--text) 8%, transparent);
 }
 .producer-controls button:first-child .icon {
-  transform: rotate(180deg);
+  transform: none;
 }
+.producer-controls button:nth-child(2) .icon { transform: rotate(180deg); }
+.producer-controls .producer-pause { font-size: 1rem; font-weight: 700; }
 .producer-inner h2,
 .faq-intro h2 {
   margin: 0;
@@ -2579,8 +2588,9 @@ select:focus-visible {
   scroll-snap-type: x mandatory;
   overscroll-behavior-inline: contain;
   padding: 0.2rem 0 1rem;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
+.producer-carousel::-webkit-scrollbar { display: none; }
 .producer-carousel:focus-visible {
   outline: 2px solid var(--text);
   outline-offset: 3px;
@@ -2588,7 +2598,7 @@ select:focus-visible {
 .producer-card {
   display: flex;
   flex-direction: column;
-  flex: 0 0 clamp(14rem, 22vw, 18rem);
+  flex: 0 0 clamp(16rem, 23vw, 18.5rem);
   overflow: hidden;
   margin: 0;
   border: 1px solid color-mix(in srgb, var(--text) 13%, transparent);
@@ -2597,21 +2607,34 @@ select:focus-visible {
   color: var(--text);
   scroll-snap-align: start;
 }
+.producer-card-top {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  padding: 1.3rem 1.3rem 0;
+}
 .producer-card img {
   display: block;
-  width: 100%;
+  width: 6.5rem;
   aspect-ratio: 1;
   object-fit: cover;
+  border-radius: 0.65rem;
+}
+.producer-card-index {
+  color: var(--secondary);
+  font-family: var(--font-label);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
 }
 .producer-card figcaption {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 10rem;
-  padding: 1.2rem;
+  min-height: 8.5rem;
+  padding: 1.2rem 1.3rem 1.4rem;
 }
 .producer-card strong {
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   font-weight: 600;
 }
 .producer-card p {
@@ -2619,14 +2642,6 @@ select:focus-visible {
   color: var(--secondary);
   font-size: 0.9rem;
   line-height: 1.45;
-}
-.producer-card small {
-  margin-top: auto;
-  padding-top: 1rem;
-  color: var(--secondary);
-  font-size: 0.67rem;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
 }
 
 .faq-section {

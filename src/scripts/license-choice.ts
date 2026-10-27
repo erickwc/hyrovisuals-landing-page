@@ -11,6 +11,7 @@ export function initLicenseChoice() {
   const personalMessage = choice.querySelector<HTMLElement>('[data-license-message="personal"]');
   const teamsMessage = choice.querySelector<HTMLElement>('[data-license-message="teams"]');
   const price = choice.querySelector<HTMLElement>('[data-license-price]');
+  const benefitLists = document.querySelectorAll<HTMLElement>('[data-license-benefits]');
   const controller = new AbortController();
   const { signal } = controller;
   let selected: 'personal' | 'teams' = 'personal';
@@ -48,6 +49,7 @@ export function initLicenseChoice() {
     const isPersonal = selected === 'personal';
     if (personalMessage) personalMessage.hidden = !isPersonal;
     if (teamsMessage) teamsMessage.hidden = isPersonal;
+    benefitLists.forEach((list) => { list.hidden = list.dataset.licenseBenefits !== selected; });
     if (proceed) {
       proceed.setAttribute('aria-disabled', String(!isPersonal));
       proceed.tabIndex = isPersonal ? 0 : -1;

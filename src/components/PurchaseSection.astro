@@ -2,11 +2,8 @@
 import Icon from './Icon.astro';
 import en from '../i18n/en.json';
 
-const benefits = [
-  'purchaseBenefitSpectrums',
-  'purchaseBenefitCustom',
-  'purchaseBenefitUpdates',
-] as const;
+const personalBenefits = ['purchasePersonalKey', 'purchasePersonalAccess', 'purchasePersonalDownload'] as const;
+const teamsBenefits = ['purchaseTeamsKeys', 'purchaseTeamsAccess', 'purchaseTeamsDownload'] as const;
 ---
 
 <section
@@ -31,11 +28,16 @@ const benefits = [
       >
         {en.purchaseDescription}
       </p>
-      <ul class="purchase-benefits">
-        {benefits.map((key) => (
+      <ul class="purchase-benefits" data-license-benefits="personal" aria-live="polite">
+        {personalBenefits.map((key) => (
           <li data-anim="purchase-benefit">
             <span data-i18n={key}>{en[key]}</span>
           </li>
+        ))}
+      </ul>
+      <ul class="purchase-benefits" data-license-benefits="teams" hidden>
+        {teamsBenefits.map((key) => (
+          <li><span data-i18n={key}>{en[key]}</span></li>
         ))}
       </ul>
     </div>
@@ -50,10 +52,6 @@ const benefits = [
             <span class="purchase-license-price" data-license-price aria-live="polite">—</span>
           </span>
           <span class="purchase-license-detail" data-i18n="licensePersonalDescription">{en.licensePersonalDescription}</span>
-          <span class="purchase-license-points">
-            <span><Icon name="check" /><span data-i18n="licenseLifetime">{en.licenseLifetime}</span></span>
-            <span><Icon name="check" /><span data-i18n="licenseRedownload">{en.licenseRedownload}</span></span>
-          </span>
         </button>
         <button class="purchase-license-option" type="button" role="radio" aria-checked="false" data-license-option="teams">
           <span class="purchase-license-top">
@@ -62,10 +60,6 @@ const benefits = [
             <span class="purchase-license-soon" data-i18n="licenseTeamsSoon">{en.licenseTeamsSoon}</span>
           </span>
           <span class="purchase-license-detail" data-i18n="licenseTeamsDescription">{en.licenseTeamsDescription}</span>
-          <span class="purchase-license-points">
-            <span><Icon name="check" /><span data-i18n="licenseLifetime">{en.licenseLifetime}</span></span>
-            <span><Icon name="check" /><span data-i18n="licenseRedownload">{en.licenseRedownload}</span></span>
-          </span>
         </button>
       </div>
       <div class="purchase-license-message" aria-live="polite">

@@ -14,20 +14,26 @@ const producers = [
 <section id="enfoque" class="producer-section" aria-labelledby="producer-heading">
   <div class="page-shell producer-inner">
     <div class="producer-heading-row">
-      <h2 id="producer-heading" data-i18n="producersTitle">{en.producersTitle}</h2>
+      <div class="producer-heading-copy">
+        <h2 id="producer-heading" data-i18n="producersTitle">{en.producersTitle}</h2>
+        <p data-i18n="producersIntro">{en.producersIntro}</p>
+      </div>
       <div class="producer-controls">
+        <button class="producer-pause" type="button" data-producer-pause aria-label={en.producerPause} data-i18n-aria="producerPause" aria-pressed="false"><span aria-hidden="true">Ⅱ</span></button>
         <button type="button" data-producer-prev aria-label={en.producerPrevious} data-i18n-aria="producerPrevious"><Icon name="arrow" /></button>
         <button type="button" data-producer-next aria-label={en.producerNext} data-i18n-aria="producerNext"><Icon name="arrow" /></button>
       </div>
     </div>
     <div class="producer-carousel" role="region" aria-label={en.producersTitle} data-i18n-aria="producersTitle" data-producer-carousel tabindex="0">
-      {producers.map((producer) => (
+      {producers.map((producer, index) => (
         <figure class="producer-card">
-          <img src={producer.image} alt={producer.name} width="150" height="150" loading="lazy" />
+          <div class="producer-card-top">
+            <img src={producer.image} alt={producer.name} width="150" height="150" loading="lazy" />
+            <span class="producer-card-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+          </div>
           <figcaption>
             <strong>{producer.name}</strong>
             <p data-i18n={producer.caption}>{en[producer.caption]}</p>
-            <small data-i18n="producerDraftLabel">{en.producerDraftLabel}</small>
           </figcaption>
         </figure>
       ))}
