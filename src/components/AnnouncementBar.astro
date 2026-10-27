@@ -9,7 +9,12 @@ import en from '../i18n/en.json';
   data-i18n-aria="announcement"
 >
   <span class="announcement-track" aria-hidden="true">
-    <span data-i18n="announcement">{en.announcement}</span>
-    <span data-i18n="announcement">{en.announcement}</span>
+    {Array.from({ length: 2 }, () => (
+      <span class="announcement-set">
+        {Array.from({ length: 3 }, () => (
+          <span data-i18n="announcement">{en.announcement}</span>
+        ))}
+      </span>
+    ))}
   </span>
 </a>

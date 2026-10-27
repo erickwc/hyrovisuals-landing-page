@@ -2472,9 +2472,16 @@ select:focus-visible {
   width: max-content;
   animation: announcement-scroll 28s linear infinite;
 }
-.announcement-track span {
+.announcement-set {
+  display: flex;
   flex: none;
-  padding-inline: 2rem;
+  min-width: 100vw;
+  justify-content: space-around;
+  gap: 2.5rem;
+  padding-right: 2.5rem;
+}
+.announcement-set span {
+  flex: none;
   white-space: nowrap;
 }
 .announcement-bar:hover .announcement-track,
@@ -2673,8 +2680,10 @@ select:focus-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .announcement-track { animation: none; }
-  .announcement-track span + span { display: none; }
-  .announcement-track span { white-space: normal; }
+  .announcement-set + .announcement-set,
+  .announcement-set span + span { display: none; }
+  .announcement-set { min-width: 0; padding: 0 1rem; }
+  .announcement-set span { white-space: normal; }
   .announcement-track { width: 100%; justify-content: center; text-align: center; }
   .faq-toggle::before,
   .faq-toggle::after { transition: none; }
