@@ -1,0 +1,31 @@
+---
+import en from '../i18n/en.json';
+import { buyerReviews } from '../data/reviews';
+
+const publishedReviews = buyerReviews.filter(
+  (review) => review.purchaseVerified && review.approvedForPublication,
+);
+---
+
+<section id="resenas" class="reviews-section" aria-labelledby="reviews-heading">
+  <div class="page-shell reviews-inner">
+    <div class="reviews-intro">
+      <h2 id="reviews-heading" data-i18n="reviewsTitle">{en.reviewsTitle}</h2>
+      <p data-i18n="reviewsIntro">{en.reviewsIntro}</p>
+    </div>
+    {publishedReviews.length > 0 ? (
+      <div class="reviews-list">
+        {publishedReviews.map((review) => (
+          <figure class="review-entry">
+            <blockquote>{review.comment}</blockquote>
+            <figcaption>{review.author}</figcaption>
+          </figure>
+        ))}
+      </div>
+    ) : (
+      <div class="reviews-empty">
+        <p data-i18n="reviewsPending">{en.reviewsPending}</p>
+      </div>
+    )}
+  </div>
+</section>

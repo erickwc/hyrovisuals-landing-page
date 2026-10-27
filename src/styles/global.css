@@ -2514,6 +2514,7 @@ select:focus-visible {
 }
 
 .producer-section,
+.reviews-section,
 .faq-section {
   scroll-margin-top: var(--nav-height);
 }
@@ -2644,9 +2645,70 @@ select:focus-visible {
   line-height: 1.45;
 }
 
+.reviews-section {
+  padding-block: clamp(5rem, 7vw, 7.5rem);
+  border-top: 1px solid var(--border);
+  background: var(--background);
+}
+.reviews-inner {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: clamp(2rem, 7vw, 7rem);
+  max-width: 82rem;
+}
+.reviews-intro h2 {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+}
+.reviews-intro p {
+  max-width: 30rem;
+  margin: 1.2rem 0 0;
+  color: var(--secondary);
+  font-size: clamp(1rem, 1.4vw, 1.18rem);
+  line-height: 1.5;
+}
+.reviews-empty {
+  border-top: 1px solid var(--border);
+  padding-top: 1.35rem;
+}
+.reviews-empty p {
+  max-width: 31rem;
+  margin: 0;
+  color: var(--secondary);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+.reviews-list {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+}
+.review-entry {
+  margin: 0;
+  padding-block: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.review-entry blockquote {
+  margin: 0 0 1.25rem;
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+.review-entry figcaption {
+  color: var(--secondary);
+  font-size: 0.85rem;
+}
 .faq-section {
   padding-block: clamp(5rem, 8vw, 8rem);
   border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
 }
 .faq-layout {
   display: grid;
@@ -2746,6 +2808,9 @@ select:focus-visible {
   .producer-heading-row h2 { font-size: clamp(1.9rem, 8vw, 2.5rem); }
   .producer-controls { margin-left: auto; }
   .faq-item summary { font-size: 1rem; }
+  .reviews-inner,
+  .reviews-list { grid-template-columns: minmax(0, 1fr); }
+  .reviews-intro h2 { font-size: clamp(2.5rem, 10vw, 4rem); }
 }
 @media (prefers-reduced-motion: reduce) {
   .announcement-track { animation: none; }
