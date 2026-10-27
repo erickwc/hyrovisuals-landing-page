@@ -1,0 +1,32 @@
+---
+import en from '../i18n/en.json';
+
+const questions = [
+  ['faqDeliveryQuestion', 'faqDeliveryAnswer'],
+  ['faqPlatformsQuestion', 'faqPlatformsAnswer'],
+  ['faqLicenseQuestion', 'faqLicenseAnswer'],
+  ['faqSubscriptionQuestion', 'faqSubscriptionAnswer'],
+  ['faqTeamsQuestion', 'faqTeamsAnswer'],
+  ['faqPaymentQuestion', 'faqPaymentAnswer'],
+] as const;
+---
+
+<section id="faq" class="faq-section" aria-labelledby="faq-heading">
+  <div class="page-shell faq-layout">
+    <div class="faq-intro">
+      <h2 id="faq-heading" data-i18n="faqTitle">{en.faqTitle}</h2>
+      <p data-i18n="faqIntro">{en.faqIntro}</p>
+    </div>
+    <div class="faq-list">
+      {questions.map(([question, answer]) => (
+        <details class="faq-item">
+          <summary>
+            <span data-i18n={question}>{en[question]}</span>
+            <span class="faq-toggle" aria-hidden="true"></span>
+          </summary>
+          <p data-i18n={answer}>{en[answer]}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

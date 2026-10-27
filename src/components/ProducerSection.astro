@@ -1,0 +1,34 @@
+---
+import en from '../i18n/en.json';
+
+type Producer = {
+  name: string;
+  quote: string;
+  image: string;
+  imageAlt: string;
+};
+
+// Add verified producer references here when the names, images, and quotes are supplied.
+const producers: Producer[] = [];
+---
+
+<section id="enfoque" class="producer-section" aria-labelledby="producer-heading">
+  <div class="page-shell producer-inner">
+    <h2 id="producer-heading" data-i18n="producersTitle">{en.producersTitle}</h2>
+    {producers.length > 0 ? (
+      <div class="producer-carousel" role="region" aria-label={en.producersTitle} data-i18n-aria="producersTitle" tabindex="0">
+        {producers.map((producer) => (
+          <figure class="producer-card">
+            <img src={producer.image} alt={producer.imageAlt} loading="lazy" />
+            <figcaption>
+              <blockquote>“{producer.quote}”</blockquote>
+              <cite>{producer.name}</cite>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    ) : (
+      <p class="producer-pending" data-i18n="producersPending">{en.producersPending}</p>
+    )}
+  </div>
+</section>

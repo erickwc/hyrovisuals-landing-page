@@ -8,6 +8,9 @@ import FeatureItem from '../components/FeatureItem.astro';
 import PlatformBadge from '../components/PlatformBadge.astro';
 import VisualCarousel from '../components/VisualCarousel.astro';
 import PurchaseSection from '../components/PurchaseSection.astro';
+import AnnouncementBar from '../components/AnnouncementBar.astro';
+import ProducerSection from '../components/ProducerSection.astro';
+import FaqSection from '../components/FaqSection.astro';
 import en from '../i18n/en.json';
 const features = [
   ['spectrum', 'spectrums'],
@@ -24,6 +27,7 @@ const features = [
   <header id="inicio" class="site-header">
     <Navbar />
   </header>
+  <AnnouncementBar />
   <main id="main">
     <section class="hero" aria-labelledby="hero-heading">
       <div class="background-lines page-shell" aria-hidden="true">
@@ -46,7 +50,7 @@ const features = [
         <Button />
       </div>
       <VisualCarousel />
-      <div class="features page-shell">
+      <div id="personalizacion" class="features page-shell">
         {features.map(([icon, key]) => (
           <FeatureItem
             icon={icon}
@@ -64,6 +68,8 @@ const features = [
         </div>
       </div>
     </section>
+    <ProducerSection />
     <PurchaseSection />
+    <FaqSection />
   </main>
 </Layout>
