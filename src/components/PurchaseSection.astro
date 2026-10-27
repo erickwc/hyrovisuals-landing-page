@@ -44,20 +44,28 @@ const benefits = [
       <h3 data-i18n="licenseChoiceTitle">{en.licenseChoiceTitle}</h3>
       <div class="purchase-license-options" role="radiogroup" aria-label={en.licenseChoiceTitle} data-i18n-aria="licenseChoiceTitle">
         <button class="purchase-license-option is-selected" type="button" role="radio" aria-checked="true" data-license-option="personal">
-          <span class="purchase-license-indicator" aria-hidden="true"></span>
-          <span class="purchase-license-detail">
+          <span class="purchase-license-top">
+            <span class="purchase-license-indicator" aria-hidden="true"></span>
             <strong data-i18n="licensePersonal">{en.licensePersonal}</strong>
-            <small data-i18n="licensePersonalDescription">{en.licensePersonalDescription}</small>
+            <span class="purchase-license-price" data-license-price aria-live="polite">—</span>
           </span>
-          <span class="purchase-license-price" data-license-price aria-live="polite">—</span>
+          <span class="purchase-license-detail" data-i18n="licensePersonalDescription">{en.licensePersonalDescription}</span>
+          <span class="purchase-license-points">
+            <span><Icon name="check" /><span data-i18n="licenseLifetime">{en.licenseLifetime}</span></span>
+            <span><Icon name="check" /><span data-i18n="licenseRedownload">{en.licenseRedownload}</span></span>
+          </span>
         </button>
         <button class="purchase-license-option" type="button" role="radio" aria-checked="false" data-license-option="teams">
-          <span class="purchase-license-indicator" aria-hidden="true"></span>
-          <span class="purchase-license-detail">
+          <span class="purchase-license-top">
+            <span class="purchase-license-indicator" aria-hidden="true"></span>
             <strong data-i18n="licenseTeams">{en.licenseTeams}</strong>
-            <small data-i18n="licenseTeamsDescription">{en.licenseTeamsDescription}</small>
+            <span class="purchase-license-soon" data-i18n="licenseTeamsSoon">{en.licenseTeamsSoon}</span>
           </span>
-          <span class="purchase-license-soon" data-i18n="licenseTeamsSoon">{en.licenseTeamsSoon}</span>
+          <span class="purchase-license-detail" data-i18n="licenseTeamsDescription">{en.licenseTeamsDescription}</span>
+          <span class="purchase-license-points">
+            <span><Icon name="check" /><span data-i18n="licenseLifetime">{en.licenseLifetime}</span></span>
+            <span><Icon name="check" /><span data-i18n="licenseRedownload">{en.licenseRedownload}</span></span>
+          </span>
         </button>
       </div>
       <div class="purchase-license-message" aria-live="polite">

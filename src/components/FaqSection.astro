@@ -3,6 +3,7 @@ import en from '../i18n/en.json';
 
 const questions = [
   ['faqDeliveryQuestion', 'faqDeliveryAnswer'],
+  ['faqRedownloadQuestion', 'faqRedownloadAnswer'],
   ['faqPlatformsQuestion', 'faqPlatformsAnswer'],
   ['faqLicenseQuestion', 'faqLicenseAnswer'],
   ['faqSubscriptionQuestion', 'faqSubscriptionAnswer'],
@@ -24,7 +25,7 @@ const questions = [
             <span data-i18n={question}>{en[question]}</span>
             <span class="faq-toggle" aria-hidden="true"></span>
           </summary>
-          <p data-i18n={answer}>{en[answer]}</p>
+          <div class="faq-answer"><p data-i18n={answer}>{en[answer]}</p></div>
         </details>
       ))}
     </div>

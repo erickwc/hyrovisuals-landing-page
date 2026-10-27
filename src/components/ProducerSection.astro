@@ -1,34 +1,36 @@
 ---
+import Icon from './Icon.astro';
 import en from '../i18n/en.json';
 
-type Producer = {
-  name: string;
-  quote: string;
-  image: string;
-  imageAlt: string;
-};
-
-// Add verified producer references here when the names, images, and quotes are supplied.
-const producers: Producer[] = [];
+const producers = [
+  { name: 'Antian Rose', image: '/images/producers/antian-rose.jpg', caption: 'producerAntianCaption' },
+  { name: 'Rick Tyver', image: '/images/producers/rick-tyver.jpg', caption: 'producerRickCaption' },
+  { name: 'Beats By Carlos', image: '/images/producers/beats-by-carlos.jpg', caption: 'producerCarlosCaption' },
+  { name: 'Naito', image: '/images/producers/naito.jpg', caption: 'producerNaitoCaption' },
+  { name: 'Diegod', image: '/images/producers/diegod.jpg', caption: 'producerDiegodCaption' },
+] as const;
 ---
 
 <section id="enfoque" class="producer-section" aria-labelledby="producer-heading">
   <div class="page-shell producer-inner">
-    <h2 id="producer-heading" data-i18n="producersTitle">{en.producersTitle}</h2>
-    {producers.length > 0 ? (
-      <div class="producer-carousel" role="region" aria-label={en.producersTitle} data-i18n-aria="producersTitle" tabindex="0">
-        {producers.map((producer) => (
-          <figure class="producer-card">
-            <img src={producer.image} alt={producer.imageAlt} loading="lazy" />
-            <figcaption>
-              <blockquote>“{producer.quote}”</blockquote>
-              <cite>{producer.name}</cite>
-            </figcaption>
-          </figure>
-        ))}
+    <div class="producer-heading-row">
+      <h2 id="producer-heading" data-i18n="producersTitle">{en.producersTitle}</h2>
+      <div class="producer-controls">
+        <button type="button" data-producer-prev aria-label={en.producerPrevious} data-i18n-aria="producerPrevious"><Icon name="arrow" /></button>
+        <button type="button" data-producer-next aria-label={en.producerNext} data-i18n-aria="producerNext"><Icon name="arrow" /></button>
       </div>
-    ) : (
-      <p class="producer-pending" data-i18n="producersPending">{en.producersPending}</p>
-    )}
+    </div>
+    <div class="producer-carousel" role="region" aria-label={en.producersTitle} data-i18n-aria="producersTitle" data-producer-carousel tabindex="0">
+      {producers.map((producer) => (
+        <figure class="producer-card">
+          <img src={producer.image} alt={producer.name} width="150" height="150" loading="lazy" />
+          <figcaption>
+            <strong>{producer.name}</strong>
+            <p data-i18n={producer.caption}>{en[producer.caption]}</p>
+            <small data-i18n="producerDraftLabel">{en.producerDraftLabel}</small>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
   </div>
 </section>

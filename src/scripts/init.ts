@@ -13,6 +13,8 @@ import { initPurchaseProcessing } from './purchase-processing';
 import { initWhopCheckout } from './whop-checkout';
 import { initAccountMenu } from './account-menu';
 import { initLicenseChoice } from './license-choice';
+import { initProducerCarousel } from './producer-carousel';
+import { initFaq } from './faq';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 let cleanup = () => {};
 async function init() {
@@ -39,6 +41,8 @@ async function init() {
   let stopCarousel = () => {};
   const stopCheckout = initPurchaseCheckout();
   const stopLicenseChoice = initLicenseChoice();
+  const stopProducerCarousel = initProducerCarousel();
+  const stopFaq = initFaq();
   let lenis: Lenis | undefined;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const stopPreferences = initPreferences(() => {
@@ -67,6 +71,8 @@ async function init() {
     stopCarousel();
     stopCheckout();
     stopLicenseChoice();
+    stopProducerCarousel();
+    stopFaq();
     stopAccountMenu();
     lenis?.destroy();
     gsap.ticker.remove(tick);
