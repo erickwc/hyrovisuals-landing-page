@@ -1,0 +1,56 @@
+---
+import en from '../i18n/en.json';
+
+const explore = [
+  ['/#personalizacion', 'navFunctions'],
+  ['/#enfoque', 'navProducers'],
+  ['/#faq', 'navQuestions'],
+  ['/#compra', 'footerLicenses'],
+] as const;
+
+const account = [
+  ['/biblioteca/', 'footerLibrary'],
+  ['/cuenta/', 'accountMenuSettings'],
+] as const;
+---
+
+<footer class="site-footer">
+  <div class="page-shell footer-inner">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/#inicio" aria-label={en.brandHome} data-i18n-aria="brandHome">
+          <span class="brand-crop"><img src="/images/hyro-logo.png" alt="HYRO" width="5339" height="724" loading="lazy" /></span>
+        </a>
+        <p data-i18n="footerDescription">{en.footerDescription}</p>
+      </div>
+      <nav class="footer-nav" aria-label={en.footerNavigation} data-i18n-aria="footerNavigation">
+        <div class="footer-link-group">
+          <h2 data-i18n="footerExplore">{en.footerExplore}</h2>
+          <ul>
+            {explore.map(([href, key]) => <li><a href={href} data-i18n={key}>{en[key]}</a></li>)}
+          </ul>
+        </div>
+        <div class="footer-link-group">
+          <h2 data-i18n="footerAccount">{en.footerAccount}</h2>
+          <ul>
+            {account.map(([href, key]) => <li><a href={href} data-i18n={key}>{en[key]}</a></li>)}
+          </ul>
+        </div>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-payments">
+        <span class="footer-bottom-label" data-i18n="purchasePaymentMethods">{en.purchasePaymentMethods}</span>
+        <ul aria-label={en.purchasePaymentMethods} data-i18n-aria="purchasePaymentMethods">
+          <li><img src="/images/payment/visa.png" alt="Visa" width="600" height="203" loading="lazy" /></li>
+          <li class="footer-mastercard" aria-label="Mastercard"><span aria-hidden="true"></span><span aria-hidden="true"></span></li>
+          <li><img src="/images/payment/paypal.png" alt="PayPal" width="600" height="148" loading="lazy" /></li>
+          <li><img src="/images/payment/google-pay.png" alt="Google Pay" width="600" height="225" loading="lazy" /></li>
+          <li><img src="/images/payment/apple-pay.png" alt="Apple Pay" width="600" height="250" loading="lazy" /></li>
+        </ul>
+        <p data-i18n="footerPaymentNote">{en.footerPaymentNote}</p>
+      </div>
+      <p class="footer-copyright">© {new Date().getFullYear()} HYRO. <span data-i18n="footerRights">{en.footerRights}</span></p>
+    </div>
+  </div>
+</footer>
