@@ -3,6 +3,7 @@ export interface Env {
   WOMPI_CARD_ENABLED?: string;
   WOMPI_CARD_LIVE_ENABLED?: string;
   WOMPI_MODE?: string;
+  WOMPI_CARD_PRICE_CENTS?: string;
   WOMPI_APP_ID?: string;
   WOMPI_API_SECRET?: string;
   HYRO_SITE_URL?: string;
@@ -107,11 +108,14 @@ export async function handle(request: Request, env: Env, fetcher: typeof fetch =
   if (request.method === 'OPTIONS') return reply(200, {});
   if (request.method !== 'POST') return reply(405, { error: 'method_not_allowed' });
   const real = env.WOMPI_MODE === 'live';
+  const priceCents = Number(env.WOMPI_CARD_PRICE_CENTS);
   const publicKey = env.HYRO_SUPABASE_PUBLISHABLE_KEY || env.SUPABASE_PUBLISHABLE_KEY || env.SUPABASE_ANON_KEY;
   if (env.WOMPI_CARD_ENABLED !== 'true' || !['test', 'live'].includes(env.WOMPI_MODE ?? '') ||
     (real && env.WOMPI_CARD_LIVE_ENABLED !== 'true') || !origin.startsWith('https://') ||
     !env.WOMPI_APP_ID || !env.WOMPI_API_SECRET || !env.SUPABASE_URL || !publicKey ||
-    !env.SUPABASE_SERVICE_ROLE_KEY || !env.LICENSE_ENCRYPTION_KEY) return reply(503, { error: 'not_configured' });
+    !env.SUPABASE_SERVICE_ROLE_KEY || !env.LICENSE_ENCRYPTION_KEY ||
+    !Number.isSafeInteger(priceCents) || priceCents < 1 || priceCents > 10000000)
+    return reply(503, { error: 'not_configured' });
   try {
     const webhook = new URL(request.url).searchParams.get('webhook') === '1';
     if (!webhook && request.headers.get('origin') !== origin) throw new Failure(403, 'invalid_origin');
@@ -176,7 +180,7 @@ export async function handle(request: Request, env: Env, fetcher: typeof fetch =
     if (!webhook && body.action === 'config') {
       const regions = await api('/api/Regiones');
       if (!Array.isArray(regions)) throw new Failure(502, 'provider_unavailable');
-      return reply(200, { mode: env.WOMPI_MODE, regions: regions.map(r => ({ id: r.id, nombre: r.nombre,
+      return reply(200, { mode: env.WOMPI_MODE, amount_cents: priceCents, regions: regions.map(r => ({ id: r.id, nombre: r.nombre,
         territorios: Array.isArray(r.territorios) ? r.territorios.map((t: Obj) => ({ id: t.id, nombre: t.nombre })) : [] })) });
     }
     if (webhook || body.action === 'status') {
@@ -192,7 +196,8 @@ export async function handle(request: Request, env: Env, fetcher: typeof fetch =
       // Bind even a transaction whose create response was lost. The idExterno came from our server.
       await db('rpc/bind_wompi_card_transaction', 'POST', { p_checkout_id: checkout.id, p_transaction_id: transactionId });
       if (transaction.esAprobada === true && transaction.resultadoTransaccion === 0) {
-        if (transaction.monto !== 20 || (transaction.montoOriginal != null && transaction.montoOriginal !== 20))
+        const amount = checkout.amount_cents / 100;
+        if (transaction.monto !== amount || (transaction.montoOriginal != null && transaction.montoOriginal !== amount))
           throw new Failure(409, 'payment_mismatch');
         if (real) await db('rpc/complete_wompi_card_purchase', 'POST', { p_checkout_id: checkout.id,
           p_transaction_id: transactionId, ...await encryptedLicense(env.LICENSE_ENCRYPTION_KEY) });
@@ -206,6 +211,7 @@ export async function handle(request: Request, env: Env, fetcher: typeof fetch =
       return reply(200, { status: 'awaiting_3ds',
         ...(!webhook && checkout.challenge_url ? { challenge_url: challengeUrl(checkout.challenge_url) } : {}) });
     }
+    if (body.expected_amount_cents !== priceCents) throw new Failure(409, 'price_changed');
     const payment = validatePayment(body);
     // Clear references on parsed input; the whitelisted payload survives only until the provider call.
     delete body.card; delete body.billing;
@@ -216,21 +222,23 @@ export async function handle(request: Request, env: Env, fetcher: typeof fetch =
     await encryptedLicense(env.LICENSE_ENCRYPTION_KEY); // Fail before starting a payment if delivery is misconfigured.
     const reservation = await db('rpc/reserve_wompi_card_checkout', 'POST', {
       p_user_id: user.id, p_request_id: body.request_id, p_is_productive: real, p_buyer_email: user.email,
+      p_amount_cents: priceCents,
     });
     if (reservation.library_url) return reply(200, { library_url: '/biblioteca/' });
     if (reservation.limited) throw new Failure(429, 'rate_limited');
     checkout = reservation.checkout;
     if (!checkout || !uuid(checkout.id)) throw new Failure(503, 'verification_pending');
     if (checkout.is_productive !== real) throw new Failure(409, 'mode_mismatch');
+    if (checkout.amount_cents !== priceCents) throw new Failure(409, 'price_changed');
     if (!reservation.claimed) return reply(200, { status: checkout.status, request_id: checkout.request_id,
       ...(checkout.challenge_url && checkout.status === 'awaiting_3ds' ? { challenge_url: challengeUrl(checkout.challenge_url) } : {}) });
     try {
-      const result = await api('/TransaccionCompra/3Ds', { ...payment, monto: 20, idExterno: checkout.id,
+      const result = await api('/TransaccionCompra/3Ds', { ...payment, monto: checkout.amount_cents / 100, idExterno: checkout.id,
         urlRedirect: `${origin}/checkout/?card=return&request=${checkout.request_id}`,
         configuracion: { urlWebhook: `${env.SUPABASE_URL}/functions/v1/wompi-card?webhook=1`, notificarTransaccionCliente: true },
         datosAdicionales: { hyro_checkout: checkout.id },
       }) as Obj;
-      if (!uuid(result.idTransaccion) || result.esReal !== real || result.monto !== 20)
+      if (!uuid(result.idTransaccion) || result.esReal !== real || result.monto !== checkout.amount_cents / 100)
         throw new Failure(502, 'verification_pending');
       const url = challengeUrl(result.urlCompletarPago3Ds);
       await db('rpc/bind_wompi_card_transaction', 'POST', { p_checkout_id: checkout.id, p_transaction_id: result.idTransaccion });

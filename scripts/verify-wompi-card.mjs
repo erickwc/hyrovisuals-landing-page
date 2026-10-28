@@ -7,11 +7,11 @@ import { handle, validatePayment, challengeUrl } from '../supabase/functions/wom
 
 const user = '11111111-1111-4111-8111-111111111111';
 const product = '22222222-2222-4222-8222-222222222222';
-const env = { WOMPI_CARD_ENABLED: 'true', WOMPI_MODE: 'test', WOMPI_APP_ID: 'mock-app', WOMPI_API_SECRET: 'mock-secret',
+const env = { WOMPI_CARD_ENABLED: 'true', WOMPI_MODE: 'test', WOMPI_CARD_PRICE_CENTS: '2000', WOMPI_APP_ID: 'mock-app', WOMPI_API_SECRET: 'mock-secret',
   HYRO_SITE_URL: 'https://test.byhyro.com', SUPABASE_URL: 'https://example.supabase.co', SUPABASE_PUBLISHABLE_KEY: 'public',
   SUPABASE_SERVICE_ROLE_KEY: 'service', LICENSE_ENCRYPTION_KEY: Buffer.alloc(32, 7).toString('base64') };
 // Synthetic values used only by the mocked transport. Never sent to a payment service.
-const payment = () => ({ action: 'create', request_id: randomUUID(), card: { number: '4111111111111111', cvv: '123', month: 12, year: 2030 },
+const payment = () => ({ action: 'create', request_id: randomUUID(), expected_amount_cents: 2000, card: { number: '4111111111111111', cvv: '123', month: 12, year: 2030 },
   billing: { nombre: 'Test', apellido: 'Buyer', email: 'test@example.com', ciudad: 'San Salvador', direccion: 'Test address',
     idPais: 'SV', idRegion: 'SV-SS', codigoPostal: '1101', telefono: '50370000000' } });
 const request = body => new Request('https://example.supabase.co/functions/v1/wompi-card', { method: 'POST',
@@ -35,9 +35,10 @@ async function fixture(real = false) {
       key_hash bytea,key_ciphertext bytea,key_nonce bytea,key_version integer,status text default 'active',issued_at timestamptz default now(),revoked_at timestamptz,activation_epoch integer default 0,unique(user_id,product_id));
     create table license_activations(id uuid primary key default gen_random_uuid(),license_id uuid references licenses(id),deactivated_at timestamptz);
     insert into profiles values('${user}'); insert into products values('${product}','hyro-visuals',2000,'USD',true);`);
-  for (const name of ['20261028184800_wompi_card_3ds.sql']) {
+  for (const name of ['20261028174009_wompi_card_3ds.sql']) {
     await db.exec(await readFile(new URL(`../supabase/migrations/${name}`, import.meta.url), 'utf8'));
   }
+  await db.exec('alter table public.wompi_card_checkouts add column amount_cents integer not null default 2000');
   const state = { posts: 0, failCreate: false, transactions: new Map(), writes: [], lastPayload: null, calls: [] };
   const fetcher = async (input, init = {}) => {
     const url = new URL(input);
@@ -177,4 +178,3 @@ test('timeout remains under review and cannot create another charge with a new r
     assert.equal((await f.db.query('select status from wompi_card_checkouts')).rows[0].status, 'review');
   } finally { await f.db.close(); }
 });
-

@@ -26,6 +26,7 @@ export function initWompiCheckout() {
   let busy = false;
   let message: Message = 'cardPreview';
   let mode: 'test' | 'live' | 'preview' = 'preview';
+  let amountCents = 0;
   let regions: Region[] = [];
   let currentId: string | null = null;
   let returning = false;
@@ -37,6 +38,12 @@ export function initWompiCheckout() {
     status.textContent = words()[message];
     resultCopy.textContent = words()[message];
     root.querySelector<HTMLElement>('[data-card-mode]')!.textContent = words()[mode === 'test' ? 'cardTestMode' : mode === 'live' ? 'cardLiveMode' : 'cardPreviewMode'];
+    if (amountCents) {
+      const price = new Intl.NumberFormat(document.documentElement.lang === 'es' ? 'es-SV' : 'en-US',
+        { style: 'currency', currency: 'USD' }).format(amountCents / 100);
+      root.querySelector<HTMLElement>('[data-card-price]')!.textContent = price;
+      button.textContent = `${document.documentElement.lang === 'es' ? 'Pagar ahora' : 'Pay now'} · ${price}`;
+    }
     button.disabled = !ready || busy;
     button.hidden = returning || !login.hidden;
     form.querySelectorAll<HTMLFieldSetElement>('fieldset').forEach(f => f.disabled = !ready || busy);
@@ -110,7 +117,7 @@ export function initWompiCheckout() {
     const billing: Record<string, string> = {};
     form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-billing]').forEach(input => { billing[input.dataset.billing!] = input.value.trim(); });
     billing.telefono = billing.telefono.replace(/[+ ()-]/g, '');
-    const payment = { action: 'create', request_id: currentId ?? crypto.randomUUID(),
+    const payment = { action: 'create', request_id: currentId ?? crypto.randomUUID(), expected_amount_cents: amountCents,
       card: { number: form.querySelector<HTMLInputElement>('[data-card-number]')!.value.replace(/ /g, ''),
         cvv: form.querySelector<HTMLInputElement>('[data-card-cvv]')!.value,
         month: Number(expiry.slice(0, 2)), year: 2000 + Number(expiry.slice(2)) }, billing };
@@ -147,12 +154,13 @@ export function initWompiCheckout() {
   if (!validId(currentId)) currentId = null;
   if (!currentId) returning = false;
   render();
-  if (import.meta.env.PUBLIC_WOMPI_CHECKOUT_ENABLED === 'true') void (async () => {
+  void (async () => {
     try {
       const config = await api({ action: 'config' });
       if (signal.aborted) return;
-      if (!Array.isArray(config.regions) || !['test', 'live'].includes(config.mode)) throw new Error('not_configured');
-      regions = config.regions; mode = config.mode; ready = true;
+      if (!Array.isArray(config.regions) || !['test', 'live'].includes(config.mode) ||
+        !Number.isSafeInteger(config.amount_cents) || config.amount_cents < 1) throw new Error('not_configured');
+      regions = config.regions; mode = config.mode; amountCents = config.amount_cents; ready = true;
       for (const item of regions) country.add(new Option(item.nombre, item.id));
       say('wompiReady');
       if (currentId) await poll(returning ? 12 : 0);
