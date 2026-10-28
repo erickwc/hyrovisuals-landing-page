@@ -1,5 +1,3 @@
-import { supabase } from '../lib/supabase';
-
 export function initLicenseChoice() {
   const choice = document.querySelector<HTMLElement>('[data-license-choice]');
   if (!choice) return () => {};
@@ -16,8 +14,7 @@ export function initLicenseChoice() {
   const { signal } = controller;
   let selected: 'personal' | 'teams' = 'personal';
 
-  // Payhip owns the final price; do not display an amount from another processor.
-  if (price) price.textContent = document.documentElement.lang === 'es' ? 'Ver precio al pagar' : 'See price at checkout';
+  if (price) price.textContent = '20,00 US$';
 
   const select = (option: HTMLButtonElement) => {
     selected = option.dataset.licenseOption === 'teams' ? 'teams' : 'personal';

@@ -1,0 +1,52 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+---
+
+<Layout page="checkout">
+  <header class="site-header"><Navbar accountPage /></header>
+  <main class="account-page hosted-checkout" data-wompi-hosted>
+    <div class="page-shell hosted-layout">
+      <div class="hosted-copy">
+        <a href="/#compra" class="hosted-back">← Volver a HYRO</a>
+        <p class="hosted-eyebrow">HYRO VISUALS / PAGO SEGURO</p>
+        <h1>Tu licencia, a un paso.</h1>
+        <p>Completa el pago en la página segura de Wompi. Al confirmarse, encontrarás tu clave y los instaladores en tu biblioteca.</p>
+      </div>
+      <section class="hosted-order" aria-labelledby="hosted-title">
+        <p class="hosted-eyebrow">RESUMEN DEL PEDIDO</p>
+        <h2 id="hosted-title">HYRO Visuals · Personal</h2>
+        <p>Una clave de activación para un equipo a la vez. Pago único y actualizaciones incluidas.</p>
+        <div class="hosted-total"><span>Total</span><strong>$20.00 USD</strong></div>
+        <p class="hosted-status" data-hosted-status role="status" aria-live="polite">Preparando el pago seguro…</p>
+        <button class="hosted-button" data-hosted-pay type="button" disabled>Continuar con Wompi ↗</button>
+        <a class="hosted-login" data-hosted-login href="/cuenta/?continuar=wompi" hidden>Iniciar sesión para pagar</a>
+        <button class="hosted-retry" data-hosted-retry type="button" hidden>Comprobar compra</button>
+        <p class="hosted-note">Wompi procesa el pago. HYRO genera tu licencia solo después de verificar la transacción.</p>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .hosted-checkout { min-height: calc(100svh - var(--nav-height)); padding: clamp(3rem, 8vw, 7rem) 0; }
+  .hosted-layout { max-width: 1060px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, 26rem); gap: clamp(3rem, 8vw, 8rem); align-items: start; }
+  .hosted-copy { max-width: 32rem; }
+  .hosted-back { display: inline-block; color: var(--secondary); font-size: .85rem; margin-bottom: clamp(3rem, 7vw, 6rem); }
+  .hosted-back:hover { color: var(--text); }
+  .hosted-eyebrow { font-family: var(--font-label); font-size: .72rem; letter-spacing: .12em; color: var(--secondary); }
+  .hosted-copy h1 { font-family: var(--font-title); font-size: clamp(3rem, 6vw, 6rem); line-height: .95; letter-spacing: -.045em; margin: 1rem 0 1.4rem; }
+  .hosted-copy > p:last-child, .hosted-order > p:not(.hosted-eyebrow):not(.hosted-status):not(.hosted-note) { color: var(--secondary); line-height: 1.6; }
+  .hosted-order { border: 1px solid var(--border); border-radius: .7rem; padding: clamp(1.5rem, 3vw, 2rem); background: var(--surface); }
+  .hosted-order h2 { font-size: 1.25rem; margin: 1rem 0 .5rem; }
+  .hosted-total { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--border); margin-top: 2rem; padding: 1.25rem 0; }
+  .hosted-total strong { white-space: nowrap; }
+  .hosted-status { color: var(--secondary); min-height: 1.5em; font-size: .82rem; margin-bottom: .8rem; }
+  .hosted-button, .hosted-login, .hosted-retry { width: 100%; min-height: 3.2rem; border: 0; border-radius: .4rem; display: grid; place-items: center; text-align: center; font: inherit; font-weight: 600; cursor: pointer; }
+  .hosted-button { background: var(--text); color: var(--background); }
+  .hosted-button:disabled { opacity: .45; cursor: wait; }
+  .hosted-login, .hosted-retry { background: transparent; border: 1px solid var(--border); color: var(--text); margin-top: .6rem; }
+  .hosted-note { color: var(--secondary); font-size: .78rem; line-height: 1.5; margin-top: 1.3rem; }
+  [hidden] { display: none !important; }
+  @media (max-width: 740px) { .hosted-layout { grid-template-columns: 1fr; gap: 2.5rem; } .hosted-back { margin-bottom: 3rem; } }
+</style>
