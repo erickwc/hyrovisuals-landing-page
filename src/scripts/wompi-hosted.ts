@@ -60,14 +60,14 @@ export function initWompiHosted() {
       const data = await api({ action: 'create', request_id: requestId });
       if (data.library_url) { location.assign('/biblioteca/'); return; }
       const url = new URL(data.payment_url);
-      if (url.protocol !== 'https:' || url.hostname !== 'lk.wompi.sv') throw new Error('invalid_payment_url');
+      if (url.protocol !== 'https:' || !['lk.wompi.sv', 's.wompi.sv'].includes(url.hostname)) throw new Error('invalid_payment_url');
       location.assign(url.href);
     } catch (error) { fail(error); busy = false; button.disabled = false; }
   }, { signal: controller.signal });
   retry.addEventListener('click', () => { clearTimeout(timer); void poll(20); }, { signal: controller.signal });
   try { requestId = sessionStorage.getItem('hyro:wompi-request'); } catch { /* Optional storage. */ }
   if (!validId(requestId)) requestId = null;
-  if (requestId && (new URL(location.href).searchParams.has('resultado') || document.referrer.startsWith('https://lk.wompi.sv/'))) {
+  if (requestId && (new URL(location.href).searchParams.has('resultado') || /^https:\/\/(?:lk|s)\.wompi\.sv\//.test(document.referrer))) {
     history.replaceState(null, '', '/checkout/');
     button.hidden = true;
     retry.hidden = false;

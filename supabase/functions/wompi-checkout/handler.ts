@@ -138,7 +138,7 @@ export async function handle(request: Request, env: Env, fetcher: typeof fetch =
         throw new Failure(409, 'payment_mismatch');
       if (checkout.link_id === null) {
         const url = new URL(link.urlEnlace);
-        if (url.protocol !== 'https:' || url.hostname !== 'lk.wompi.sv') throw new Failure(409, 'payment_mismatch');
+        if (url.protocol !== 'https:' || !['lk.wompi.sv', 's.wompi.sv'].includes(url.hostname)) throw new Failure(409, 'payment_mismatch');
         await db(`wompi_checkouts?id=eq.${id}&link_id=is.null`, 'PATCH', {
           link_id: linkId, link_url: url.href, is_productive: expectedReal,
         });
@@ -170,9 +170,12 @@ export async function handle(request: Request, env: Env, fetcher: typeof fetch =
       limitesDeUso: { cantidadMaximaPagosExitosos: 1 },
     });
     const paymentUrl = new URL(result.urlEnlace);
-    if (paymentUrl.protocol !== 'https:' || paymentUrl.hostname !== 'lk.wompi.sv' ||
-      !Number.isSafeInteger(result.idEnlace) || result.idEnlace <= 0 ||
-      result.estaProductivo !== (env.WOMPI_MODE === 'live')) throw new Failure(502, 'invalid_payment_link');
+    if (result.estaProductivo !== (env.WOMPI_MODE === 'live'))
+      throw new Failure(409, 'wompi_mode_mismatch');
+    if (paymentUrl.protocol !== 'https:' || !['lk.wompi.sv', 's.wompi.sv'].includes(paymentUrl.hostname))
+      throw new Failure(502, 'invalid_payment_host');
+    if (!Number.isSafeInteger(result.idEnlace) || result.idEnlace <= 0)
+      throw new Failure(502, 'invalid_payment_id');
     await db(`wompi_checkouts?id=eq.${checkout.id}&link_id=is.null`, 'PATCH', {
       link_id: result.idEnlace, link_url: paymentUrl.href, is_productive: result.estaProductivo,
     });
