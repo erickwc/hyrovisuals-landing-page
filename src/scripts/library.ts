@@ -7,31 +7,44 @@ export function initLibraryPage() {
   const root = document.querySelector<HTMLElement>('[data-library-root]');
   if (!root) return () => {};
   const purchaseParam = new URLSearchParams(location.search).get('compra');
-  if (purchaseParam === 'procesando') {
-    location.replace('/compra/');
-    return () => {};
-  }
   const controller = new AbortController();
   const status = root.querySelector<HTMLElement>('[data-library-status]');
   const purchaseNotice = root.querySelector<HTMLElement>('[data-purchase-notice]');
   const list = root.querySelector<HTMLElement>('[data-library-products]');
   const say = (message: string) => { if (status) status.textContent = message; };
-  const returningFromCheckout = purchaseParam === 'confirmada';
+  const returningFromCheckout = purchaseParam === 'confirmada' || purchaseParam === 'procesando';
 
   const load = async (): Promise<boolean> => {
     if (!supabase) { say('La cuenta no está configurada.'); return false; }
     const client = supabase;
     const { data: auth } = await client.auth.getUser();
     if (controller.signal.aborted) return false;
-    if (!auth.user) { location.assign('/cuenta/'); return false; }
+    if (!auth.user) {
+      location.assign(returningFromCheckout ? '/cuenta/?continuar=biblioteca-pendiente' : '/cuenta/');
+      return false;
+    }
+    if (purchaseParam === 'procesando') {
+      let intentId: string | null = null;
+      try { intentId = sessionStorage.getItem('hyro:checkout-intent-id'); } catch { /* Storage is optional. */ }
+      if (intentId && /^[0-9a-f-]{36}$/i.test(intentId)) {
+        const { data: intent, error: intentError } = await client.from('purchase_intents')
+          .select('consumed_at').eq('id', intentId).maybeSingle();
+        if (controller.signal.aborted) return false;
+        if (intentError || !intent?.consumed_at) {
+          say('Confirmando tu pago y preparando tu licencia… Esta página se actualizará automáticamente.');
+          return false;
+        }
+      }
+    }
     const { data, error } = await client.from('licenses')
       .select('id,product_id,products(name)').eq('status', 'active');
     if (controller.signal.aborted) return false;
     if (error) { say('No pudimos cargar tus productos.'); return false; }
     const licenses = (data ?? []) as unknown as License[];
     if (!licenses.length) {
-      if (returningFromCheckout) { location.replace('/compra/'); return false; }
-      say('Todavía no tienes productos en tu biblioteca.');
+      say(returningFromCheckout
+        ? 'Confirmando tu pago y preparando tu licencia… Esta página se actualizará automáticamente.'
+        : 'Todavía no tienes productos en tu biblioteca.');
       return false;
     }
     const { data: buildData, error: buildError } = await client.from('product_builds')
@@ -170,9 +183,23 @@ export function initLibraryPage() {
       card.append(artwork, details);
       list?.append(card);
     }
-    if (returningFromCheckout) history.replaceState(null, '', location.pathname);
+    if (returningFromCheckout) {
+      try { sessionStorage.removeItem('hyro:checkout-intent-id'); } catch { /* Storage is optional. */ }
+      try { sessionStorage.removeItem('hyro:checkout-product-id'); } catch { /* Storage is optional. */ }
+      history.replaceState(null, '', location.pathname);
+    }
     return true;
   };
-  void load();
+  if (returningFromCheckout) {
+    void (async () => {
+      let attempts = 0;
+      while (!controller.signal.aborted) {
+        if (await load()) return;
+        if (controller.signal.aborted) return;
+        attempts += 1;
+        await new Promise<void>((resolve) => setTimeout(resolve, attempts < 20 ? 1500 : 5000));
+      }
+    })();
+  } else void load();
   return () => controller.abort();
 }
