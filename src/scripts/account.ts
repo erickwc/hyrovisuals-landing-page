@@ -159,7 +159,7 @@ export function initAccountPage() {
         showUser(result.user.email ?? email);
         void showAdminLink(result.user.id);
         const continueTo = new URLSearchParams(location.search).get('continuar');
-        if (continueTo === 'compra') location.assign('/pago/');
+        if (continueTo === 'compra') location.assign('/#compra');
         else if (continueTo === 'compra-pendiente') location.assign('/compra/');
       }
       else setStatus('accountCheckEmail');
@@ -187,7 +187,7 @@ export function initAccountPage() {
       showUser(result.user.email ?? null);
       void showAdminLink(result.user.id);
       const continueTo = new URLSearchParams(location.search).get('continuar');
-      if (continueTo === 'compra') location.assign('/pago/');
+      if (continueTo === 'compra') location.assign('/#compra');
       else if (continueTo === 'compra-pendiente') location.assign('/compra/');
     } catch {
       setStatus('accountLoginError');
