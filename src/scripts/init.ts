@@ -12,6 +12,7 @@ import { initLibraryPage } from './library';
 import { initPurchaseProcessing } from './purchase-processing';
 import { initWhopCheckout } from './whop-checkout';
 import { initWompiHosted } from './wompi-hosted';
+import { initWompiCheckout } from './wompi-checkout';
 import { initAccountMenu } from './account-menu';
 import { initLicenseChoice } from './license-choice';
 import { initProducerCarousel } from './producer-carousel';
@@ -28,7 +29,7 @@ async function init() {
     const stopAccount = document.body.dataset.page === 'admin' ? initAdminPage()
       : document.body.dataset.page === 'library' ? initLibraryPage()
       : document.body.dataset.page === 'processing' ? initPurchaseProcessing()
-      : document.body.dataset.page === 'checkout' ? (document.querySelector('[data-wompi-hosted]') ? initWompiHosted() : initWhopCheckout()) : initAccountPage();
+      : document.body.dataset.page === 'checkout' ? (document.querySelector('[data-wompi-card]') ? initWompiCheckout() : document.querySelector('[data-wompi-hosted]') ? initWompiHosted() : initWhopCheckout()) : initAccountPage();
     cleanup = () => {
       stopAccount();
       stopPreferences();

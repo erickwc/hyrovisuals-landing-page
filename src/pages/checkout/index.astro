@@ -1,52 +1,127 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
+import en from '../../i18n/en.json';
+const contact = [
+  { label: 'cardFirstName', key: 'nombre', autocomplete: 'given-name', max: 50, type: 'text' },
+  { label: 'cardLastName', key: 'apellido', autocomplete: 'family-name', max: 50, type: 'text' },
+  { label: 'cardEmail', key: 'email', autocomplete: 'email', max: 200, type: 'email' },
+  { label: 'cardPhone', key: 'telefono', autocomplete: 'tel', max: 20, type: 'tel' },
+] as const;
 ---
-
 <Layout page="checkout">
   <header class="site-header"><Navbar accountPage /></header>
-  <main class="account-page hosted-checkout" data-wompi-hosted>
-    <div class="page-shell hosted-layout">
-      <div class="hosted-copy">
-        <a href="/#compra" class="hosted-back">← Volver a HYRO</a>
-        <p class="hosted-eyebrow">HYRO VISUALS / PAGO SEGURO</p>
-        <h1>Tu licencia, a un paso.</h1>
-        <p>Completa el pago en la página segura de Wompi. Al confirmarse, encontrarás tu clave y los instaladores en tu biblioteca.</p>
+  <main class="account-page card-checkout" data-wompi-card>
+    <div class="page-shell">
+      <a class="card-back" href="/#compra" data-i18n="wompiBack">{en.wompiBack}</a>
+      <div class="card-heading">
+        <p class="account-eyebrow">HYRO / CHECKOUT</p>
+        <h1 data-i18n="wompiTitle">{en.wompiTitle}</h1>
+        <p data-i18n="wompiDescription">{en.wompiDescription}</p>
       </div>
-      <section class="hosted-order" aria-labelledby="hosted-title">
-        <p class="hosted-eyebrow">RESUMEN DEL PEDIDO</p>
-        <h2 id="hosted-title">HYRO Visuals · Personal</h2>
-        <p>Una clave de activación para un equipo a la vez. Pago único y actualizaciones incluidas.</p>
-        <div class="hosted-total"><span>Total</span><strong>$20.00 USD</strong></div>
-        <p class="hosted-status" data-hosted-status role="status" aria-live="polite">Preparando el pago seguro…</p>
-        <button class="hosted-button" data-hosted-pay type="button" disabled>Continuar con Wompi ↗</button>
-        <a class="hosted-login" data-hosted-login href="/cuenta/?continuar=wompi" hidden>Iniciar sesión para pagar</a>
-        <button class="hosted-retry" data-hosted-retry type="button" hidden>Comprobar compra</button>
-        <p class="hosted-note">Wompi procesa el pago. HYRO genera tu licencia solo después de verificar la transacción.</p>
-      </section>
+      <div class="card-checkout-layout">
+        <form id="wompi-card-form" class="card-form" method="post" action="/checkout/" autocomplete="off" data-card-form>
+          <fieldset disabled>
+            <legend><span aria-hidden="true">01</span><span data-i18n="cardContact">{en.cardContact}</span></legend>
+            <div class="card-fields">
+              {contact.map(item => <label>
+                <span data-i18n={item.label}>{en[item.label]}</span>
+                <input data-billing={item.key} type={item.type} autocomplete={item.autocomplete} maxlength={item.max} required />
+              </label>)}
+            </div>
+          </fieldset>
+          <fieldset disabled>
+            <legend><span aria-hidden="true">02</span><span data-i18n="cardBilling">{en.cardBilling}</span></legend>
+            <div class="card-fields">
+              <label class="card-field-wide"><span data-i18n="cardAddress">{en.cardAddress}</span><input data-billing="direccion" autocomplete="street-address" maxlength="50" required /></label>
+              <label><span data-i18n="cardCountry">{en.cardCountry}</span><select data-billing="idPais" autocomplete="country" required><option value="" data-i18n="cardSelect">{en.cardSelect}</option></select></label>
+              <label><span data-i18n="cardRegion">{en.cardRegion}</span><select data-billing="idRegion" autocomplete="address-level1" required><option value="" data-i18n="cardSelect">{en.cardSelect}</option></select></label>
+              <label><span data-i18n="cardCity">{en.cardCity}</span><input data-billing="ciudad" autocomplete="address-level2" maxlength="50" required /></label>
+              <label><span data-i18n="cardPostal">{en.cardPostal}</span><input data-billing="codigoPostal" autocomplete="postal-code" maxlength="50" required /></label>
+            </div>
+          </fieldset>
+          <fieldset disabled>
+            <legend><span aria-hidden="true">03</span><span data-i18n="cardPayment">{en.cardPayment}</span></legend>
+            <div class="card-fields">
+              <label class="card-field-wide"><span data-i18n="cardNumber">{en.cardNumber}</span><input data-card-number type="text" inputmode="numeric" autocomplete="off" spellcheck="false" minlength="13" maxlength="23" pattern="[0-9 ]{13,23}" required /></label>
+              <label><span data-i18n="cardExpiry">{en.cardExpiry}</span><input data-card-expiry type="text" inputmode="numeric" autocomplete="off" placeholder="MM / YY" maxlength="7" pattern="[0-9]{2}[ ]*/?[ ]*[0-9]{2}" required /></label>
+              <label><span data-i18n="cardCvv">{en.cardCvv}</span><input data-card-cvv type="password" inputmode="numeric" autocomplete="off" minlength="3" maxlength="3" pattern="[0-9]{3}" required /></label>
+            </div>
+            <p class="card-help" data-i18n="card3dsNote">{en.card3dsNote}</p>
+          </fieldset>
+        </form>
+        <section class="card-result" data-card-result hidden aria-labelledby="card-result-title">
+          <span class="card-result-mark" aria-hidden="true">HYRO</span>
+          <h2 id="card-result-title" data-i18n="cardResultTitle">{en.cardResultTitle}</h2>
+          <p data-card-result-copy role="status" aria-live="polite"></p>
+          <a data-card-resume class="card-action" hidden data-i18n="cardResume">{en.cardResume}</a>
+          <button data-card-check class="card-action-secondary" type="button" data-i18n="cardCheck">{en.cardCheck}</button>
+          <button data-card-restart class="card-action-secondary" type="button" hidden data-i18n="cardRestart">{en.cardRestart}</button>
+          <a class="card-back" href="/biblioteca/" data-i18n="cardLibrary">{en.cardLibrary}</a>
+        </section>
+        <aside class="card-order" aria-labelledby="card-order-title">
+          <p id="card-order-title" class="card-caption" data-i18n="wompiSummary">{en.wompiSummary}</p>
+          <div class="card-product"><span class="card-product-mark" aria-hidden="true">H</span><div><h2>HYRO Visuals</h2><p data-i18n="wompiLicense">{en.wompiLicense}</p></div></div>
+          <div class="card-order-total"><span data-i18n="wompiTotal">{en.wompiTotal}</span><strong>$20.00 <small>USD</small></strong></div>
+          <p class="card-mode" data-card-mode></p>
+          <p class="card-status" data-card-status role="status" aria-live="polite"></p>
+          <a class="card-action" href="/cuenta/?continuar=wompi" data-card-login hidden data-i18n="cardLogin">{en.cardLogin}</a>
+          <button class="card-action" type="submit" form="wompi-card-form" data-wompi-pay disabled data-i18n="wompiPay">{en.wompiPay}</button>
+          <p class="card-help" data-i18n="wompiSafety">{en.wompiSafety}</p>
+          <div class="card-provider"><span>Wompi</span><span>3D Secure</span></div>
+        </aside>
+      </div>
     </div>
   </main>
 </Layout>
 
 <style>
-  .hosted-checkout { min-height: calc(100svh - var(--nav-height)); padding: clamp(3rem, 8vw, 7rem) 0; }
-  .hosted-layout { max-width: 1060px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, 26rem); gap: clamp(3rem, 8vw, 8rem); align-items: start; }
-  .hosted-copy { max-width: 32rem; }
-  .hosted-back { display: inline-block; color: var(--secondary); font-size: .85rem; margin-bottom: clamp(3rem, 7vw, 6rem); }
-  .hosted-back:hover { color: var(--text); }
-  .hosted-eyebrow { font-family: var(--font-label); font-size: .72rem; letter-spacing: .12em; color: var(--secondary); }
-  .hosted-copy h1 { font-family: var(--font-title); font-size: clamp(3rem, 6vw, 6rem); line-height: .95; letter-spacing: -.045em; margin: 1rem 0 1.4rem; }
-  .hosted-copy > p:last-child, .hosted-order > p:not(.hosted-eyebrow):not(.hosted-status):not(.hosted-note) { color: var(--secondary); line-height: 1.6; }
-  .hosted-order { border: 1px solid var(--border); border-radius: .7rem; padding: clamp(1.5rem, 3vw, 2rem); background: var(--surface); }
-  .hosted-order h2 { font-size: 1.25rem; margin: 1rem 0 .5rem; }
-  .hosted-total { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--border); margin-top: 2rem; padding: 1.25rem 0; }
-  .hosted-total strong { white-space: nowrap; }
-  .hosted-status { color: var(--secondary); min-height: 1.5em; font-size: .82rem; margin-bottom: .8rem; }
-  .hosted-button, .hosted-login, .hosted-retry { width: 100%; min-height: 3.2rem; border: 0; border-radius: .4rem; display: grid; place-items: center; text-align: center; font: inherit; font-weight: 600; cursor: pointer; }
-  .hosted-button { background: var(--text); color: var(--background); }
-  .hosted-button:disabled { opacity: .45; cursor: wait; }
-  .hosted-login, .hosted-retry { background: transparent; border: 1px solid var(--border); color: var(--text); margin-top: .6rem; }
-  .hosted-note { color: var(--secondary); font-size: .78rem; line-height: 1.5; margin-top: 1.3rem; }
+  .card-checkout { display: block; overflow: visible; padding-block: 2rem 6rem; }
+  .card-checkout::before, .card-checkout::after { content: none; }
+  .card-checkout > .page-shell { max-width: 1120px; }
+  .card-back { color: var(--secondary); font-size: .85rem; text-decoration: underline; text-underline-offset: .25em; }
+  .card-heading { padding-block: 2.5rem; }
+  .card-heading .account-eyebrow { margin-bottom: 1.1rem; font-size: .7rem; }
+  .card-heading h1 { font-family: var(--font-title); font-size: clamp(1.75rem, 3.3vw, 3.5rem); line-height: 1.1; font-weight: 400; letter-spacing: -.025em; }
+  .card-heading > p:last-child { margin-top: 1rem; max-width: 38rem; line-height: 1.65; color: var(--secondary); }
+  .card-checkout-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(19rem, .66fr); gap: clamp(2rem, 5vw, 5rem); align-items: start; }
+  .card-form { min-width: 0; }
+  .card-form fieldset { margin: 0 0 2.25rem; padding: 0; border: 0; min-width: 0; }
+  .card-form legend { display: flex; gap: .85rem; align-items: baseline; width: 100%; font-size: 1rem; font-weight: 600; padding-bottom: 1.25rem; }
+  .card-form legend > span:first-child { font-family: var(--font-label); color: var(--secondary); font-size: .7rem; font-weight: 400; }
+  .card-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.1rem 1rem; }
+  .card-fields label { display: grid; gap: .5rem; min-width: 0; font-size: .78rem; color: var(--secondary); }
+  .card-field-wide { grid-column: 1 / -1; }
+  .card-fields input, .card-fields select { width: 100%; min-width: 0; height: 2.9rem; border: 1px solid var(--border); border-radius: 5px; background: var(--surface); color: var(--text); padding: .6rem .8rem; font-family: var(--font-body); font-size: 1rem; transition: border-color .15s; }
+  .card-fields input:disabled, .card-fields select:disabled { opacity: 1; cursor: not-allowed; }
+  .card-fields input:focus-visible, .card-fields select:focus-visible, .card-action:focus-visible, .card-action-secondary:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+  .card-help { font-size: .76rem; line-height: 1.65; color: var(--secondary); margin-top: 1rem; }
+  .card-order { position: sticky; top: calc(var(--nav-height) + 2rem); padding: 1.8rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); }
+  .card-caption { font-family: var(--font-label); letter-spacing: .14em; font-size: .67rem; color: var(--secondary); }
+  .card-product { display: flex; align-items: center; gap: 1rem; margin-block: 1.8rem; }
+  .card-product-mark { display: grid; place-items: center; width: 3rem; height: 3rem; flex-shrink: 0; background: var(--text); color: var(--background); border-radius: 4px; font-size: 1.5rem; font-family: var(--font-title); }
+  .card-product h2 { font-size: 1rem; font-weight: 600; }
+  .card-product p { font-size: .75rem; line-height: 1.6; color: var(--secondary); margin-top: .4rem; }
+  .card-order-total { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; border-top: 1px solid var(--border); padding-block: 1.5rem; }
+  .card-order-total > span { font-size: .85rem; }
+  .card-order-total strong { font-size: 1.6rem; font-weight: 500; letter-spacing: -.04em; }
+  .card-order-total small { font-size: .7rem; letter-spacing: 0; color: var(--secondary); }
+  .card-mode { font-family: var(--font-label); letter-spacing: .08em; font-size: .65rem; margin-bottom: .75rem; }
+  .card-status { color: var(--secondary); font-size: .8rem; line-height: 1.6; margin-bottom: 1.25rem; }
+  .card-action { display: flex; justify-content: center; align-items: center; width: 100%; min-height: 3.1rem; padding: .75rem 1rem; border: 0; border-radius: 5px; background: var(--button-bg); color: var(--button-text); text-align: center; font-size: .85rem; font-weight: 500; cursor: pointer; }
+  .card-action:disabled { opacity: .5; cursor: not-allowed; }
+  .card-provider { display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1.5rem; font-family: var(--font-label); font-size: .75rem; color: var(--secondary); }
+  .card-result { padding-block: 2rem; }
+  .card-result-mark { font-family: var(--font-title); color: var(--secondary); font-size: .85rem; }
+  .card-result h2 { font-size: 1.8rem; margin-block: 1.5rem 1rem; }
+  .card-result p { color: var(--secondary); line-height: 1.7; margin-bottom: 2rem; }
+  .card-action-secondary { display: block; background: transparent; border: 1px solid var(--border); border-radius: 5px; width: 100%; padding: .85rem; margin-block: 1rem; cursor: pointer; color: var(--text); }
   [hidden] { display: none !important; }
-  @media (max-width: 740px) { .hosted-layout { grid-template-columns: 1fr; gap: 2.5rem; } .hosted-back { margin-bottom: 3rem; } }
+  @media (max-width: 760px) {
+    .card-checkout-layout { grid-template-columns: 1fr; gap: 1rem; }
+    .card-order { position: static; padding: 1.4rem; }
+    .card-heading { padding-block: 2rem; }
+    .card-checkout { padding-top: 1rem; }
+  }
+  @media (max-width: 390px) { .card-fields { gap: 1rem .7rem; } .card-fields label { font-size: .72rem; } }
 </style>
