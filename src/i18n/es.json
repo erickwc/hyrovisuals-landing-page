@@ -212,6 +212,8 @@
   "card3dsNote": "Al continuar, tu banco puede pedirte confirmar el pago mediante 3D Secure.",
   "cardResultTitle": "El estado de tu pago",
   "cardChecking": "Estamos comprobando tu pago…",
+  "cardProcessingTitle": "Validando tu pago",
+  "cardProcessingDescription": "Estamos verificando el pago con Wompi. Cuando se confirme, abriremos tu biblioteca automáticamente.",
   "cardResume": "Continuar verificación del banco",
   "cardCheck": "Comprobar el pago",
   "cardRestart": "Iniciar un nuevo intento",

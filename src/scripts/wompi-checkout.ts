@@ -10,13 +10,18 @@ export function initWompiCheckout() {
   if (!root) return () => {};
   const form = root.querySelector<HTMLFormElement>('[data-card-form]')!;
   const button = root.querySelector<HTMLButtonElement>('[data-wompi-pay]')!;
+  const payLabel = root.querySelector<HTMLElement>('[data-card-pay-label]')!;
+  const paySpinner = root.querySelector<HTMLElement>('[data-card-pay-spinner]')!;
   const result = root.querySelector<HTMLElement>('[data-card-result]')!;
+  const processing = root.querySelector<HTMLElement>('[data-card-processing]')!;
   const status = root.querySelector<HTMLElement>('[data-card-status]')!;
   const resultCopy = root.querySelector<HTMLElement>('[data-card-result-copy]')!;
   const login = root.querySelector<HTMLAnchorElement>('[data-card-login]')!;
   const resume = root.querySelector<HTMLAnchorElement>('[data-card-resume]')!;
   const check = root.querySelector<HTMLButtonElement>('[data-card-check]')!;
   const restart = root.querySelector<HTMLButtonElement>('[data-card-restart]')!;
+  const processingTitle = root.querySelector<HTMLElement>('[data-card-processing-title]')!;
+  const processingCopy = root.querySelector<HTMLElement>('[data-card-processing-copy]')!;
   const country = form.querySelector<HTMLSelectElement>('[data-billing="idPais"]')!;
   const region = form.querySelector<HTMLSelectElement>('[data-billing="idRegion"]')!;
   const controller = new AbortController();
@@ -37,13 +42,17 @@ export function initWompiCheckout() {
   const render = () => {
     status.textContent = words()[message];
     resultCopy.textContent = words()[message];
+    processingTitle.textContent = words().cardProcessingTitle;
+    processingCopy.textContent = words().cardProcessingDescription;
     root.querySelector<HTMLElement>('[data-card-mode]')!.textContent = words()[mode === 'test' ? 'cardTestMode' : mode === 'live' ? 'cardLiveMode' : 'cardPreviewMode'];
     if (amountCents) {
       const price = new Intl.NumberFormat(document.documentElement.lang === 'es' ? 'es-SV' : 'en-US',
         { style: 'currency', currency: 'USD' }).format(amountCents / 100);
       root.querySelector<HTMLElement>('[data-card-price]')!.textContent = price;
-      button.textContent = `${document.documentElement.lang === 'es' ? 'Pagar ahora' : 'Pay now'} · ${price}`;
+      payLabel.textContent = busy ? words().wompiWorking : `${document.documentElement.lang === 'es' ? 'Pagar ahora' : 'Pay now'} · ${price}`;
     }
+    paySpinner.hidden = !busy;
+    button.classList.toggle('is-loading', busy);
     button.disabled = !ready || busy;
     button.hidden = returning || !login.hidden;
     form.querySelectorAll<HTMLFieldSetElement>('fieldset').forEach(f => f.disabled = !ready || busy);
@@ -79,7 +88,14 @@ export function initWompiCheckout() {
       !(parsed.hostname === 'wompi.sv' || parsed.hostname.endsWith('.wompi.sv'))) throw new Error('invalid_url');
     return parsed.href;
   };
+  const showProcessing = () => {
+    returning = true;
+    result.hidden = true;
+    processing.hidden = false;
+    root.classList.add('card-return-checking');
+  };
   const showResult = (data: { status: string; request_id?: string; challenge_url?: string }) => {
+    processing.hidden = true;
     root.classList.remove('card-return-checking');
     returning = true; form.hidden = true; result.hidden = false;
     if (data.request_id && validId(data.request_id)) remember(data.request_id);
@@ -89,8 +105,8 @@ export function initWompiCheckout() {
     check.hidden = !restart.hidden;
     say(data.status === 'test_paid' ? 'cardTestSuccess' : data.status === 'declined' ? 'cardDeclined' : 'cardPending');
   };
-  const poll = async (remaining = 0, attempt = 0) => {
-    if (!currentId || signal.aborted || busy) return;
+  const poll = async (remaining = Number.POSITIVE_INFINITY, attempt = 0) => {
+    if (!currentId || signal.aborted) return;
     check.disabled = true;
     let retry = false;
     try {
@@ -105,30 +121,27 @@ export function initWompiCheckout() {
         currentId = null;
         try { sessionStorage.removeItem('hyro:card-request'); } catch { /* Optional. */ }
         root.classList.remove('card-return-checking');
+        processing.hidden = true;
         returning = false; result.hidden = true; form.hidden = false;
         if (ready) say('wompiReady');
         return;
       }
       retry = remaining > 0 && !['test_paid', 'declined'].includes(data.status);
-      if (returning && retry && attempt < 3 && !data.challenge_url) {
-        // Keep the successful return lightweight while the webhook catches up.
-        say('cardChecking');
-      } else showResult(data);
+      if (retry) showProcessing();
+      else showResult(data);
     } catch (error) {
       if (!signal.aborted) {
         const code = error instanceof Error ? error.message : '';
         retry = remaining > 0 && !['unauthorized', 'not_configured', 'mode_mismatch', 'rate_limited'].includes(code);
-        if (returning && retry && attempt < 3) say('cardChecking');
+        if (returning && retry) showProcessing();
         else {
+          processing.hidden = true;
           root.classList.remove('card-return-checking');
           failure(error);
         }
       }
     } finally {
       check.disabled = false;
-      if (!retry && returning && root.classList.contains('card-return-checking')) {
-        showResult({ status: 'review' });
-      }
       if (retry && !signal.aborted) {
         const delay = attempt < 3 ? 1500 : attempt < 8 ? 3000 : 5000;
         timer = setTimeout(() => void poll(remaining - 1, attempt + 1), delay);
@@ -157,13 +170,9 @@ export function initWompiCheckout() {
       const data = await api(payment);
       if (signal.aborted) return;
       if (data.library_url) { location.assign('/biblioteca/'); return; }
-      showResult(data);
       if (data.challenge_url && data.status === 'awaiting_3ds') location.assign(url(data.challenge_url));
-      else if (!['test_paid', 'declined'].includes(data.status)) {
-        root.classList.add('card-return-checking');
-        say('cardChecking');
-        timer = setTimeout(() => void poll(20), 0);
-      }
+      else if (['test_paid', 'declined'].includes(data.status)) showResult(data);
+      else { showProcessing(); timer = setTimeout(() => void poll(), 0); }
     } catch (error) {
       if (!signal.aborted) {
         const code = error instanceof Error ? error.message : '';
@@ -172,9 +181,9 @@ export function initWompiCheckout() {
       }
     } finally { payment.card.number = ''; payment.card.cvv = ''; wipeCard(); busy = false; render(); }
   }, { signal });
-  check.addEventListener('click', () => { clearTimeout(timer); void poll(20); }, { signal });
+  check.addEventListener('click', () => { clearTimeout(timer); showProcessing(); void poll(); }, { signal });
   restart.addEventListener('click', () => {
-    clearTimeout(timer); remember(crypto.randomUUID()); returning = false; result.hidden = true; form.hidden = false; say('wompiReady');
+    clearTimeout(timer); processing.hidden = true; remember(crypto.randomUUID()); returning = false; result.hidden = true; form.hidden = false; say('wompiReady');
   }, { signal });
   document.addEventListener('hyro:language', render, { signal });
   window.addEventListener('pagehide', wipeCard, { signal });
@@ -187,17 +196,15 @@ export function initWompiCheckout() {
   }
   try { currentId ||= sessionStorage.getItem('hyro:card-request'); } catch { /* Optional. */ }
   if (!validId(currentId)) currentId = null;
+  if (currentId) returning = true;
   if (!currentId) returning = false;
   render();
   // On Wompi's return URL, check the transaction immediately. The payment-status
   // endpoint does not depend on the checkout configuration, so don't make the
   // buyer wait for unrelated merchant/region lookups before verifying the charge.
   if (returning && currentId) {
-    form.hidden = true;
-    result.hidden = false;
-    root.classList.add('card-return-checking');
-    say('cardChecking');
-    void poll(20);
+    showProcessing();
+    void poll();
   }
   void (async () => {
     try {

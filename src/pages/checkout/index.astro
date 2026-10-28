@@ -66,13 +66,23 @@ const contact = [
           <p class="card-mode" data-card-mode></p>
           <p class="card-status" data-card-status role="status" aria-live="polite"></p>
           <a class="card-action" href="/cuenta/?continuar=wompi" data-card-login hidden data-i18n="cardLogin">{en.cardLogin}</a>
-          <button class="card-action" type="submit" form="wompi-card-form" data-wompi-pay disabled data-i18n="wompiPay">{en.wompiPay}</button>
+          <button class="card-action" type="submit" form="wompi-card-form" data-wompi-pay disabled>
+            <span data-card-pay-spinner class="card-spinner card-spinner-button" aria-hidden="true" hidden></span>
+            <span data-card-pay-label data-i18n="wompiPay">{en.wompiPay}</span>
+          </button>
           <p class="card-help" data-i18n="wompiSafety">{en.wompiSafety}</p>
           <div class="card-provider"><span>Wompi</span><span>3D Secure</span></div>
         </aside>
       </div>
     </div>
   </main>
+  <div class="card-processing" data-card-processing hidden role="status" aria-live="polite" aria-atomic="true">
+    <div class="card-processing-dialog">
+      <span class="card-spinner card-spinner-modal" aria-hidden="true"></span>
+      <h2 data-card-processing-title data-i18n="cardProcessingTitle">{en.cardProcessingTitle}</h2>
+      <p data-card-processing-copy data-i18n="cardProcessingDescription">{en.cardProcessingDescription}</p>
+    </div>
+  </div>
 </Layout>
 
 <style>
@@ -108,26 +118,26 @@ const contact = [
   .card-order-total small { font-size: .7rem; letter-spacing: 0; color: var(--secondary); }
   .card-mode { font-family: var(--font-label); letter-spacing: .08em; font-size: .65rem; margin-bottom: .75rem; }
   .card-status { color: var(--secondary); font-size: .8rem; line-height: 1.6; margin-bottom: 1.25rem; }
-  .card-action { display: flex; justify-content: center; align-items: center; width: 100%; min-height: 3.1rem; padding: .75rem 1rem; border: 0; border-radius: 5px; background: var(--button-bg); color: var(--button-text); text-align: center; font-size: .85rem; font-weight: 500; cursor: pointer; }
+  .card-action { display: flex; justify-content: center; align-items: center; gap: .65rem; width: 100%; min-height: 3.1rem; padding: .75rem 1rem; border: 0; border-radius: 5px; background: var(--button-bg); color: var(--button-text); text-align: center; font-size: .85rem; font-weight: 500; cursor: pointer; }
   .card-action:disabled { opacity: .5; cursor: not-allowed; }
+  .card-action.is-loading { opacity: 1; cursor: progress; }
+  .card-spinner { display: inline-block; flex: 0 0 auto; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: card-spinner-turn .75s linear infinite; }
+  .card-spinner-button { width: 1rem; height: 1rem; }
+  .card-spinner-modal { width: 2rem; height: 2rem; color: var(--text); }
+  @keyframes card-spinner-turn { to { transform: rotate(360deg); } }
+  .card-processing { position: fixed; z-index: 2000; inset: 0; display: grid; place-items: center; padding: 1.25rem; background: color-mix(in srgb, var(--background) 70%, transparent); -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px); }
+  .card-processing[hidden] { display: none !important; }
+  .card-processing-dialog { display: grid; justify-items: center; width: min(100%, 26rem); padding: clamp(1.75rem, 5vw, 2.5rem); border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); text-align: center; box-shadow: 0 12px 40px rgb(0 0 0 / .12); }
+  .card-processing-dialog h2 { margin: 1.25rem 0 .5rem; font-size: 1.15rem; font-weight: 550; }
+  .card-processing-dialog p { margin: 0; max-width: 22rem; color: var(--secondary); font-size: .88rem; line-height: 1.6; }
   .card-provider { display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1.5rem; font-family: var(--font-label); font-size: .75rem; color: var(--secondary); }
   .card-result { padding-block: 2rem; }
   .card-result-mark { font-family: var(--font-title); color: var(--secondary); font-size: .85rem; }
   .card-result h2 { font-size: 1.8rem; margin-block: 1.5rem 1rem; }
   .card-result p { color: var(--secondary); line-height: 1.7; margin-bottom: 2rem; }
-  .card-checkout.card-return-checking .card-back,
-  .card-checkout.card-return-checking .card-heading,
-  .card-checkout.card-return-checking .card-order { display: none; }
-  .card-checkout.card-return-checking .card-checkout-layout { grid-template-columns: 1fr; min-height: 58vh; align-items: center; justify-items: center; }
-  .card-checkout.card-return-checking .card-result { width: min(100%, 28rem); padding: 0; text-align: center; }
-  .card-checkout.card-return-checking .card-result-mark,
-  .card-checkout.card-return-checking .card-result h2,
-  .card-checkout.card-return-checking [data-card-check],
-  .card-checkout.card-return-checking [data-card-restart],
-  .card-checkout.card-return-checking [data-card-library] { display: none; }
-  .card-checkout.card-return-checking .card-result p { margin: 0; font-size: .95rem; }
   .card-action-secondary { display: block; background: transparent; border: 1px solid var(--border); border-radius: 5px; width: 100%; padding: .85rem; margin-block: 1rem; cursor: pointer; color: var(--text); }
   [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { .card-spinner { animation-duration: 1.8s; } }
   @media (max-width: 760px) {
     .card-checkout-layout { grid-template-columns: 1fr; gap: 1rem; }
     .card-order { position: static; padding: 1.4rem; }
