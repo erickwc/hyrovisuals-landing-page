@@ -16,28 +16,8 @@ export function initLicenseChoice() {
   const { signal } = controller;
   let selected: 'personal' | 'teams' = 'personal';
 
-  if (price) {
-    if (!supabase) {
-      price.textContent = document.documentElement.lang === 'es' ? 'Ver precio al pagar' : 'See price at checkout';
-    } else {
-      void supabase.functions.invoke('whop-plan-price').then(({ data, error }) => {
-      if (!price.isConnected) return;
-      if (error || typeof data?.amount !== 'number' || !Number.isFinite(data.amount)
-        || typeof data?.currency !== 'string') {
-        price.textContent = document.documentElement.lang === 'es' ? 'Ver precio al pagar' : 'See price at checkout';
-        return;
-      }
-      const locale = document.documentElement.lang === 'es' ? 'es-ES' : 'en-US';
-      const amount = new Intl.NumberFormat(locale, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(data.amount);
-      price.textContent = `${amount} ${data.currency === 'USD' ? 'US$' : data.currency}`;
-      }).catch(() => {
-        if (price.isConnected) price.textContent = document.documentElement.lang === 'es' ? 'Ver precio al pagar' : 'See price at checkout';
-      });
-    }
-  }
+  // Payhip owns the final price; do not display an amount from another processor.
+  if (price) price.textContent = document.documentElement.lang === 'es' ? 'Ver precio al pagar' : 'See price at checkout';
 
   const select = (option: HTMLButtonElement) => {
     selected = option.dataset.licenseOption === 'teams' ? 'teams' : 'personal';
