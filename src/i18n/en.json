@@ -211,6 +211,7 @@
   "cardCvv": "Security code (CVV)",
   "card3dsNote": "After continuing, your bank may ask you to confirm the payment with 3D Secure.",
   "cardResultTitle": "Your payment status",
+  "cardChecking": "Checking your payment…",
   "cardResume": "Continue bank verification",
   "cardCheck": "Check payment status",
   "cardRestart": "Start a new attempt",
@@ -224,7 +225,7 @@
   "cardInvalid": "Check the card number, expiry date and three-digit security code.",
   "cardBillingInvalid": "Check the billing details and choose your country and region.",
   "cardRateLimited": "Too many attempts. Please wait 15 minutes before trying again.",
-  "cardPending": "Your payment is awaiting confirmation. Continue bank verification if available, or check again. Please do not make another payment.",
+  "cardPending": "Wompi has not confirmed the payment yet. Do not pay again; you can check again or continue bank verification.",
   "cardTestSuccess": "Test payment confirmed. No real charge was made and no real license was issued.",
   "cardDeclined": "Wompi has confirmed that this attempt was not approved. You can start a new attempt."
 }

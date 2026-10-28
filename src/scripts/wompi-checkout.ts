@@ -80,6 +80,7 @@ export function initWompiCheckout() {
     return parsed.href;
   };
   const showResult = (data: { status: string; request_id?: string; challenge_url?: string }) => {
+    root.classList.remove('card-return-checking');
     returning = true; form.hidden = true; result.hidden = false;
     if (data.request_id && validId(data.request_id)) remember(data.request_id);
     resume.hidden = true;
@@ -88,22 +89,51 @@ export function initWompiCheckout() {
     check.hidden = !restart.hidden;
     say(data.status === 'test_paid' ? 'cardTestSuccess' : data.status === 'declined' ? 'cardDeclined' : 'cardPending');
   };
-  const poll = async (remaining = 0) => {
+  const poll = async (remaining = 0, attempt = 0) => {
     if (!currentId || signal.aborted || busy) return;
     check.disabled = true;
+    let retry = false;
     try {
       const data = await api({ action: 'status', request_id: currentId });
       if (signal.aborted) return;
-      if (data.status === 'paid') { location.replace('/biblioteca/?compra=confirmada'); return; }
+      if (data.status === 'paid') {
+        root.classList.remove('card-return-checking');
+        location.replace('/biblioteca/?compra=confirmada');
+        return;
+      }
       if (data.status === 'unknown') {
         currentId = null;
         try { sessionStorage.removeItem('hyro:card-request'); } catch { /* Optional. */ }
-        returning = false; result.hidden = true; form.hidden = false; say('wompiReady'); return;
+        root.classList.remove('card-return-checking');
+        returning = false; result.hidden = true; form.hidden = false;
+        if (ready) say('wompiReady');
+        return;
       }
-      showResult(data);
-      if (remaining > 0 && !['test_paid', 'declined'].includes(data.status)) timer = setTimeout(() => void poll(remaining - 1), 5000);
-    } catch (error) { if (!signal.aborted) failure(error); }
-    finally { check.disabled = false; }
+      retry = remaining > 0 && !['test_paid', 'declined'].includes(data.status);
+      if (returning && retry && attempt < 3 && !data.challenge_url) {
+        // Keep the successful return lightweight while the webhook catches up.
+        say('cardChecking');
+      } else showResult(data);
+    } catch (error) {
+      if (!signal.aborted) {
+        const code = error instanceof Error ? error.message : '';
+        retry = remaining > 0 && !['unauthorized', 'not_configured', 'mode_mismatch', 'rate_limited'].includes(code);
+        if (returning && retry && attempt < 3) say('cardChecking');
+        else {
+          root.classList.remove('card-return-checking');
+          failure(error);
+        }
+      }
+    } finally {
+      check.disabled = false;
+      if (!retry && returning && root.classList.contains('card-return-checking')) {
+        showResult({ status: 'review' });
+      }
+      if (retry && !signal.aborted) {
+        const delay = attempt < 3 ? 1500 : attempt < 8 ? 3000 : 5000;
+        timer = setTimeout(() => void poll(remaining - 1, attempt + 1), delay);
+      }
+    }
   };
   country.addEventListener('change', () => {
     region.replaceChildren(new Option(words().cardSelect, ''));
@@ -129,6 +159,11 @@ export function initWompiCheckout() {
       if (data.library_url) { location.assign('/biblioteca/'); return; }
       showResult(data);
       if (data.challenge_url && data.status === 'awaiting_3ds') location.assign(url(data.challenge_url));
+      else if (!['test_paid', 'declined'].includes(data.status)) {
+        root.classList.add('card-return-checking');
+        say('cardChecking');
+        timer = setTimeout(() => void poll(20), 0);
+      }
     } catch (error) {
       if (!signal.aborted) {
         const code = error instanceof Error ? error.message : '';
@@ -137,7 +172,7 @@ export function initWompiCheckout() {
       }
     } finally { payment.card.number = ''; payment.card.cvv = ''; wipeCard(); busy = false; render(); }
   }, { signal });
-  check.addEventListener('click', () => { clearTimeout(timer); void poll(); }, { signal });
+  check.addEventListener('click', () => { clearTimeout(timer); void poll(20); }, { signal });
   restart.addEventListener('click', () => {
     clearTimeout(timer); remember(crypto.randomUUID()); returning = false; result.hidden = true; form.hidden = false; say('wompiReady');
   }, { signal });
@@ -154,6 +189,16 @@ export function initWompiCheckout() {
   if (!validId(currentId)) currentId = null;
   if (!currentId) returning = false;
   render();
+  // On Wompi's return URL, check the transaction immediately. The payment-status
+  // endpoint does not depend on the checkout configuration, so don't make the
+  // buyer wait for unrelated merchant/region lookups before verifying the charge.
+  if (returning && currentId) {
+    form.hidden = true;
+    result.hidden = false;
+    root.classList.add('card-return-checking');
+    say('cardChecking');
+    void poll(20);
+  }
   void (async () => {
     try {
       const config = await api({ action: 'config' });
@@ -162,9 +207,12 @@ export function initWompiCheckout() {
         !Number.isSafeInteger(config.amount_cents) || config.amount_cents < 1) throw new Error('not_configured');
       regions = config.regions; mode = config.mode; amountCents = config.amount_cents; ready = true;
       for (const item of regions) country.add(new Option(item.nombre, item.id));
-      say('wompiReady');
-      if (currentId) await poll(returning ? 12 : 0);
-    } catch (error) { if (!signal.aborted) failure(error); }
+      if (!returning && result.hidden) say('wompiReady');
+      if (currentId && !returning) void poll();
+    } catch (error) {
+      // The immediate status check handles return-page errors independently.
+      if (!signal.aborted && !returning) failure(error);
+    }
   })();
   return () => { controller.abort(); clearTimeout(timer); wipeCard(); };
 }
