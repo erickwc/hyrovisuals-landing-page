@@ -195,9 +195,12 @@ export async function handle(request: Request, env: Env, fetcher: typeof fetch =
         (checkout.transaction_id && checkout.transaction_id !== transactionId)) throw new Failure(409, 'payment_mismatch');
       // Bind even a transaction whose create response was lost. The idExterno came from our server.
       await db('rpc/bind_wompi_card_transaction', 'POST', { p_checkout_id: checkout.id, p_transaction_id: transactionId });
-      if (transaction.esAprobada === true && transaction.resultadoTransaccion === 0) {
-        const amount = checkout.amount_cents / 100;
-        if (transaction.monto !== amount || (transaction.montoOriginal != null && transaction.montoOriginal !== amount))
+      // Wompi documents esReal + esAprobada as the authoritative success fields.
+      // resultadoTransaccion is not part of that contract and may be absent or
+      // use a provider-specific value even when the payment is approved.
+      if (transaction.esAprobada === true) {
+        const amountCents = Math.round(Number(transaction.monto) * 100);
+        if (!Number.isSafeInteger(amountCents) || amountCents !== checkout.amount_cents)
           throw new Failure(409, 'payment_mismatch');
         if (real) await db('rpc/complete_wompi_card_purchase', 'POST', { p_checkout_id: checkout.id,
           p_transaction_id: transactionId, ...await encryptedLicense(env.LICENSE_ENCRYPTION_KEY) });
