@@ -1,5 +1,244 @@
 @import 'tailwindcss';
 @import 'lenis/dist/lenis.css';
+/* Account access: a quiet, self-contained surface without the site navigation. */
+.auth-page {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding: 1.5rem 1rem;
+  background: var(--background);
+  font-family: var(--font-body);
+}
+.auth-shell {
+  width: min(100%, 29rem);
+  padding: 3.5rem 0 1.5rem;
+
+  color: var(--text);
+  text-align: center;
+}
+.auth-logo {
+  position: absolute;
+  top: clamp(1.25rem, 3vw, 2.5rem);
+  left: clamp(1.25rem, 3vw, 2.5rem);
+  width: 2.75rem;
+  height: 2.75rem;
+  filter: contrast(5);
+  mix-blend-mode: screen;
+}
+
+.auth-view[hidden], .auth-status[hidden], .auth-admin-link[hidden] { display: none; }
+.auth-view h1 {
+  margin: 0;
+  font-family: var(--font-label);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -.025em;
+  line-height: 1.25;
+}
+.auth-copy {
+  margin: .6rem 0 1.8rem;
+  color: var(--secondary);
+  font-size: .8125rem;
+  line-height: 1.55;
+}
+.auth-form { display: grid; gap: 1.15rem; text-align: left; }
+.auth-field { display: grid; gap: .32rem; }
+.auth-field label {
+  font-family: var(--font-label);
+  font-size: .75rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.auth-field input {
+  width: 100%;
+  height: var(--button-height);
+  padding: 0 .72rem;
+  border: 1px solid color-mix(in srgb, var(--text) 9%, transparent);
+  border-radius: var(--radius-full);
+  outline: 0;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: .8125rem;
+  transition: border-color .24s ease, box-shadow .24s ease, background-color .24s ease;
+}
+.auth-field input:focus-visible {
+  border-color: color-mix(in srgb, var(--text) 28%, transparent);
+  outline: 0;
+  background: var(--surface);
+  box-shadow: 0 0 0 .15rem color-mix(in srgb, var(--text) 6%, transparent);
+}
+.auth-input, .auth-password { position: relative; }
+.auth-input > .icon, .auth-password > .icon {
+  position: absolute;
+  top: 50%;
+  left: .8rem;
+  width: .95rem;
+  height: .95rem;
+  color: var(--secondary);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.auth-input input, .auth-password input { padding-left: 1.1rem; }
+.auth-password input { padding-right: 2.45rem; }
+.auth-password button {
+  position: absolute;
+  inset: 0 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 2.45rem;
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+  cursor: pointer;
+}
+.auth-password button:hover { color: var(--text); }
+.auth-password button .icon { width: .95rem; height: .95rem; }
+.auth-eye-hidden, .auth-password button[aria-pressed='true'] .auth-eye-visible { display: none; }
+.auth-password button[aria-pressed='true'] .auth-eye-hidden { display: block; }
+.auth-submit {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  width: 100%;
+  min-height: var(--button-height);
+  margin-top: .55rem;
+  padding: .45rem .65rem;
+  border: 0;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: var(--button-bg);
+  color: var(--button-text);
+  font-family: var(--font-label);
+  font-size: var(--text-body);
+  font-weight: 600;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out), opacity var(--duration-fast) ease;
+}
+.auth-submit .icon { width: .95rem; height: .95rem; }
+.auth-submit::before {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 25%, rgb(255 255 255 / .32) 50%, transparent 75%);
+  content: '';
+  transform: translateX(-125%);
+  transition: transform .8s var(--ease-out);
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .auth-submit:hover { transform: translateY(-2px); box-shadow: 0 .45rem 1.2rem rgb(0 0 0 / .18); }
+  .auth-submit:hover::before { transform: translateX(125%); }
+}
+.auth-submit:active { transform: scale(.985); }
+.auth-submit:focus-visible { outline: 2px solid var(--text); outline-offset: .2rem; }
+.auth-submit:disabled { opacity: .55; cursor: wait; }
+.auth-text-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: .8125rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--duration-fast) ease;
+}
+.auth-text-link:hover { color: var(--text); }
+.auth-text-link:focus-visible { outline: 1px solid var(--secondary); outline-offset: .2rem; border-radius: .15rem; }
+.auth-forgot { display: block; margin: .75rem auto 0; color: var(--secondary); }
+.auth-switch-copy { margin: 1.4rem 0 0; color: var(--secondary); font-size: .8125rem; line-height: 1.5; }
+.auth-switch-copy .auth-text-link { margin-left: .15rem; font-weight: 600; }
+.auth-status { margin: 1.35rem 0 0; color: var(--text); font-size: .8125rem; line-height: 1.5; }
+.auth-user-email { margin: 0 0 1.5rem; overflow-wrap: anywhere; font-size: .8125rem; }
+.auth-admin-link { display: inline-block; margin-top: 1.25rem; }
+.auth-signout { display: block; margin: 1.5rem auto 0; color: var(--secondary); }
+@keyframes auth-enter {
+  from { opacity: 0; transform: translateY(.5rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .auth-logo { animation: auth-enter .7s var(--ease-out) both; }
+  .auth-view:not([hidden]) { animation: auth-enter .7s var(--ease-out) both; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-submit, .auth-submit::before, .auth-field input, .auth-text-link { transition-duration: 0s; }
+}
+.auth-field input { text-align: left; padding-right: 1.1rem; }
+.auth-password input { padding-right: 2.7rem; }
+.auth-field input::placeholder { color: var(--secondary); opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .auth-view:not([hidden]) .auth-field { animation: auth-enter .65s var(--ease-out) both; }
+  .auth-view:not([hidden]) .auth-field:nth-child(2) { animation-delay: .08s; }
+  .auth-view:not([hidden]) .auth-submit { animation: auth-enter .65s .16s var(--ease-out) backwards; }
+}
+
+.auth-page::before, .auth-page::after {
+  position: absolute;
+  top: 50%;
+  width: min(18vw, 14rem);
+  height: 18rem;
+  z-index: -1;
+  pointer-events: none;
+  content: '';
+  transform: translateY(-50%);
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--text) 16%, transparent) .7px, transparent .9px);
+  background-size: .85rem .85rem;
+  mask-image: radial-gradient(ellipse, #000, transparent 70%);
+}
+.auth-page::before { left: 3%; }
+.auth-page::after { right: 3%; }
+.auth-title-es { display: none; }
+html[lang="es"] .auth-title-es { display: inline; }
+html[lang="es"] .auth-title-en { display: none; }
+.auth-accent-o { position: relative; display: inline-block; }
+.auth-accent-o::after {
+  position: absolute;
+  content: '';
+  width: .2em;
+  height: .1em;
+  background: currentColor;
+  top: -.13em;
+  left: 52%;
+  transform: rotate(-55deg);
+}
+.auth-view[data-auth-panel="login"] h1 { margin-bottom: 1.1rem; }
+@media (max-width: 40rem) {
+  .auth-page::before, .auth-page::after { opacity: .4; width: 10vw; }
+  .auth-page::before { left: 0; }
+  .auth-page::after { right: 0; }
+}
+.auth-view[data-auth-panel="login"] h1 {
+  font-family: var(--font-title);
+  font-size: clamp(1.5rem, 4.2vw, 2.4rem);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -.03em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.auth-form, .auth-switch-copy, .auth-forgot, .auth-status, .auth-user-email {
+  max-width: 22rem;
+  margin-inline: auto;
+}
+.auth-copy { margin-bottom: 1.8rem; }
+.auth-form { gap: 1rem; }
+.auth-switch-copy { margin-top: 1.5rem; }
+.auth-field input { padding-inline: 1rem; }
+.auth-password input { padding-right: 2.8rem; }
+.auth-password button { width: 2.8rem; }
+
+:root[data-theme='light'] .auth-logo {
+  filter: contrast(5) invert(1);
+  mix-blend-mode: multiply;
+}
+
 @font-face {
   font-family: 'Gelegar Expanded';
   src: url('/fonts/gelegar-expanded.otf') format('opentype');
@@ -2954,3 +3193,6 @@ select:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .footer-link-group a { transition: none; }
 }
+
+.auth-submit[data-auth-action='login'] { transition-property: box-shadow, opacity; }
+.auth-submit[data-auth-action='login']:hover, .auth-submit[data-auth-action='login']:active { transform: none; }

@@ -1,249 +1,69 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import Navbar from '../../components/Navbar.astro';
 import Icon from '../../components/Icon.astro';
 import en from '../../i18n/en.json';
 ---
 
 <Layout page="account">
-  <a class="skip-link" href="#main" data-i18n="skip">
-    {en.skip}
-  </a>
-  <header class="site-header">
-    <Navbar accountPage />
-  </header>
-  <main id="main" class="account-page">
-    <div class="account-layout page-shell">
-      <div class="account-intro">
-        <p class="account-eyebrow">
-          <span class="account-eyebrow-dot" aria-hidden="true"></span>
-          <span data-i18n="accountEyebrow">{en.accountEyebrow}</span>
-        </p>
-        <h1 class="account-title">
-          <span class="gradient-text" data-i18n="accountTitleFirst">
-            {en.accountTitleFirst}
-          </span>
-          <span class="gradient-text" data-i18n="accountTitleSecond">
-            {en.accountTitleSecond}
-          </span>
-        </h1>
-        <p class="account-intro-copy" data-i18n="accountIntro">
-          {en.accountIntro}
-        </p>
-        <a class="account-back" href="/">
-          <Icon name="arrow" />
-          <span data-i18n="accountBack">{en.accountBack}</span>
-        </a>
+  <a class="skip-link" href="#main" data-i18n="skip">{en.skip}</a>
+  <main id="main" class="auth-page">
+    <img class="auth-logo" src="/images/hyro-mark.png" alt="HYRO" width="1000" height="1000" />
+    <section class="auth-shell" aria-label={en.accountNav} data-i18n-aria="accountNav" data-auth-root>
+
+
+      <div class="auth-view" data-auth-panel="login">
+        <h1 aria-label={en.accountLoginTitle} data-i18n-aria="accountLoginTitle"><span class="auth-title-es" aria-hidden="true">INICIA SESI<span class="auth-accent-o">O</span>N</span><span class="auth-title-en" aria-hidden="true">LOG IN</span></h1>
+        <form class="auth-form" data-auth-form="login" autocomplete="on">
+          <div class="auth-field"><label for="login-email" data-i18n="accountEmail">{en.accountEmail}</label><div class="auth-input"><input id="login-email" name="email" type="email" placeholder="nombre@correo.com" autocomplete="email" required /></div></div>
+          <div class="auth-field"><label for="login-password" data-i18n="accountPassword">{en.accountPassword}</label><div class="auth-password"><input id="login-password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required /><button type="button" data-password-toggle aria-label={en.accountShowPassword} aria-pressed="false"><span class="auth-eye-visible"><Icon name="eye" /></span><span class="auth-eye-hidden"><Icon name="eye-off" /></span></button></div></div>
+          <button class="auth-submit" type="submit" data-auth-action="login"><span data-i18n="accountLoginAction">{en.accountLoginAction}</span></button>
+        </form>
+        <p class="auth-switch-copy"><span data-i18n="accountNoAccount">{en.accountNoAccount}</span> <button class="auth-text-link" type="button" data-auth-switch="register" data-i18n="accountCreateAccount">{en.accountCreateAccount}</button></p>
+        <button class="auth-text-link auth-forgot" type="button" data-auth-switch="recover" data-i18n="accountForgotPassword">{en.accountForgotPassword}</button>
       </div>
 
-      <section
-        class="account-panel"
-        aria-label={en.accountNav}
-        data-i18n-aria="accountNav"
-      >
-        <div class="account-panel-inner" data-auth-root>
-          <div
-            class="account-tabs"
-            role="tablist"
-            aria-label={en.accountNav}
-            data-i18n-aria="accountNav"
-          >
-            <button
-              id="account-register-tab"
-              type="button"
-              role="tab"
-              aria-selected="true"
-              aria-controls="account-register-panel"
-              data-auth-tab="register"
-              data-i18n="accountTabRegister"
-            >
-              {en.accountTabRegister}
-            </button>
-            <button
-              id="account-login-tab"
-              type="button"
-              role="tab"
-              aria-selected="false"
-              aria-controls="account-login-panel"
-              tabindex="-1"
-              data-auth-tab="login"
-              data-i18n="accountTabLogin"
-            >
-              {en.accountTabLogin}
-            </button>
-          </div>
+      <div class="auth-view" data-auth-panel="register" hidden>
+        <h1 data-i18n="accountRegisterTitle">{en.accountRegisterTitle}</h1>
+        <p class="auth-copy" data-i18n="accountRegisterDescription">{en.accountRegisterDescription}</p>
+        <form class="auth-form" data-auth-form="register" autocomplete="on">
+          <div class="auth-field"><label for="register-name" data-i18n="accountName">{en.accountName}</label><div class="auth-input"><input id="register-name" name="name" type="text" placeholder="Tu nombre" autocomplete="name" maxlength="120" required /></div></div>
+          <div class="auth-field"><label for="register-email" data-i18n="accountEmail">{en.accountEmail}</label><div class="auth-input"><input id="register-email" name="email" type="email" placeholder="nombre@correo.com" autocomplete="email" required /></div></div>
+          <div class="auth-field"><label for="register-password" data-i18n="accountPassword">{en.accountPassword}</label><div class="auth-password"><input id="register-password" name="password" type="password" placeholder="••••••••" autocomplete="new-password" minlength="8" required /><button type="button" data-password-toggle aria-label={en.accountShowPassword} aria-pressed="false"><span class="auth-eye-visible"><Icon name="eye" /></span><span class="auth-eye-hidden"><Icon name="eye-off" /></span></button></div></div>
+          <div class="auth-field"><label for="register-confirm" data-i18n="accountConfirmPassword">{en.accountConfirmPassword}</label><div class="auth-password"><input id="register-confirm" name="confirmPassword" type="password" placeholder="••••••••" autocomplete="new-password" minlength="8" required /><button type="button" data-password-toggle aria-label={en.accountShowPassword} aria-pressed="false"><span class="auth-eye-visible"><Icon name="eye" /></span><span class="auth-eye-hidden"><Icon name="eye-off" /></span></button></div></div>
+          <button class="auth-submit" type="submit" data-auth-action="register"><span data-i18n="accountRegisterAction">{en.accountRegisterAction}</span><Icon name="arrow" /></button>
+        </form>
+        <p class="auth-switch-copy"><span data-i18n="accountHaveAccount">{en.accountHaveAccount}</span> <button class="auth-text-link" type="button" data-auth-switch="login" data-i18n="accountLoginAction">{en.accountLoginAction}</button></p>
+      </div>
 
-          <div
-            id="account-register-panel"
-            class="account-tab-panel"
-            role="tabpanel"
-            aria-labelledby="account-register-tab"
-            data-auth-panel="register"
-          >
-            <h2 data-i18n="accountRegisterTitle">{en.accountRegisterTitle}</h2>
-            <p
-              class="account-panel-copy"
-              data-i18n="accountRegisterDescription"
-            >
-              {en.accountRegisterDescription}
-            </p>
-            <form class="account-form" data-auth-form="register" autocomplete="on">
-              <div class="account-field">
-                <label for="register-name" data-i18n="accountName">
-                  {en.accountName}
-                </label>
-                <input
-                  id="register-name"
-                  name="name"
-                  type="text"
-                  autocomplete="name"
-                  maxlength="120"
-                  required
-                />
-              </div>
-              <div class="account-field">
-                <label for="register-email" data-i18n="accountEmail">
-                  {en.accountEmail}
-                </label>
-                <input
-                  id="register-email"
-                  name="email"
-                  type="email"
-                  autocomplete="email"
-                  required
-                />
-              </div>
-              <div class="account-field">
-                <label for="register-password" data-i18n="accountPassword">
-                  {en.accountPassword}
-                </label>
-                <div class="account-password-field">
-                  <input
-                    id="register-password"
-                    name="password"
-                    type="password"
-                    autocomplete="new-password"
-                    minlength="8"
-                    required
-                  />
-                  <button
-                    type="button"
-                    data-password-toggle
-                    aria-label={en.accountShowPassword}
-                  >
-                    <Icon name="eye" />
-                  </button>
-                </div>
-              </div>
-              <div class="account-field">
-                <label
-                  for="register-confirm"
-                  data-i18n="accountConfirmPassword"
-                >
-                  {en.accountConfirmPassword}
-                </label>
-                <div class="account-password-field">
-                  <input
-                    id="register-confirm"
-                    name="confirmPassword"
-                    type="password"
-                    autocomplete="new-password"
-                    minlength="8"
-                    required
-                  />
-                  <button
-                    type="button"
-                    data-password-toggle
-                    aria-label={en.accountShowPassword}
-                  >
-                    <Icon name="eye" />
-                  </button>
-                </div>
-              </div>
-              <button
-                class="account-submit"
-                type="submit"
-                data-auth-action="register"
-              >
-                <span data-i18n="accountRegisterAction">
-                  {en.accountRegisterAction}
-                </span>
-                <Icon name="arrow" />
-              </button>
-            </form>
-          </div>
+      <div class="auth-view" data-auth-panel="recover" hidden>
+        <h1 data-i18n="accountRecoverTitle">{en.accountRecoverTitle}</h1>
+        <p class="auth-copy" data-i18n="accountRecoverDescription">{en.accountRecoverDescription}</p>
+        <form class="auth-form" data-auth-form="recover">
+          <div class="auth-field"><label for="recover-email" data-i18n="accountEmail">{en.accountEmail}</label><div class="auth-input"><input id="recover-email" name="email" type="email" placeholder="nombre@correo.com" autocomplete="email" required /></div></div>
+          <button class="auth-submit" type="submit" data-auth-action="recover"><span data-i18n="accountRecoverAction">{en.accountRecoverAction}</span><Icon name="arrow" /></button>
+        </form>
+        <p class="auth-switch-copy"><button class="auth-text-link" type="button" data-auth-switch="login" data-i18n="accountBackToLogin">{en.accountBackToLogin}</button></p>
+      </div>
 
-          <div
-            id="account-login-panel"
-            class="account-tab-panel"
-            role="tabpanel"
-            aria-labelledby="account-login-tab"
-            data-auth-panel="login"
-            hidden
-          >
-            <h2 data-i18n="accountLoginTitle">{en.accountLoginTitle}</h2>
-            <p class="account-panel-copy" data-i18n="accountLoginDescription">
-              {en.accountLoginDescription}
-            </p>
-            <form class="account-form" data-auth-form="login" autocomplete="on">
-              <div class="account-field">
-                <label for="login-email" data-i18n="accountEmail">
-                  {en.accountEmail}
-                </label>
-                <input
-                  id="login-email"
-                  name="email"
-                  type="email"
-                  autocomplete="email"
-                  required
-                />
-              </div>
-              <div class="account-field">
-                <label for="login-password" data-i18n="accountPassword">
-                  {en.accountPassword}
-                </label>
-                <div class="account-password-field">
-                  <input
-                    id="login-password"
-                    name="password"
-                    type="password"
-                    autocomplete="current-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    data-password-toggle
-                    aria-label={en.accountShowPassword}
-                  >
-                    <Icon name="eye" />
-                  </button>
-                </div>
-              </div>
-              <button
-                class="account-submit"
-                type="submit"
-                data-auth-action="login"
-              >
-                <span data-i18n="accountLoginAction">
-                  {en.accountLoginAction}
-                </span>
-                <Icon name="arrow" />
-              </button>
-            </form>
-          </div>
-          <p class="account-status" data-auth-status role="status" aria-live="polite" hidden></p>
-          <div class="account-signed-in" data-auth-signed-in hidden>
-            <h2 data-i18n="accountSignedInTitle">{en.accountSignedInTitle}</h2>
-            <p data-i18n="accountSignedInDescription">{en.accountSignedInDescription}</p>
-            <p class="account-user-email" data-auth-email></p>
-            <a class="account-admin-link" href="/biblioteca/">Mi biblioteca y licencias</a>
-            <a class="account-admin-link" href="/admin/" data-auth-admin-link hidden data-i18n="accountAdminLink">{en.accountAdminLink}</a>
-            <button class="account-submit" type="button" data-auth-signout>
-              <span data-i18n="accountSignOut">{en.accountSignOut}</span>
-            </button>
-          </div>
-        </div>
-      </section>
-    </div>
+      <div class="auth-view" data-auth-panel="reset" hidden>
+        <h1 data-i18n="accountResetTitle">{en.accountResetTitle}</h1>
+        <p class="auth-copy" data-i18n="accountResetDescription">{en.accountResetDescription}</p>
+        <form class="auth-form" data-auth-form="reset">
+          <div class="auth-field"><label for="reset-password" data-i18n="accountPassword">{en.accountPassword}</label><div class="auth-password"><input id="reset-password" name="password" type="password" placeholder="••••••••" autocomplete="new-password" minlength="8" required /><button type="button" data-password-toggle aria-label={en.accountShowPassword} aria-pressed="false"><span class="auth-eye-visible"><Icon name="eye" /></span><span class="auth-eye-hidden"><Icon name="eye-off" /></span></button></div></div>
+          <div class="auth-field"><label for="reset-confirm" data-i18n="accountConfirmPassword">{en.accountConfirmPassword}</label><div class="auth-password"><input id="reset-confirm" name="confirmPassword" type="password" placeholder="••••••••" autocomplete="new-password" minlength="8" required /><button type="button" data-password-toggle aria-label={en.accountShowPassword} aria-pressed="false"><span class="auth-eye-visible"><Icon name="eye" /></span><span class="auth-eye-hidden"><Icon name="eye-off" /></span></button></div></div>
+          <button class="auth-submit" type="submit" data-auth-action="reset"><span data-i18n="accountResetAction">{en.accountResetAction}</span><Icon name="arrow" /></button>
+        </form>
+      </div>
+
+      <p class="auth-status" data-auth-status role="status" aria-live="polite" hidden></p>
+      <div class="auth-view auth-signed-in" data-auth-signed-in hidden>
+        <h1 data-i18n="accountSignedInTitle">{en.accountSignedInTitle}</h1>
+        <p class="auth-copy" data-i18n="accountSignedInDescription">{en.accountSignedInDescription}</p>
+        <p class="auth-user-email" data-auth-email></p>
+        <a class="auth-submit" href="/biblioteca/" data-i18n="accountLibrary">{en.accountLibrary}</a>
+        <a class="auth-text-link auth-admin-link" href="/admin/" data-auth-admin-link hidden data-i18n="accountAdminLink">{en.accountAdminLink}</a>
+        <button class="auth-text-link auth-signout" type="button" data-auth-signout data-i18n="accountSignOut">{en.accountSignOut}</button>
+      </div>
+    </section>
   </main>
 </Layout>

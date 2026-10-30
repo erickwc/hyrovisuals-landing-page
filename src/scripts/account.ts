@@ -1,8 +1,9 @@
 import en from '../i18n/en.json';
 import es from '../i18n/es.json';
 import { supabase } from '../lib/supabase';
+import { gsap } from 'gsap';
 
-type Mode = 'register' | 'login';
+type Mode = 'register' | 'login' | 'recover' | 'reset';
 type StatusKey =
   | 'accountPasswordMismatch'
   | 'accountPasswordShort'
@@ -10,8 +11,13 @@ type StatusKey =
   | 'accountCheckEmail'
   | 'accountLoginError'
   | 'accountRegisterError'
+  | 'accountEmailRateLimit'
   | 'accountSignOutError'
-  | 'accountConfigError';
+  | 'accountConfigError'
+  | 'accountRecoverSent'
+  | 'accountRecoverError'
+  | 'accountResetSuccess'
+  | 'accountResetError';
 
 export function initAccountPage() {
   const root = document.querySelector<HTMLElement>('[data-auth-root]');
@@ -19,13 +25,30 @@ export function initAccountPage() {
 
   const controller = new AbortController();
   const { signal } = controller;
-  const tabs = Array.from(
-    root.querySelectorAll<HTMLButtonElement>('[data-auth-tab]'),
-  );
+  const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+  const pointerQuery = matchMedia('(hover:hover) and (pointer:fine) and (min-width:768px)');
+  const loginButton = root.querySelector<HTMLButtonElement>('[data-auth-action="login"]');
+  const motionTokens = getComputedStyle(document.documentElement);
+  const motionDuration = parseFloat(motionTokens.getPropertyValue('--duration-base')) || .65;
+  const motionEase = motionTokens.getPropertyValue('--ease-gsap').trim() || 'power3.out';
+  const magnetStrength = parseFloat(motionTokens.getPropertyValue('--magnet-strength')) || .12;
+  loginButton?.addEventListener('pointermove', (event) => {
+    if (motionQuery.matches || !pointerQuery.matches || loginButton.disabled) return;
+    const bounds = loginButton.getBoundingClientRect();
+    gsap.to(loginButton, {
+      x: (event.clientX - bounds.left - bounds.width / 2) * magnetStrength,
+      y: (event.clientY - bounds.top - bounds.height / 2) * magnetStrength,
+      duration: motionDuration, ease: motionEase, overwrite: 'auto',
+    });
+  }, { signal });
+  const resetMagnet = () => {
+    if (loginButton) gsap.to(loginButton, { x: 0, y: 0, duration: motionQuery.matches ? 0 : motionDuration, ease: motionEase, overwrite: 'auto' });
+  };
+  loginButton?.addEventListener('pointerleave', resetMagnet, { signal });
+  motionQuery.addEventListener('change', resetMagnet, { signal });
   const panels = Array.from(
     root.querySelectorAll<HTMLElement>('[data-auth-panel]'),
   );
-  const tabList = root.querySelector<HTMLElement>('.account-tabs');
   const signedIn = root.querySelector<HTMLElement>('[data-auth-signed-in]');
   const emailDisplay = root.querySelector<HTMLElement>('[data-auth-email]');
   const adminLink = root.querySelector<HTMLAnchorElement>('[data-auth-admin-link]');
@@ -36,8 +59,12 @@ export function initAccountPage() {
   const loginForm = root.querySelector<HTMLFormElement>(
     '[data-auth-form="login"]',
   );
+  const recoverForm = root.querySelector<HTMLFormElement>('[data-auth-form="recover"]');
+  const resetForm = root.querySelector<HTMLFormElement>('[data-auth-form="reset"]');
   let statusKey: StatusKey | null = null;
   let busy = false;
+  let mode: Mode = 'login';
+  let recoverySession = false;
 
   const dictionary = () => (document.documentElement.lang === 'es' ? es : en);
   const setStatus = (key: StatusKey | null) => {
@@ -54,9 +81,8 @@ export function initAccountPage() {
   };
   const showUser = (email: string | null) => {
     const active = Boolean(email);
-    if (tabList) tabList.hidden = active;
     panels.forEach((panel) => {
-      panel.hidden = active || panel.dataset.authPanel !== 'register';
+      panel.hidden = active || panel.dataset.authPanel !== mode;
     });
     if (signedIn) signedIn.hidden = !active;
     if (emailDisplay) emailDisplay.textContent = email ?? '';
@@ -68,38 +94,17 @@ export function initAccountPage() {
     if (!signal.aborted && !error && adminLink) adminLink.hidden = data?.role !== 'admin';
   };
 
-  const show = (mode: Mode, focus = false) => {
+  const show = (nextMode: Mode) => {
+    mode = nextMode;
     setStatus(null);
-    tabs.forEach((tab) => {
-      const selected = tab.dataset.authTab === mode;
-      tab.setAttribute('aria-selected', String(selected));
-      tab.tabIndex = selected ? 0 : -1;
-      if (selected && focus) tab.focus();
-    });
     panels.forEach((panel) => {
-      panel.hidden = panel.dataset.authPanel !== mode;
+      panel.hidden = panel.dataset.authPanel !== nextMode;
     });
+    root.querySelector<HTMLInputElement>(`[data-auth-panel="${nextMode}"] input`)?.focus();
   };
 
-  tabs.forEach((tab, index) => {
-    tab.addEventListener('click', () => show(tab.dataset.authTab as Mode), {
-      signal,
-    });
-    tab.addEventListener(
-      'keydown',
-      (event) => {
-        let next: number;
-        if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
-        else if (event.key === 'ArrowLeft')
-          next = (index - 1 + tabs.length) % tabs.length;
-        else if (event.key === 'Home') next = 0;
-        else if (event.key === 'End') next = tabs.length - 1;
-        else return;
-        event.preventDefault();
-        show(tabs[next].dataset.authTab as Mode, true);
-      },
-      { signal },
-    );
+  root.querySelectorAll<HTMLButtonElement>('[data-auth-switch]').forEach((button) => {
+    button.addEventListener('click', () => show(button.dataset.authSwitch as Mode), { signal });
   });
 
   const passwordButtons = Array.from(
@@ -116,6 +121,7 @@ export function initAccountPage() {
           ? words.accountHidePassword
           : words.accountShowPassword,
       );
+      button.setAttribute('aria-pressed', String(input?.type === 'text'));
     });
   };
   passwordButtons.forEach((button) => {
@@ -164,8 +170,9 @@ export function initAccountPage() {
         else if (continueTo === 'biblioteca-pendiente') location.assign('/biblioteca/?compra=procesando');
       }
       else setStatus('accountCheckEmail');
-    } catch {
-      setStatus('accountRegisterError');
+    } catch (error) {
+      const code = error && typeof error === 'object' && 'code' in error ? error.code : null;
+      setStatus(code === 'over_email_send_rate_limit' ? 'accountEmailRateLimit' : 'accountRegisterError');
     } finally {
       setBusy(false);
     }
@@ -198,6 +205,50 @@ export function initAccountPage() {
     }
   }, { signal });
 
+  recoverForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (busy) return;
+    if (!supabase) return setStatus('accountConfigError');
+    setBusy(true);
+    setStatus('accountWorking');
+    const email = String(new FormData(recoverForm).get('email') ?? '').trim();
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: new URL('/cuenta/', location.origin).href,
+      });
+      setStatus(error ? 'accountRecoverError' : 'accountRecoverSent');
+    } catch {
+      setStatus('accountRecoverError');
+    } finally {
+      setBusy(false);
+    }
+  }, { signal });
+
+  resetForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (busy) return;
+    if (!supabase) return setStatus('accountConfigError');
+    const data = new FormData(resetForm);
+    const password = String(data.get('password') ?? '');
+    if (password.length < 8) return setStatus('accountPasswordShort');
+    if (password !== String(data.get('confirmPassword') ?? '')) return setStatus('accountPasswordMismatch');
+    setBusy(true);
+    setStatus('accountWorking');
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) return setStatus('accountResetError');
+      resetForm.reset();
+      await supabase.auth.signOut();
+      recoverySession = false;
+      show('login');
+      setStatus('accountResetSuccess');
+    } catch {
+      setStatus('accountResetError');
+    } finally {
+      setBusy(false);
+    }
+  }, { signal });
+
   root.querySelector<HTMLButtonElement>('[data-auth-signout]')?.addEventListener(
     'click',
     async () => {
@@ -214,7 +265,12 @@ export function initAccountPage() {
 
   const subscription = supabase?.auth.onAuthStateChange((event, session) => {
     if (signal.aborted) return;
-    if (event === 'INITIAL_SESSION') return;
+    if (event === 'PASSWORD_RECOVERY') {
+      recoverySession = true;
+      show('reset');
+      return;
+    }
+    if (event === 'INITIAL_SESSION' || recoverySession) return;
     if (session?.user) {
       showUser(session.user.email ?? null);
       void showAdminLink(session.user.id);
@@ -226,7 +282,7 @@ export function initAccountPage() {
   });
   if (supabase) {
     void supabase.auth.getUser().then(({ data, error }) => {
-      if (!signal.aborted && !error && data.user) {
+      if (!signal.aborted && !error && data.user && !recoverySession) {
         showUser(data.user.email ?? null);
         void showAdminLink(data.user.id);
       }
@@ -242,6 +298,7 @@ export function initAccountPage() {
 
   return () => {
     controller.abort();
+    if (loginButton) gsap.killTweensOf(loginButton);
     subscription?.data.subscription.unsubscribe();
   };
 }
