@@ -3236,3 +3236,5 @@ select:focus-visible {
 .auth-view[data-auth-panel="register"] .auth-form { gap: 1.25rem; }
 .auth-view[data-auth-panel="register"] .auth-field { gap: .55rem; }
 .auth-view[data-auth-panel="register"] .auth-submit { margin-top: .65rem; }
+
+.auth-view[data-auth-panel="register"] .auth-submit { margin-top: 1.4rem; }

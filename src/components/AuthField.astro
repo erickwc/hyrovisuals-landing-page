@@ -1,0 +1,23 @@
+---
+import Icon from './Icon.astro';
+import en from '../i18n/en.json';
+interface Props {
+  id: string;
+  name: string;
+  labelKey: keyof typeof en;
+  type?: 'text' | 'email' | 'password';
+  placeholder?: string;
+  autocomplete?: string;
+  maxlength?: number;
+  minlength?: number;
+  describedBy?: string;
+}
+const { id, name, labelKey, type = 'text', placeholder, autocomplete, maxlength, minlength, describedBy } = Astro.props;
+---
+<div class="auth-field">
+  <label for={id} data-i18n={labelKey}>{en[labelKey]}</label>
+  <div class={type === 'password' ? 'auth-password' : 'auth-input'}>
+    <input {id} {name} {type} {placeholder} {autocomplete} {maxlength} {minlength} aria-describedby={describedBy} required />
+    {type === 'password' && <button type="button" data-password-toggle aria-label={en.accountShowPassword} aria-pressed="false"><span class="auth-eye-visible"><Icon name="eye" /></span><span class="auth-eye-hidden"><Icon name="eye-off" /></span></button>}
+  </div>
+</div>
