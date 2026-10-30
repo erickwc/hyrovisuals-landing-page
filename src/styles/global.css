@@ -3201,3 +3201,10 @@ select:focus-visible {
 .auth-submit[data-auth-action='register'] { transition-property: box-shadow, opacity; }
 .auth-submit[data-auth-action='register']:hover, .auth-submit[data-auth-action='register']:active { transform: none; }
 .auth-password-hint { margin: -.55rem 0 0; color: var(--secondary); font-size: .75rem; line-height: 1.45; }
+
+.auth-register-title span { display: block; }
+.auth-password-rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .35rem .65rem; margin: -.45rem 0 0; padding: 0; list-style: none; text-align: left; color: var(--secondary); font-size: .75rem; }
+.auth-password-rules li { display: flex; align-items: center; gap: .4rem; transition: color .2s ease; }
+.auth-password-rules li::before { display: grid; place-items: center; width: .85rem; height: .85rem; flex: none; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); border-radius: 50%; content: ''; transition: border-color .2s ease, background .2s ease; }
+.auth-password-rules li[data-met='true'] { color: var(--text); }
+.auth-password-rules li[data-met='true']::before { border-color: var(--text); background: var(--text); color: var(--background); content: '✓'; font-size: .65rem; font-weight: 700; }

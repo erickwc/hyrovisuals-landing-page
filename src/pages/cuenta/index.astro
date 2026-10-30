@@ -19,12 +19,12 @@ import en from '../../i18n/en.json';
         <button class="auth-text-link auth-forgot" type="button" data-auth-switch="recover" data-i18n="accountForgotPassword">{en.accountForgotPassword}</button>
       </div>
       <div class="auth-view" data-auth-panel="register" hidden>
-        <h1 data-i18n="accountRegisterTitle">{en.accountRegisterTitle}</h1>
+        <h1 class="auth-register-title" aria-label={en.accountRegisterTitle} data-i18n-aria="accountRegisterTitle"><span data-i18n="accountRegisterTitleLine1">{en.accountRegisterTitleLine1}</span><span data-i18n="accountRegisterTitleLine2">{en.accountRegisterTitleLine2}</span></h1>
         <form class="auth-form" data-auth-form="register" autocomplete="on">
           <div class="auth-field"><label for="register-name" data-i18n="accountName">{en.accountName}</label><div class="auth-input"><input id="register-name" name="name" type="text" placeholder="Tu nombre" autocomplete="name" maxlength="120" required /></div></div>
           <div class="auth-field"><label for="register-email" data-i18n="accountEmail">{en.accountEmail}</label><div class="auth-input"><input id="register-email" name="email" type="email" placeholder="nombre@correo.com" autocomplete="email" required /></div></div>
           <div class="auth-field"><label for="register-password" data-i18n="accountPassword">{en.accountPassword}</label><div class="auth-password"><input id="register-password" name="password" aria-describedby="register-password-hint" type="password" placeholder="••••••••" autocomplete="new-password" minlength="8" required /><button type="button" data-password-toggle aria-label={en.accountShowPassword} aria-pressed="false"><span class="auth-eye-visible"><Icon name="eye" /></span><span class="auth-eye-hidden"><Icon name="eye-off" /></span></button></div></div>
-          <p class="auth-password-hint" id="register-password-hint" data-i18n="accountPasswordRequirements">{en.accountPasswordRequirements}</p>
+          <ul class="auth-password-rules" id="register-password-hint" aria-label={en.accountPasswordRequirements} data-i18n-aria="accountPasswordRequirements"><li data-password-rule="length" data-i18n="accountRuleLength">{en.accountRuleLength}</li><li data-password-rule="special" data-i18n="accountRuleSpecial">{en.accountRuleSpecial}</li><li data-password-rule="number" data-i18n="accountRuleNumber">{en.accountRuleNumber}</li><li data-password-rule="uppercase" data-i18n="accountRuleUppercase">{en.accountRuleUppercase}</li></ul>
           <button class="auth-submit" type="submit" data-auth-action="register"><span data-i18n="accountRegisterAction">{en.accountRegisterAction}</span></button>
         </form>
         <p class="auth-switch-copy"><span data-i18n="accountHaveAccount">{en.accountHaveAccount}</span> <button class="auth-text-link" type="button" data-auth-switch="login" data-i18n="accountLoginAction">{en.accountLoginAction}</button></p>

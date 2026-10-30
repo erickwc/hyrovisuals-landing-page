@@ -134,6 +134,14 @@ export function initAccountPage() {
       { signal },
     );
   });
+  const registerPassword = root.querySelector<HTMLInputElement>('#register-password');
+  const updatePasswordRules = () => {
+    const value = registerPassword?.value ?? '';
+    const checks: Record<string, boolean> = { length: value.length >= 8, special: /[^A-Za-z0-9\s]/.test(value), number: /[0-9]/.test(value), uppercase: /[A-Z]/.test(value) };
+    root.querySelectorAll<HTMLElement>('[data-password-rule]').forEach((item) => { item.dataset.met = String(checks[item.dataset.passwordRule ?? '']); });
+  };
+  registerPassword?.addEventListener('input', updatePasswordRules, { signal });
+  updatePasswordRules();
   registerForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (busy) return;
@@ -158,6 +166,7 @@ export function initAccountPage() {
       });
       if (error) throw error;
       registerForm.reset();
+      updatePasswordRules();
       if (result.session && result.user) {
         showUser(result.user.email ?? email);
         void showAdminLink(result.user.id);
