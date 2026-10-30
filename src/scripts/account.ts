@@ -139,8 +139,12 @@ export function initAccountPage() {
     const value = registerPassword?.value ?? '';
     const checks: Record<string, boolean> = { length: value.length >= 8, special: /[^A-Za-z0-9\s]/.test(value), number: /[0-9]/.test(value), uppercase: /[A-Z]/.test(value) };
     root.querySelectorAll<HTMLElement>('[data-password-rule]').forEach((item) => { item.dataset.met = String(checks[item.dataset.passwordRule ?? '']); });
+    const panel = root.querySelector<HTMLElement>('#register-password-hint');
+    if (panel) panel.hidden = !value || document.activeElement !== registerPassword;
   };
   registerPassword?.addEventListener('input', updatePasswordRules, { signal });
+  registerPassword?.addEventListener('focus', updatePasswordRules, { signal });
+  registerPassword?.addEventListener('blur', () => { const panel = root.querySelector<HTMLElement>('#register-password-hint'); if (panel) panel.hidden = true; }, { signal });
   updatePasswordRules();
   registerForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -150,9 +154,7 @@ export function initAccountPage() {
     const fullName = String(data.get('name') ?? '').trim();
     const email = String(data.get('email') ?? '').trim();
     const password = String(data.get('password') ?? '');
-    const confirmation = String(data.get('confirmPassword') ?? '');
-    if (password.length < 8) return setStatus('accountPasswordShort');
-    if (password !== confirmation) return setStatus('accountPasswordMismatch');
+    if (password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9\s]/.test(password)) return setStatus('accountPasswordRequirements');
     setBusy(true);
     setStatus('accountWorking');
     try {
