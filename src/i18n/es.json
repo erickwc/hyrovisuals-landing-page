@@ -246,5 +246,6 @@
   "accountResetSuccess": "Contraseña actualizada. Inicia sesión para continuar.",
   "accountResetError": "No pudimos actualizar la contraseña. Solicita un nuevo enlace.",
   "accountLibrary": "Ir a mi biblioteca",
-  "accountEmailRateLimit": "Se alcanzó el límite de correos de confirmación. Inténtalo más tarde o usa una cuenta de prueba existente."
+  "accountEmailRateLimit": "Se alcanzó el límite de correos de confirmación. Inténtalo más tarde o usa una cuenta de prueba existente.",
+  "accountPasswordRequirements": "Usa al menos 8 caracteres, una mayúscula y un símbolo especial."
 }

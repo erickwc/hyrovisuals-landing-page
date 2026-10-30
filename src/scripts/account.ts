@@ -7,6 +7,7 @@ type Mode = 'register' | 'login' | 'recover' | 'reset';
 type StatusKey =
   | 'accountPasswordMismatch'
   | 'accountPasswordShort'
+  | 'accountPasswordRequirements'
   | 'accountWorking'
   | 'accountCheckEmail'
   | 'accountLoginError'
@@ -27,24 +28,20 @@ export function initAccountPage() {
   const { signal } = controller;
   const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
   const pointerQuery = matchMedia('(hover:hover) and (pointer:fine) and (min-width:768px)');
-  const loginButton = root.querySelector<HTMLButtonElement>('[data-auth-action="login"]');
+  const magneticButtons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-auth-action="login"], [data-auth-action="register"]'));
   const motionTokens = getComputedStyle(document.documentElement);
   const motionDuration = parseFloat(motionTokens.getPropertyValue('--duration-base')) || .65;
   const motionEase = motionTokens.getPropertyValue('--ease-gsap').trim() || 'power3.out';
   const magnetStrength = parseFloat(motionTokens.getPropertyValue('--magnet-strength')) || .12;
-  loginButton?.addEventListener('pointermove', (event) => {
-    if (motionQuery.matches || !pointerQuery.matches || loginButton.disabled) return;
-    const bounds = loginButton.getBoundingClientRect();
-    gsap.to(loginButton, {
-      x: (event.clientX - bounds.left - bounds.width / 2) * magnetStrength,
-      y: (event.clientY - bounds.top - bounds.height / 2) * magnetStrength,
-      duration: motionDuration, ease: motionEase, overwrite: 'auto',
-    });
-  }, { signal });
-  const resetMagnet = () => {
-    if (loginButton) gsap.to(loginButton, { x: 0, y: 0, duration: motionQuery.matches ? 0 : motionDuration, ease: motionEase, overwrite: 'auto' });
-  };
-  loginButton?.addEventListener('pointerleave', resetMagnet, { signal });
+  const resetMagnet = () => magneticButtons.forEach((button) => gsap.to(button, { x: 0, y: 0, duration: motionQuery.matches ? 0 : motionDuration, ease: motionEase, overwrite: 'auto' }));
+  magneticButtons.forEach((button) => {
+    button.addEventListener('pointermove', (event) => {
+      if (motionQuery.matches || !pointerQuery.matches || button.disabled) return;
+      const bounds = button.getBoundingClientRect();
+      gsap.to(button, { x: (event.clientX - bounds.left - bounds.width / 2) * magnetStrength, y: (event.clientY - bounds.top - bounds.height / 2) * magnetStrength, duration: motionDuration, ease: motionEase, overwrite: 'auto' });
+    }, { signal });
+    button.addEventListener('pointerleave', resetMagnet, { signal });
+  });
   motionQuery.addEventListener('change', resetMagnet, { signal });
   const panels = Array.from(
     root.querySelectorAll<HTMLElement>('[data-auth-panel]'),
@@ -298,7 +295,7 @@ export function initAccountPage() {
 
   return () => {
     controller.abort();
-    if (loginButton) gsap.killTweensOf(loginButton);
+    magneticButtons.forEach((button) => gsap.killTweensOf(button));
     subscription?.data.subscription.unsubscribe();
   };
 }

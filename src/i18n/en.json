@@ -246,5 +246,6 @@
   "accountResetSuccess": "Password updated. Log in to continue.",
   "accountResetError": "We couldn't update the password. Request a new link.",
   "accountLibrary": "Go to my library",
-  "accountEmailRateLimit": "The confirmation email limit has been reached. Try again later or use an existing test account."
+  "accountEmailRateLimit": "The confirmation email limit has been reached. Try again later or use an existing test account.",
+  "accountPasswordRequirements": "Use at least 8 characters, one uppercase letter, and one special character."
 }

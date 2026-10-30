@@ -3196,3 +3196,8 @@ select:focus-visible {
 
 .auth-submit[data-auth-action='login'] { transition-property: box-shadow, opacity; }
 .auth-submit[data-auth-action='login']:hover, .auth-submit[data-auth-action='login']:active { transform: none; }
+
+.auth-view[data-auth-panel="register"] h1 { font-family: var(--font-title); font-size: clamp(1.5rem, 4.2vw, 2.4rem); font-weight: 400; text-transform: uppercase; letter-spacing: -.03em; line-height: 1.15; margin-bottom: 1.1rem; }
+.auth-submit[data-auth-action='register'] { transition-property: box-shadow, opacity; }
+.auth-submit[data-auth-action='register']:hover, .auth-submit[data-auth-action='register']:active { transform: none; }
+.auth-password-hint { margin: -.55rem 0 0; color: var(--secondary); font-size: .75rem; line-height: 1.45; }
