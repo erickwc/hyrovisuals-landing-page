@@ -1,0 +1,17 @@
+node_modules/
+dist/
+*.log
+.env
+.env.*
+!.env.example
+
+# herramientas de asistente de IA y sus cachés locales
+.claude/
+.agents/
+.impeccable/
+.taste-skill/
+
+# sistema
+.DS_Store
+Thumbs.db
+skills-lock.json

@@ -1,0 +1,139 @@
+/* barra de resumen, sin líneas */
+.rvs-bar {
+  display: grid;
+  grid-template-columns: auto minmax(120px, 220px) 1fr;
+  gap: clamp(20px, 4vw, 56px);
+  align-items: center;
+  margin-top: 22px;
+  padding-block: 18px;
+  border-block: 1px solid var(--rule);
+}
+.rvs-score p {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  line-height: 1;
+}
+.rvs-score b {
+  font: 800 clamp(34px, 4vw, 46px) / 1 var(--head);
+  letter-spacing: -0.05em;
+}
+.rvs-score p span {
+  font-size: 15px;
+  color: var(--muted);
+}
+.rvs-score small {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.rvs-bars {
+  display: grid;
+  gap: 5px;
+}
+.rvs-bars > div {
+  display: grid;
+  grid-template-columns: 10px 1fr;
+  gap: 10px;
+  align-items: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+.rvs-bars u {
+  display: block;
+  height: 3px;
+  background: var(--panel);
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+}
+.rvs-bars u i {
+  position: absolute;
+  inset: 0;
+  background: var(--red);
+  transform-origin: left;
+}
+.rvs-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* lista en columnas, separada solo por espacio */
+.rvs-grid {
+  columns: 2;
+  column-gap: clamp(28px, 5vw, 80px);
+  margin-top: 6px;
+}
+.rvs-item {
+  break-inside: avoid;
+  padding-block: 20px;
+  border-bottom: 1px solid var(--rule);
+  animation: rvs-in 0.35s var(--ease) both;
+}
+@keyframes rvs-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.rvs-item blockquote {
+  margin: 0;
+  font: 500 13.5px / 1.55 var(--body);
+  text-wrap: pretty;
+}
+.rvs-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.rvs-foot b {
+  color: var(--text);
+  font-weight: 600;
+}
+.rvs-foot em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--red);
+  flex: none;
+}
+.rvs-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+.skel i {
+  display: block;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--panel);
+  margin-bottom: 10px;
+}
+.skel i:last-child {
+  width: 55%;
+  margin-bottom: 0;
+}
+
+@media (min-width: 1200px) {
+  .rvs-grid {
+    columns: 3;
+  }
+}
+@media (max-width: 860px) {
+  .rvs-bar {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .rvs-tabs {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+  .rvs-grid {
+    columns: 1;
+  }
+}
