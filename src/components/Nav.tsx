@@ -85,10 +85,10 @@ export function Nav() {
           <div className="tools">
             <LangButton />
             <ThemeButton />
-            <a className="login up" href="#login">
+            <a className="login up" href="/cuenta/">
               {c.nav.login}
             </a>
-            <a className="btn sm signup" href="#signup">
+            <a className="btn sm signup" href="/cuenta/">
               {c.nav.signup}
             </a>
             <button
@@ -132,10 +132,10 @@ export function Nav() {
               ))}
             </nav>
             <div className="menu__foot wrap">
-              <a href="#login" className="btn ghost lg" onClick={() => setOpen(false)}>
+              <a href="/cuenta/" className="btn ghost lg" onClick={() => setOpen(false)}>
                 {c.nav.login}
               </a>
-              <a href="#signup" className="btn lg" onClick={() => setOpen(false)}>
+              <a href="/cuenta/" className="btn lg" onClick={() => setOpen(false)}>
                 {c.nav.signup}
               </a>
             </div>

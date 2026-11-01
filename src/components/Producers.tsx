@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { usePrefs } from "../lib/prefs";
+import { asset } from "../lib/asset";
 import { producers } from "../data/content";
 import { EASE, PhotoSlot, SplitHeading } from "./ui";
 import "../styles/producers.css";
@@ -67,7 +68,7 @@ export function Producers() {
             <AnimatePresence initial={false}>
               <motion.div key={cur.slug} className="pv__img" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease: EASE }}>
                 <PhotoSlot
-                  src={`/media/productores/${cur.photo ?? `${cur.slug}.jpg`}`}
+                  src={asset(`media/productores/${cur.photo ?? `${cur.slug}.jpg`}`)}
                   alt={cur.name}
                   pendingLabel={p.photo}
                   fallback={<span className="pv__ini">{initials(cur.name)}</span>}

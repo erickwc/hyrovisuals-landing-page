@@ -1,6 +1,7 @@
 import { useRef, useState, type PointerEvent as RPointerEvent } from "react";
 import { AnimatePresence, motion, useInView } from "motion/react";
 import { usePrefs } from "../lib/prefs";
+import { asset } from "../lib/asset";
 import { previewIds, type PreviewId } from "../data/content";
 import { EASE, Reveal, SplitHeading, VideoSlot } from "./ui";
 import "../styles/preview.css";
@@ -142,7 +143,7 @@ export function Preview() {
           <AnimatePresence mode="wait" initial={false}>
             <motion.div key={open} className="pv-stage__in" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35, ease: EASE }}>
               <div className="pv-big">
-                <VideoSlot src={`/media/videos/preview/${open}.mp4`} alt={items[open].title} pendingLabel={c.preview.pending} className="pv-big__video" />
+                <VideoSlot src={asset(`media/videos/preview/${open}.mp4`)} alt={items[open].title} pendingLabel={c.preview.pending} className="pv-big__video" />
               </div>
               <div className="pv-info">
                 <h3>{items[open].title}</h3>

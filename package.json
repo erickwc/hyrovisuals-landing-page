@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "build:web3": "tsc --noEmit && vite build --base=/web3/ --outDir dist-web3 --emptyOutDir",
     "preview": "vite preview"
   },
   "dependencies": {

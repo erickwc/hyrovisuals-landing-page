@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { usePrefs } from "../lib/prefs";
+import { asset } from "../lib/asset";
 import { Logo } from "./Nav";
 import { Reveal, SplitHeading } from "./ui";
 import "../styles/footer.css";
@@ -23,7 +24,7 @@ export function Footer() {
 
   return (
     <footer className="ft">
-      <img className="ft__mascot" src="/media/brand/mascota.webp" alt="" width="1254" height="1254" loading="lazy" decoding="async" />
+      <img className="ft__mascot" src={asset("media/brand/mascota.webp")} alt="" width="1254" height="1254" loading="lazy" decoding="async" />
       <div className="wrap">
         <a className="ft__cta" href="#licencias">
           <SplitHeading as="span" lines={f.cta} />
@@ -63,10 +64,9 @@ export function Footer() {
             <a href="#licencias">{f.licenses}</a>
           </nav>
           <nav className="ft__links" aria-label={f.space}>
-            <a href="/biblioteca">{f.library}</a>
-            <a href="/cuenta">{f.account}</a>
-            <a href="/login">{c.nav.login}</a>
-            <a href="/crear-cuenta">{c.nav.signup}</a>
+            <a href="/biblioteca/">{f.library}</a>
+            <a href="/cuenta/">{f.account}</a>
+            <a href="/cuenta/">{c.nav.login}</a>
           </nav>
           <nav className="ft__links" aria-label={f.follow}>
             <a href="#">Instagram</a>
