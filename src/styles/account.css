@@ -1,0 +1,339 @@
+.dash-tabs {
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+.dash-tabs__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  gap: 12px;
+  overflow-x: auto;
+}
+.dash-tabs__links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dash-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--muted);
+  font: 500 12px var(--body);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s, background-color 0.2s;
+}
+.dash-tab:hover {
+  color: var(--text);
+}
+.dash-tab.active {
+  color: var(--text);
+  background: var(--red-soft);
+}
+.dash-tab--logout:hover {
+  color: var(--red);
+}
+
+.dash {
+  padding-block: clamp(28px, 5vw, 56px);
+}
+.dash__section {
+  display: grid;
+  gap: 28px;
+}
+.dash__head {
+  display: grid;
+  gap: 6px;
+  max-width: 620px;
+}
+.dash__eyebrow {
+  color: var(--muted);
+}
+.dash__title {
+  font-size: clamp(22px, 3.4vw, 32px);
+}
+.dash__sub {
+  max-width: 52ch;
+  margin-top: 0;
+}
+
+/* estado genérico: vacío, error, carga de texto simple */
+.dash-state {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+  padding: 48px var(--pad);
+  border: 1px dashed var(--line);
+  border-radius: 16px;
+  color: var(--muted);
+}
+.dash-state__icon {
+  color: var(--muted);
+}
+
+/* biblioteca */
+.lib-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 18px;
+}
+.lib-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+}
+.lib-card__photo {
+  aspect-ratio: 16 / 10;
+}
+.lib-card__body {
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+  flex: 1;
+}
+.lib-card__name {
+  font: 600 15px var(--body);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.lib-card__tag {
+  align-self: start;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font: 500 10px var(--body);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: inline-flex;
+  align-items: center;
+}
+.lib-card__foot {
+  margin-top: auto;
+}
+
+.lib-card--skel .lib-card__photo,
+.skel-line {
+  background: var(--rule);
+  animation: dash-pulse 1.4s ease-in-out infinite;
+}
+.skel-line {
+  height: 12px;
+  border-radius: 6px;
+}
+@keyframes dash-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* detalle de producto */
+.pd {
+  display: grid;
+  gap: 32px;
+}
+.pd__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font: 500 12px var(--body);
+  text-decoration: none;
+  width: fit-content;
+}
+.pd__back:hover {
+  color: var(--text);
+}
+.pd__head {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 24px;
+  align-items: center;
+}
+.pd__photo {
+  border-radius: 16px;
+  aspect-ratio: 1;
+}
+.pd__info {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+.pd__name {
+  font-size: clamp(22px, 3.6vw, 30px);
+}
+.pd__version {
+  color: var(--muted);
+  font-size: 12px;
+}
+.pd__section {
+  display: grid;
+  gap: 14px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+.pd__section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 13px var(--body);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.pd__downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.pd__licenses {
+  display: grid;
+  gap: 10px;
+}
+.license-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.license-card__key {
+  font: 500 13px "Space Grotesk", monospace;
+  letter-spacing: 0.04em;
+}
+.license-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ic.sm {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+/* reseña */
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.review-form {
+  display: grid;
+  gap: 16px;
+  max-width: 480px;
+  margin-top: 4px;
+}
+.stars {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+.stars button {
+  color: var(--line);
+  transition: color 0.15s;
+}
+.stars button[data-active="true"] {
+  color: var(--red);
+}
+.review-form textarea {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--panel);
+  color: var(--text);
+  font: 500 13px var(--body);
+}
+.review-form textarea:focus {
+  outline: none;
+  border-color: var(--text);
+}
+
+/* compras */
+.purch-table {
+  display: grid;
+  gap: 10px;
+}
+.purch-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 16px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.purch-row__product {
+  font: 600 13px var(--body);
+}
+.purch-row__date {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+.status-badge {
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font: 500 10px var(--body);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.status-badge[data-status="paid"] {
+  border-color: var(--red);
+  color: var(--text);
+  background: var(--red-soft);
+}
+
+/* mi cuenta */
+.account-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+}
+.account-info p {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+@media (max-width: 720px) {
+  .pd__head {
+    grid-template-columns: 96px 1fr;
+  }
+  .purch-row {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+}

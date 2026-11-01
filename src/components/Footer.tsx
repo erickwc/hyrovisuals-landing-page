@@ -62,7 +62,7 @@ export function Footer() {
             <a href="#licencias">{f.licenses}</a>
           </nav>
           <nav className="ft__links" aria-label={f.space}>
-            <a href="/biblioteca/">{f.library}</a>
+            <Link to="/cuenta/biblioteca">{f.library}</Link>
             <Link to="/cuenta">{f.account}</Link>
             <Link to="/login">{c.nav.login}</Link>
           </nav>

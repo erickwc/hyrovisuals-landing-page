@@ -108,7 +108,7 @@ export function Nav() {
             <Link className="login up" to="/login">
               {c.nav.login}
             </Link>
-            <Button size="sm" className="signup" href="/register">
+            <Button size="sm" className="signup" to="/register">
               {c.nav.signup}
             </Button>
           </div>
@@ -170,10 +170,10 @@ export function Nav() {
             </div>
 
             <div className="menu__foot wrap">
-              <Button href="/login" variant="ghost" size="lg" onClick={() => setOpen(false)}>
+              <Button to="/login" variant="ghost" size="lg" onClick={() => setOpen(false)}>
                 {c.nav.login}
               </Button>
-              <Button href="/register" size="lg" onClick={() => setOpen(false)}>
+              <Button to="/register" size="lg" onClick={() => setOpen(false)}>
                 {c.nav.signup}
               </Button>
             </div>
