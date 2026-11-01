@@ -3,6 +3,7 @@ import { motion, useInView } from "motion/react";
 import { usePrefs } from "../lib/prefs";
 import { fetchReviews, summarize, type Review, type ReviewRole } from "../lib/reviewsDb";
 import { EASE, Reveal, SplitHeading } from "./ui";
+import { Button } from "./Button";
 import "../styles/reviews.css";
 
 type Filter = "all" | ReviewRole;
@@ -107,9 +108,9 @@ export function Reviews() {
             </ul>
             {shown < filtered.length && (
               <div className="rvs-more">
-                <button type="button" className="btn ghost" onClick={() => setShown((s) => s + PAGE)}>
+                <Button variant="ghost" onClick={() => setShown((s) => s + PAGE)}>
                   {r.more}
-                </button>
+                </Button>
               </div>
             )}
           </>

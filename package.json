@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "build:web3": "tsc --noEmit && vite build --base=/web3/ --outDir dist-web3 --emptyOutDir",
+    "build:web3": "tsc --noEmit && vite build --base=/web3/ --outDir dist-web3 --emptyOutDir && node scripts/web3-routes.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "motion": "^14.9.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.18.5"
   },
   "devDependencies": {
     "@types/react": "^18.3.31",

@@ -3,6 +3,8 @@ import { AnimatePresence, animate, motion, useInView, useReducedMotion } from "m
 import { usePrefs } from "../lib/prefs";
 import { plans, type PlanId } from "../data/content";
 import { EASE, Reveal, SplitHeading } from "./ui";
+import { Button } from "./Button";
+import { LockKeyhole } from "./animate-ui/icons/hugeicons/lock-keyhole";
 import "../styles/pricing.css";
 
 const payments = ["Visa", "Mastercard", "PayPal"];
@@ -113,22 +115,16 @@ export function Pricing() {
                     ,00 US$<i>{b.once}</i>
                   </span>
                 </div>
-                <a className="btn buy-btn" href="/checkout/">
-                  <span>{b.buy}</span>
-                  <svg className="ar" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M5 12h14M13 6l6 6-6 6" />
-                  </svg>
-                </a>
+                <Button className="buy-btn" href="/checkout/" arrow>
+                  {b.buy}
+                </Button>
                 <div className="pay" aria-label={b.pay}>
                   {payments.map((m) => (
                     <span key={m}>{m}</span>
                   ))}
                 </div>
                 <p className="secure">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <rect x="5" y="11" width="14" height="9" rx="2" />
-                    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-                  </svg>
+                  <LockKeyhole size={14} aria-hidden="true" />
                   {b.secure}
                 </p>
                 <div className="code" aria-hidden="true" />

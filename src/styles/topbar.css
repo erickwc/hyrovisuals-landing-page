@@ -27,10 +27,11 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
+/* separación entre frases: solo espacio, sin signo */
 .tb li::after {
-  content: "★";
-  margin-inline: 20px;
-  font-size: 11px;
+  content: "";
+  width: 40px;
+  flex: none;
 }
 .tb__price s {
   opacity: 0.6;

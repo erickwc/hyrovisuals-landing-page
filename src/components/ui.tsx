@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type ElementType } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { createStrip, type PanelKind, type StripParams } from "../lib/visualizer";
+import { ArrowRight02 } from "./animate-ui/icons/hugeicons/arrow-right-02";
+import { Play } from "./animate-ui/icons/hugeicons/play";
 
 export const EASE = [0.2, 0.8, 0.2, 1] as const;
 const INK = "#f4f2ef";
@@ -172,9 +174,7 @@ export function VideoSlot({
       {!ok && (
         <div className="video-slot__empty" role="img" aria-label={`${alt}. ${pendingLabel}`}>
           <span className="video-slot__play">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M7 4.5v15l13-7.5z" />
-            </svg>
+            <Play size={20} aria-hidden="true" />
           </span>
           <b>{pendingLabel}</b>
           <code>{src}</code>
@@ -228,9 +228,5 @@ export function useLoop(ms: number, active: boolean) {
 }
 
 export function Arrow() {
-  return (
-    <svg className="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M5 12h14M13 6l6 6-6 6" />
-    </svg>
-  );
+  return <ArrowRight02 className="arrow" size={18} aria-hidden="true" />;
 }

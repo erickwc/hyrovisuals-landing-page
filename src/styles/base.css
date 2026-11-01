@@ -236,7 +236,10 @@ main > section:nth-of-type(n + 4) {
   height: 40px;
   padding: 0 20px;
   border-radius: 999px;
-  background: var(--btn);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: none;
   color: var(--btn-text);
   text-decoration: none;
   border: 0;
@@ -245,10 +248,39 @@ main > section:nth-of-type(n + 4) {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   white-space: nowrap;
-  transition: opacity 0.2s;
+  transition: color 0.25s;
 }
-.btn:hover {
-  opacity: 0.88;
+/* botón lleno: fondo base y relleno rojo van dentro del mismo recorte (ver Button.tsx) */
+.btn__bg,
+.btn__fill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.btn__bg {
+  background: var(--btn);
+}
+.btn__fill {
+  inset: -2px;
+  background: var(--red);
+  transform: translate3d(0, 102%, 0);
+  transition: transform 0.42s var(--ease);
+  will-change: transform;
+}
+.btn:hover .btn__fill,
+.btn:focus-visible .btn__fill {
+  transform: translate3d(0, 0, 0);
+}
+.btn:not(.ghost):hover,
+.btn:not(.ghost):focus-visible {
+  color: #0a0a0a;
+}
+.btn__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 .btn.sm {
   height: 34px;
@@ -264,9 +296,11 @@ main > section:nth-of-type(n + 4) {
   color: var(--text);
   border: 1px solid var(--line);
 }
+.btn.ghost {
+  transition: border-color 0.2s;
+}
 .btn.ghost:hover {
   border-color: var(--text);
-  opacity: 1;
 }
 .btn .arrow {
   transition: transform 0.3s var(--ease);
@@ -325,6 +359,9 @@ main > section:nth-of-type(n + 4) {
   overflow: hidden;
   padding-bottom: 0.08em;
   margin-bottom: -0.08em;
+  /* el espaciado negativo recortaba el borde derecho de la última letra (la A) */
+  padding-right: 0.1em;
+  margin-right: -0.1em;
 }
 .line-mask .line {
   display: block;

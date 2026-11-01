@@ -4,6 +4,8 @@ import { usePrefs } from "../lib/prefs";
 import { asset } from "../lib/asset";
 import { previewIds, type PreviewId } from "../data/content";
 import { EASE, Reveal, SplitHeading, VideoSlot } from "./ui";
+import { ArrowLeft02 } from "./animate-ui/icons/hugeicons/arrow-left-02";
+import { ArrowRight02 } from "./animate-ui/icons/hugeicons/arrow-right-02";
 import "../styles/preview.css";
 
 const dots = (n: number) => Array.from({ length: n }, (_, i) => <i key={i} style={{ "--k": i } as React.CSSProperties} />);
@@ -127,14 +129,10 @@ export function Preview() {
           </div>
           <div className="pv-arrows">
             <button type="button" className="ic round" onClick={() => go(-1)} aria-label={c.preview.prev}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M19 12H5M11 6l-6 6 6 6" />
-              </svg>
+              <ArrowLeft02 size={18} aria-hidden="true" />
             </button>
             <button type="button" className="ic round" onClick={() => go(1)} aria-label={c.preview.next}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
+              <ArrowRight02 size={18} aria-hidden="true" />
             </button>
           </div>
         </div>

@@ -8,7 +8,7 @@ header.top {
 .top nav {
   display: flex;
   align-items: center;
-  gap: 22px;
+  justify-content: space-between;
   height: var(--nav-h);
 }
 .logo {
@@ -16,10 +16,10 @@ header.top {
   letter-spacing: -0.04em;
   text-decoration: none;
 }
+/* logo, enlaces, iconos y cuenta: cuatro bloques repartidos con space-between */
 .links {
   display: flex;
-  gap: 22px;
-  margin-inline: auto;
+  gap: 26px;
 }
 .links a,
 .login {
@@ -27,37 +27,92 @@ header.top {
   text-decoration: none;
   transition: color 0.2s;
 }
+.links a,
+.login {
+  font-weight: 400;
+}
 .links a:hover,
 .login:hover {
   color: var(--text);
 }
-.tools {
+.tools__icons {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+}
+.acct {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.login {
+  white-space: nowrap;
+}
+
+/* iconos accionables: sin borde, alineados */
+.nic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: 500 12px var(--body);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: color 0.2s, background-color 0.2s;
+}
+.nic:hover {
+  color: var(--text);
+  background: var(--rule);
+}
+.nic svg {
+  flex: none;
+}
+.nic__i {
+  display: grid;
+  place-items: center;
 }
 .burger {
   display: none;
+  color: var(--text);
 }
 
+/* menú móvil: logo, enlaces, preferencias y cuenta, cada uno en su bloque */
 .menu {
   position: fixed;
-  inset: var(--nav-h) 0 0 0;
-  z-index: 19;
+  inset: 0;
+  z-index: 40;
   background: var(--bg);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding-block: 28px max(24px, env(safe-area-inset-bottom));
   overflow-y: auto;
 }
+.menu__bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--nav-h);
+  width: 100%;
+  border-bottom: 1px solid var(--rule);
+}
 .menu__links {
+  flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  padding-block: 28px;
 }
 .menu__links a {
-  font: 800 clamp(40px, 12vw, 72px) / 1 var(--head);
-  letter-spacing: -0.045em;
+  font: 600 clamp(38px, 11vw, 68px) / 1.04 var(--display);
+  letter-spacing: -0.03em;
   text-transform: uppercase;
   text-decoration: none;
   padding-block: 6px;
@@ -67,41 +122,54 @@ header.top {
 .menu__links a:active {
   color: var(--red);
 }
-.menu__foot {
+.menu__prefs {
+  flex: none;
+  width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding-top: 32px;
+  padding-block: 8px;
+  border-top: 1px solid var(--rule);
+}
+.menu__prefs .nic {
+  width: 100%;
+  height: 54px;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 0 4px;
+  border-radius: 0;
+  background: none;
+  color: var(--text);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+.menu__prefs > * + * {
+  border-top: 1px solid var(--rule);
+}
+.menu__prefs .nic em {
+  margin-left: auto;
+  font-style: normal;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.menu__foot {
+  flex: none;
+  width: 100%;
+  display: grid;
+  gap: 12px;
+  padding-block: 24px max(28px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--rule);
 }
 html.menu-open {
   overflow: hidden;
 }
 
-.login {
-  white-space: nowrap;
-}
 @media (max-width: 1040px) {
-  .links {
+  .links,
+  .tools__icons,
+  .acct {
     display: none;
-  }
-  .top nav {
-    gap: 10px;
-  }
-  .tools {
-    margin-left: auto;
   }
   .burger {
     display: inline-flex;
-  }
-}
-@media (max-width: 640px) {
-  .login {
-    display: none;
-  }
-}
-@media (max-width: 520px) {
-  .signup {
-    display: none;
   }
 }
 @media (min-width: 1041px) {

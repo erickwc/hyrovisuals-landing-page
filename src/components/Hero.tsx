@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { usePrefs } from "../lib/prefs";
-import { Arrow, EASE, HyroStrip, SplitHeading } from "./ui";
+import { EASE, HyroStrip, SplitHeading } from "./ui";
+import { Button } from "./Button";
+import { AppleIcon, WindowsIcon } from "./HugeIcons";
 import "../styles/hero.css";
 
 const stripParams = { primary: "#ff2a3d", secondary: "#f4f2ef", sensitivityDb: 2, motion: 1, smoothing: 0.55 };
@@ -35,11 +37,11 @@ export function Hero() {
       <div className="wrap hero__text">
         <motion.div className="hero__os" role="group" aria-label={c.features.platform} {...rise(0)}>
           <i>
-            <b aria-hidden="true">⌘</b>
+            <AppleIcon />
             {c.features.mac}
           </i>
           <i>
-            <b aria-hidden="true">⊞</b>
+            <WindowsIcon />
             {c.features.win}
           </i>
         </motion.div>
@@ -51,24 +53,18 @@ export function Hero() {
           {c.hero.sub}
         </motion.p>
         <motion.div className="hero__acts" {...rise(0.42)}>
-          <a href="#licencias" className="btn lg">
+          <Button href="#licencias" size="lg" arrow>
             {c.hero.buy}
-            <Arrow />
-          </a>
-          <a href="#preview" className="btn ghost lg">
+          </Button>
+          <Button href="#preview" variant="ghost" size="lg">
             {c.hero.preview}
-          </a>
+          </Button>
         </motion.div>
       </div>
 
       <motion.div className="strip-w" {...rise(0.58)}>
-        <div className="strip">
+        <div className="strip" onPointerEnter={(e) => e.pointerType === "mouse" && setPaused(true)} onPointerLeave={() => setPaused(false)}>
           <HyroStrip className="strip__canvas" panels={[...stripPanels]} params={stripParams} label={c.hero.stripLabel} minPanelWidth={narrow ? 62 : 120} gap={narrow ? 14 : 22} paused={paused} />
-        </div>
-        <div className="wrap strip-ctl">
-          <button type="button" className="lnk" onClick={() => setPaused((p) => !p)}>
-            {paused ? c.hero.play : c.hero.pause}
-          </button>
         </div>
       </motion.div>
     </section>
