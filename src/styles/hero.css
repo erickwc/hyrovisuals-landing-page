@@ -15,7 +15,7 @@
   font-size: clamp(22px, calc((100vw - var(--pad) * 2) / 11.6), 104px);
   margin-top: 22px;
   line-height: 0.95;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.03em;
 }
 .hero__title .line {
   white-space: nowrap;

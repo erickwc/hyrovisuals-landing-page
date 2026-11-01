@@ -109,7 +109,7 @@ const es = {
   hero: {
     kicker: "No es otro visuals, es",
     title: ["El mejor", "de la industria"],
-    sub: "Puedes seguir usando los mismos visuales de siempre, esos que ya viste, o puedes empezar a usar algo que realmente marque la diferencia. Al final, tú decides cómo quieres que se vea tu música.",
+    sub: "Quédate con los mismos visuales de siempre o elige algo que marque la diferencia. Tú decides cómo se ve tu música.",
     buy: "Consigue tu Hyro Visuals",
     preview: "Ver preview",
     pause: "Pausar visuales",
@@ -371,7 +371,7 @@ const en: Content = {
   hero: {
     kicker: "Not just another visualizer, it's",
     title: ["The best", "in the industry"],
-    sub: "You can keep using the same visuals as always, the ones you've already seen, or you can start using something that truly makes a difference. In the end, you decide how your music looks.",
+    sub: "Stick with the same old visuals, or pick something that makes a real difference. You decide how your music looks.",
     buy: "Get your Hyro Visuals",
     preview: "Watch preview",
     pause: "Pause visuals",

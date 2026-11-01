@@ -49,8 +49,17 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Clash Display";
+  src: url("/fonts/ClashDisplay-Variable.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --head: "Plus Jakarta Sans", "Arial Black", sans-serif;
+  --display: "Clash Display", "Plus Jakarta Sans", "Arial Black", sans-serif;
   --body: "Space Grotesk", system-ui, sans-serif;
   --pad: clamp(18px, 3.2vw, 72px);
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -130,10 +139,10 @@ ol {
 
 h1,
 h2 {
-  font-family: var(--head);
-  font-weight: 800;
+  font-family: var(--display);
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.03em;
   line-height: 0.92;
 }
 h3 {

@@ -402,8 +402,8 @@ section.tight {
   cursor: default;
 }
 .wr h3 {
-  font: 800 clamp(30px, 9.4vw, 132px) / 1.02 var(--head);
-  letter-spacing: -0.05em;
+  font: 600 clamp(30px, 9.4vw, 132px) / 1.02 var(--display);
+  letter-spacing: -0.035em;
   word-spacing: 0.1em;
   color: var(--text);
   transition: color 0.3s;

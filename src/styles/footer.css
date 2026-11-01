@@ -39,8 +39,8 @@
 }
 .ft__cta > span {
   display: block;
-  font: 800 clamp(30px, 6.2vw, 92px) / 0.94 var(--head);
-  letter-spacing: -0.055em;
+  font: 600 clamp(30px, 6.2vw, 92px) / 0.94 var(--display);
+  letter-spacing: -0.035em;
   text-transform: uppercase;
 }
 .ft__cta .line {
