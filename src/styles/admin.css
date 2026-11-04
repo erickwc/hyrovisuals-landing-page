@@ -1,0 +1,1451 @@
+/* Panel admin: tableros de borde a borde separados solo por líneas finas.
+   Escala: texto de 14px (títulos de sección 16px, secundarios 12–13px), rellenos internos de 8px en
+   todos los lados y controles con 6px arriba y abajo. Los grises extra son casi imperceptibles. */
+.admin {
+  --panel: var(--bg);
+  --line: color-mix(in srgb, var(--text) 9%, var(--bg));
+  --rule: var(--line);
+  --line-strong: color-mix(in srgb, var(--text) 18%, var(--bg));
+  /* superficie apenas distinta del fondo (≈ #0a0a0a en oscuro): sidebar, encabezados de tabla, barras de filtros */
+  --surface: color-mix(in srgb, var(--text) 1.5%, var(--bg));
+  /* un paso más: selección y hover, tarjetas de socios, fila destacada del reparto */
+  --raised: color-mix(in srgb, var(--text) 4%, var(--bg));
+  --selected: var(--raised);
+  --ok-bg: #09814a;
+  --ok-text: #ffffff;
+  --bad-bg: color-mix(in srgb, var(--red) 70%, #000);
+  --bad-text: #ffffff;
+  --bar-h: 56px;
+  display: flex;
+  min-height: 100vh;
+  background: var(--surface);
+  color: var(--text);
+  font: 400 12px/16px var(--body);
+}
+
+/* sidebar: barra de alto completo; el perfil va arriba y las opciones de sitio abajo */
+.admin__sidebar {
+  width: 264px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 12px 12px;
+  border-right: 1px solid var(--line);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+/* mide lo mismo que la barra del título, así su borde continúa la misma línea */
+.admin__profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--bar-h);
+  flex: none;
+  margin: 0 -12px;
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
+}
+.admin__profile-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 16px;
+}
+.admin__profile-name {
+  font: 600 12px/16px var(--body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin__profile-email {
+  font-size: 12px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin__avatar {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--red-soft);
+  color: var(--red);
+  font: 600 12px var(--body);
+}
+.admin__logout {
+  flex: none;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+.admin__logout:hover {
+  color: var(--text);
+  background: var(--selected);
+}
+.admin__nav {
+  display: grid;
+  gap: 16px;
+}
+.admin__nav-group {
+  display: grid;
+  gap: 2px;
+}
+.admin__nav-label {
+  font: 500 12px var(--body);
+  color: var(--muted);
+  padding: 0 8px 4px;
+}
+.admin__nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  color: var(--muted);
+  font: 500 12px/16px var(--body);
+  text-decoration: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s, background-color 0.15s;
+}
+.admin__nav-link svg {
+  flex: none;
+}
+/* hover y selección: gris muy sutil, texto e icono en el color de texto, sin rojo */
+.admin__nav-link:hover,
+.admin__nav-link.active {
+  color: var(--text);
+  background: var(--selected);
+}
+.admin__sidebar-foot {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+}
+
+.admin__main {
+  flex: 1;
+  min-width: 0;
+}
+/* el contenido va de borde a borde: sin márgenes ni espacio entre tableros, las líneas separan */
+.admin__page {
+  display: grid;
+  align-content: start;
+  width: 100%;
+  padding-bottom: 48px;
+}
+.admin__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-height: var(--bar-h);
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.admin__title {
+  font: 600 14px/20px var(--body);
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+.admin__sub {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* barra de filtro (periodo o producto) de ancho completo, debajo del título */
+.admin__page > .board__filters {
+  border-bottom: 1px solid var(--line);
+}
+/* contenido a 12px del sidebar, alineado con los controles de la barra de filtro */
+.admin__content {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  gap: 12px;
+  padding: 12px;
+}
+/* cada tablero (métricas, cada tabla) va separado con su propio borde: se lee mejor a simple vista */
+.board {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+/* los fondos de la primera y la última sección siguen la esquina redondeada sin recortar las listas desplegables */
+.board > :first-child {
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+}
+.board > :last-child {
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+}
+.board > * + * {
+  border-top: 1px solid var(--line);
+}
+/* si la barra de herramientas es hija directa del tablero, la línea de abajo ya la pone la sección siguiente */
+.board > .board__toolbar {
+  border-bottom: 0;
+}
+.ov-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+}
+.ov-alert + .ov-alert {
+  border-top: 1px solid var(--line);
+}
+.ov-alert > svg {
+  color: var(--red);
+  flex: none;
+}
+.ov-alert a {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.ov-alert a:hover {
+  color: var(--text);
+}
+
+.board__filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px;
+}
+.board__range {
+  font-variant-numeric: tabular-nums;
+}
+.board__hint {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+}
+.board__end {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+.board__filters .select-field__list {
+  left: 0;
+  right: auto;
+}
+.board__kpis {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+}
+.kpi {
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  min-width: 0;
+}
+.kpi + .kpi {
+  border-left: 1px solid var(--line);
+}
+.kpi__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 12px var(--body);
+  color: var(--muted);
+}
+.kpi__label svg {
+  flex: none;
+}
+.kpi__value {
+  font: 600 20px/28px var(--body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.kpi__foot {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 6px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--muted);
+}
+.kpi__delta {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.kpi__delta[data-tone="down"],
+.kpi__delta[data-tone="accent"] {
+  color: var(--red);
+}
+
+.board__main {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.board__cell {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.board__cell + .board__cell {
+  border-left: 1px solid var(--line);
+}
+.board__cell-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.board__title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font: 500 12px/16px var(--body);
+}
+.board__count {
+  font: 500 12px var(--body);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.board__note {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.board__link {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.board__link:hover {
+  color: var(--text);
+}
+/* reparto: dos tarjetas en el gris sutil para ver qué parte le toca a cada socio */
+.split__lead {
+  font-size: 12px;
+  color: var(--muted);
+}
+.split__partners {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.split__partners > div {
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--raised);
+}
+.split__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+.split__amount {
+  font: 600 20px/28px var(--body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.split__pct b {
+  color: var(--red);
+  font-weight: 600;
+}
+/* detalle del reparto: encerrado como tabla; solo la primera fila lleva el gris sutil */
+.ov-split {
+  display: grid;
+  margin-top: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.ov-split > * {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+}
+.ov-split > :first-child {
+  border-radius: 7px 7px 0 0;
+  background: var(--raised);
+}
+.ov-split > :last-child {
+  border-radius: 0 0 7px 7px;
+}
+.ov-split > * + * {
+  border-top: 1px solid var(--line);
+}
+.ov-split dt {
+  color: var(--text);
+}
+.ov-split small {
+  display: block;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--muted);
+}
+.ov-split dd {
+  font-variant-numeric: tabular-nums;
+}
+
+/* encabezado de tabla: nombre arriba; los filtros van en su propia barra debajo */
+.board__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  /* mismo gris que el hover de los enlaces del sidebar */
+  background: var(--selected);
+}
+.board__tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+/* barra de filtros sin relleno: cada control es un tramo y los bordes hacen de división */
+/* barra del buscador sobre la tabla: 8px arriba y abajo, 12px a los lados; el buscador y los filtros con su propio borde */
+.board__filterbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+}
+.board__filterbar .pager {
+  margin-left: auto;
+}
+.board__empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* tabla dentro de una celda del tablero: encerrada con su propio borde */
+.inner-table {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* confirmaciones del corte: filas de la tabla de detalle con su casilla a la derecha */
+.check-row {
+  cursor: pointer;
+}
+.check-row input {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin: 0;
+  accent-color: var(--red);
+  cursor: pointer;
+}
+.settle-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* botones dentro del admin: mismo componente, esquinas de 8px y 6px de relleno arriba y abajo */
+.admin .btn,
+.admin .btn.sm {
+  height: auto;
+  padding: 6px 11px;
+  border-radius: 8px;
+  text-transform: none;
+  letter-spacing: 0;
+  font: 600 12px/16px var(--body);
+  gap: 8px;
+}
+/* todos con 1px de borde: el lleno y el de contorno miden exactamente lo mismo (30px) */
+.admin .btn {
+  border: 1px solid transparent;
+}
+.admin .btn.ghost {
+  border-color: var(--line);
+}
+.admin .btn .btn__label {
+  gap: 8px;
+}
+.admin .btn.ghost:hover {
+  border-color: var(--line-strong);
+}
+.admin .btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.admin .btn:disabled .btn__fill {
+  transform: translate3d(0, 102%, 0);
+}
+.admin .btn:not(.ghost):disabled {
+  color: var(--btn-text);
+}
+/* cargando: bloqueado pero sin apagarse, con el hover puesto y el loader dentro */
+.admin .btn.is-loading {
+  opacity: 1;
+  cursor: progress;
+}
+.admin .btn.is-loading .btn__fill {
+  transform: translate3d(0, 0, 0);
+}
+.admin .btn.is-loading:not(.ghost) {
+  color: #0a0a0a;
+}
+
+@media (max-width: 1100px) {
+  .board__kpis {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .kpi:nth-child(odd) {
+    border-left: 0;
+  }
+  .kpi:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+}
+@media (max-width: 1000px) {
+  .board__main {
+    grid-template-columns: 1fr;
+  }
+  .board__cell + .board__cell {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* búsqueda: columna + texto en un solo control */
+.search-group {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  transition: border-color 0.15s;
+}
+.search-group:focus-within {
+  border-color: var(--line-strong);
+}
+.search-group__column .select-field__trigger {
+  height: 100%;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-radius: 8px 0 0 8px;
+}
+.search-group__column .select-field__list {
+  left: 0;
+  right: auto;
+}
+.search-group__input {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  color: var(--muted);
+  cursor: text;
+}
+.search-group__input input {
+  width: 280px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--text);
+  font: 500 12px/16px var(--body);
+}
+.search-group__input input::placeholder {
+  color: var(--muted);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pager span {
+  margin: 0 4px;
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pager button {
+  display: grid;
+  place-items: center;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.pager button:disabled {
+  color: var(--muted);
+  cursor: default;
+  opacity: 0.4;
+}
+.pager button:not(:disabled):hover {
+  border-color: var(--line-strong);
+}
+
+/* tablas: compactas, divisores finos y encabezado en el gris sutil */
+.admin-table-wrap {
+  overflow-x: auto;
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+.admin-table th {
+  text-align: left;
+  font: 500 12px var(--body);
+  color: var(--muted);
+  padding: 10px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+.admin-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.admin-table th:last-child,
+.admin-table td:last-child {
+  border-right: 0;
+}
+.admin .is-muted {
+  color: var(--muted);
+}
+.admin-table .is-num {
+  text-align: right;
+}
+.admin-table .is-plan {
+  text-transform: capitalize;
+}
+.admin-table .row-empty td {
+  padding: 16px 12px;
+  color: var(--muted);
+}
+.admin-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+/* filas que abren una página: toda la fila es clicable */
+.admin-table tr.is-link {
+  cursor: pointer;
+}
+.admin-table tr.is-link:hover td {
+  background: var(--selected);
+}
+.table-link {
+  color: inherit;
+  text-decoration: none;
+}
+.table-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.row-actions {
+  display: flex;
+  gap: 4px;
+}
+.row-action {
+  margin: -6px 0;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font: 500 12px/16px var(--body);
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+.row-action:hover {
+  color: var(--text);
+  background: var(--selected);
+}
+.admin-table .row-detail td {
+  font-size: 12px;
+  color: var(--muted);
+}
+.coupon-cell {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.coupon-cell b {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.coupon-cell span {
+  color: var(--muted);
+}
+
+/* select propio, sin <select> nativo: ni el control ni la lista abierta son del navegador */
+.select-field {
+  position: relative;
+  display: inline-flex;
+}
+.select-field__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: 500 12px/16px var(--body);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.select-field__trigger:hover {
+  border-color: var(--line-strong);
+}
+.select-field__trigger svg {
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+.select-field__trigger svg.is-open {
+  transform: rotate(180deg);
+}
+.select-field__list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+  z-index: 30;
+  padding: 4px;
+  display: grid;
+  gap: 2px;
+}
+.select-field__list button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font: 500 12px/16px var(--body);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, background-color 0.15s;
+}
+/* mismo efecto que el sidebar: gris sutil y texto en el color de texto */
+.select-field__list button:hover,
+.select-field__list button.is-active {
+  color: var(--text);
+  background: var(--selected);
+}
+
+/* estado como etiqueta de fondo sólido, sin borde ni punto: verde = hecho, gris = en espera, rojo = problema */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  margin: -2px 0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--raised);
+  color: var(--muted);
+  font: 500 12px/16px var(--body);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.status-pill[data-status="paid"],
+.status-pill[data-status="completed"] {
+  background: var(--ok-bg);
+  color: var(--ok-text);
+}
+.status-pill[data-status="refunded"],
+.status-pill[data-status="failed"] {
+  background: var(--bad-bg);
+  color: var(--bad-text);
+}
+
+/* formularios admin */
+.admin-field {
+  display: grid;
+  gap: 4px;
+  max-width: 420px;
+}
+.admin-field label {
+  font: 500 12px var(--body);
+  color: var(--muted);
+}
+.admin-field input,
+.admin-field select,
+.admin-field textarea {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: 500 12px/16px var(--body);
+}
+.admin-field textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+.admin-field input:focus,
+.admin-field select:focus,
+.admin-field textarea:focus {
+  outline: none;
+  border-color: var(--line-strong);
+}
+.admin-field .select-field,
+.admin-field .select-field__trigger {
+  width: 100%;
+}
+.admin-field .select-field__trigger {
+  justify-content: space-between;
+}
+.admin-field .select-field__list {
+  left: 0;
+  right: auto;
+}
+/* selector de archivo como el de Bootstrap: el botón es un tramo del campo, separado por una línea */
+.admin-field input[type="file"] {
+  padding: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font: 500 12px/16px var(--body);
+  cursor: pointer;
+}
+.admin-field input[type="file"]::file-selector-button {
+  margin: 0 12px 0 0;
+  padding: 6px 12px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--raised);
+  color: var(--text);
+  font: 500 12px/16px var(--body);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.admin-field input[type="file"]:hover::file-selector-button {
+  background: color-mix(in srgb, var(--text) 8%, var(--bg));
+}
+.admin-field__hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* formularios: rejilla de campos y acciones abajo (en tablero o en ventana modal) */
+.form-body {
+  padding: 12px;
+  display: grid;
+  gap: 12px;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.form-grid .admin-field,
+.form-body > .admin-field {
+  max-width: none;
+}
+.admin-field--wide {
+  grid-column: 1 / -1;
+}
+.form-foot {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px;
+}
+/* panel lateral con secciones de borde a borde (estilo Supabase): etiqueta a la izquierda, campo a la derecha */
+.form-body--flush {
+  padding: 0;
+  gap: 0;
+}
+.modal > .form-error {
+  padding: 12px;
+}
+.sp-section {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+}
+.sp-section + .sp-section {
+  border-top: 1px solid var(--line);
+}
+.sp-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.sp-section__title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font: 500 12px/16px var(--body);
+}
+.sp-field {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+}
+.sp-field > label {
+  padding-top: 7px;
+  font: 500 12px/16px var(--body);
+  color: var(--muted);
+}
+.sp-field__control.admin-field {
+  max-width: none;
+}
+/* botón de solo icono (agregar, editar, quitar) */
+.icon-btn {
+  display: grid;
+  place-items: center;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s;
+}
+.icon-btn:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--selected);
+}
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.admin-table .icon-btn {
+  margin: -6px 0;
+  padding: 6px;
+  border-color: transparent;
+}
+.row-actions--end {
+  justify-content: flex-end;
+}
+.mini-modal__body .sp-field {
+  grid-template-columns: 90px minmax(0, 1fr);
+}
+.admin input:disabled,
+.admin textarea:disabled,
+.modal__close:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.modal__close:disabled:hover {
+  background: none;
+  color: var(--muted);
+}
+@media (max-width: 560px) {
+  .sp-field {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .sp-field > label {
+    padding-top: 0;
+  }
+}
+.form-error {
+  font-size: 12px;
+  color: var(--red);
+}
+.form-preview {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.form-preview small {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ventana modal de formularios: sin desenfoque de fondo (pesa al animar) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  padding: 24px 12px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.6);
+  animation: modal-fade 0.15s ease-out;
+}
+:root[data-theme="light"] .modal-backdrop {
+  background: rgba(10, 10, 10, 0.3);
+}
+.modal {
+  width: min(640px, 100%);
+  margin: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  animation: modal-in 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.modal > * + * {
+  border-top: 1px solid var(--line);
+}
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px;
+}
+.modal__close {
+  display: grid;
+  place-items: center;
+  margin: -6px 0;
+  padding: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+.modal__close:hover {
+  color: var(--text);
+  background: var(--selected);
+}
+/* panel lateral: ocupa el alto completo a la derecha; cabecera y acciones fijas, el contenido se desplaza */
+.modal-backdrop--side {
+  padding: 0;
+  overflow: hidden;
+}
+.modal--side {
+  width: min(460px, 100%);
+  height: 100%;
+  margin: 0 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  border-width: 0 0 0 1px;
+  border-radius: 0;
+  animation: side-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.modal--side .modal__head {
+  min-height: var(--bar-h);
+  padding: 12px 16px;
+}
+.modal--side .form-foot,
+.modal--side > .form-error {
+  padding: 12px 16px;
+}
+.modal--side .form-body {
+  flex: 1;
+  align-content: start;
+  overflow-y: auto;
+}
+@keyframes side-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+@keyframes modal-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .modal-backdrop,
+  .modal,
+  .modal--side {
+    animation: none;
+  }
+}
+
+/* edición en línea dentro de una celda (precio de un plan) */
+.inline-input {
+  width: 96px;
+  margin: -6px 0;
+  padding: 5px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: 500 12px/16px var(--body);
+  font-variant-numeric: tabular-nums;
+}
+.inline-input:focus {
+  outline: none;
+  border-color: var(--text);
+}
+.history-list {
+  display: grid;
+  gap: 4px;
+}
+.history-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+.rating-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.rating-cell svg {
+  color: var(--red);
+}
+.cell-wrap {
+  white-space: normal;
+  min-width: 240px;
+  max-width: 420px;
+}
+
+/* migas en la barra del título (detalle de cliente) */
+.admin__crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.admin__crumbs a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.admin__crumbs a:hover {
+  color: var(--text);
+}
+.admin__crumbs .admin__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+/* barra de arriba y menú lateral: solo en teléfono */
+.admin__mobilebar,
+.admin__menu-close {
+  display: none;
+}
+@media (max-width: 880px) {
+  .admin {
+    flex-direction: column;
+  }
+  .admin__mobilebar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: var(--bar-h);
+    padding: 0 12px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .admin__mobilebar-title {
+    flex: 1;
+    font: 600 13px var(--body);
+  }
+  .admin__burger {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: none;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .admin__burger:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 1px;
+  }
+  /* el sidebar de siempre, como cajón que entra desde la izquierda */
+  .admin__sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 70;
+    width: min(288px, 86vw);
+    height: 100dvh;
+    transform: translateX(-100%);
+    transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.24s;
+    visibility: hidden;
+    box-shadow: none;
+  }
+  .admin__sidebar[data-open="true"] {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.35);
+  }
+  .admin__menu-close {
+    display: grid;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+  }
+  /* deja sitio a la X junto al perfil */
+  .admin__profile {
+    padding-right: 52px;
+  }
+  .admin__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgba(0, 0, 0, 0.5);
+    animation: admin-fade 0.2s ease-out;
+  }
+  html.admin-menu-open {
+    overflow: hidden;
+  }
+}
+@keyframes admin-fade {
+  from {
+    opacity: 0;
+  }
+}
+@media (max-width: 880px) and (prefers-reduced-motion: reduce) {
+  .admin__sidebar,
+  .admin__sidebar[data-open="true"] {
+    transition: none;
+  }
+}
+@media (max-width: 520px) {
+  .search-group__input input {
+    width: 120px;
+  }
+}
+
+/* en modo claro, listas y ventanas con una sombra apenas visible y de tono cálido */
+:root[data-theme="light"] .select-field__list {
+  box-shadow: 0 1px 2px rgba(110, 80, 50, 0.04), 0 8px 24px rgba(110, 80, 50, 0.06);
+}
+:root[data-theme="light"] .modal {
+  box-shadow: 0 2px 6px rgba(110, 80, 50, 0.05), 0 16px 40px rgba(110, 80, 50, 0.08);
+}
+
+/* vista de cliente: el sitio del cliente en un marco que llena el resto de la pantalla */
+.client-view {
+  padding-bottom: 0;
+  height: 100vh;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+.client-view__tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.client-view__seg {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.client-view__seg button {
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font: 500 12px/16px var(--body);
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+.client-view__seg button:hover {
+  color: var(--text);
+}
+.client-view__seg button[aria-pressed="true"] {
+  background: var(--selected);
+  color: var(--text);
+}
+.client-view__seg button:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: -2px;
+}
+.client-view__stage {
+  display: grid;
+  min-height: 0;
+  background: var(--surface);
+}
+.client-view__stage iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: var(--bg);
+}
+/* en móvil, un teléfono de 390 px centrado con su borde */
+.client-view__stage[data-device="mobile"] {
+  justify-items: center;
+  padding: 12px;
+}
+.client-view__stage[data-device="mobile"] iframe {
+  width: 390px;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+/* selector de archivo: un solo control de ancho completo; muestra el nombre del archivo al elegirlo */
+.file-pick {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 30px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: 600 12px/16px var(--body);
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.file-pick:hover {
+  border-color: var(--line-strong);
+}
+.file-pick:focus-within {
+  border-color: var(--line-strong);
+  background: var(--selected);
+}
+.file-pick[data-has-file="true"] {
+  font-weight: 500;
+}
+.file-pick svg {
+  flex: none;
+  color: var(--muted);
+}
+.file-pick span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-pick input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.file-pick[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: default;
+}
+.mini-modal__error {
+  color: var(--red);
+  font-size: 12px;
+}
+/* nuevo producto: las secciones llevan su propio relleno y sus líneas, de borde a borde */
+.mini-modal__body.np-body {
+  padding: 0;
+  gap: 0;
+}
+.np-body .mini-modal__error {
+  padding: 0 12px 12px;
+}
+
+/* clientes: foto pequeña en la primera columna */
+.client-cell__photo {
+  width: 1%;
+}
+.client-avatar {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--raised);
+  color: var(--muted);
+}
+.client-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

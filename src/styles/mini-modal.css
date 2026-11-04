@@ -1,0 +1,75 @@
+/* mini ventana anclada al botón que la abre (admin: planes e instaladores; clientes: claves y reseña) */
+.mini-anchor {
+  position: relative;
+}
+.mini-modal {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  width: min(340px, calc(100vw - 32px));
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  /* en el admin, su --surface; en el panel de clientes, el mismo fondo de la página */
+  background: var(--surface, var(--bg));
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  transform-origin: top right;
+}
+/* en modo claro, una sombra apenas visible y de tono cálido */
+:root[data-theme="light"] .mini-modal {
+  box-shadow: 0 1px 2px rgba(110, 80, 50, 0.04), 0 8px 24px rgba(110, 80, 50, 0.06);
+  animation: mini-in 0.14s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* junto a un elemento de la página (el lápiz de una fila): se coloca con coordenadas de pantalla */
+.mini-modal--fixed {
+  position: fixed;
+  right: auto;
+  z-index: 120;
+}
+.mini-modal--wide {
+  width: min(420px, calc(100vw - 32px));
+}
+/* para formularios completos (nuevo producto) */
+.mini-modal--xl {
+  width: min(480px, calc(100vw - 32px));
+}
+.mini-modal.is-closing {
+  pointer-events: none;
+  animation: mini-out 0.14s ease-in forwards;
+}
+@keyframes mini-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+}
+@keyframes mini-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mini-modal,
+  .mini-modal.is-closing {
+    animation: none;
+  }
+}
+.mini-modal > * + * {
+  border-top: 1px solid var(--line);
+}
+.mini-modal__title {
+  padding: 12px;
+  font: 500 12px/16px var(--body);
+}
+.mini-modal__body {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+.mini-modal__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px;
+}

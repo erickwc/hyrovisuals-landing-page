@@ -26,7 +26,9 @@ Así el trazo, el tamaño y la animación son los mismos en toda la página.
 Usa siempre `src/components/Button.tsx` (variantes `solid` y `ghost`, tamaños `sm`/`md`/`lg`, `arrow`):
 el relleno rojo al hacer hover está resuelto ahí. No crear `<a className="btn">` a mano.
 
-## Publicar en byhyro.com/web3
+## Publicar en byhyro.com
 
-Se compila con `npm run build:web3` y el resultado se copia a `public/web3/` del repo principal.
-Detalles de fuentes, rutas y despliegue: ver el historial de commits de `byhyro/web3`.
+La rama `main` es esta web: Cloudflare Pages (proyecto `byhyro`) la compila con `npm run build` y sirve `dist/`
+en byhyro.com. Las variables públicas del build están en `.env.production`; `public/_redirects` manda los enlaces
+viejos de `/web3/…` a la raíz. La web anterior (Astro) quedó en la rama `web-anterior`.
+Las funciones de Supabase (`supabase/functions`) y las migraciones se publican aparte con el CLI de Supabase.

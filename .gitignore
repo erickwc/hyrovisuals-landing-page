@@ -5,6 +5,10 @@ dist-web3/
 .env
 .env.*
 !.env.example
+!.env.production
+
+# estado local del CLI de Supabase
+supabase/.temp/
 
 # herramientas de asistente de IA y sus cachés locales
 .claude/

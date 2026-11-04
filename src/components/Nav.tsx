@@ -2,12 +2,14 @@ import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Link } from "react-router-dom";
 import { usePrefs } from "../lib/prefs";
+import { useLandingSession, type LandingUser } from "../lib/landingSession";
 import { AnimateIcon } from "./animate-ui/icons/icon";
 import { Search01 } from "./animate-ui/icons/hugeicons/search-01";
 import { Moon02 } from "./animate-ui/icons/hugeicons/moon-02";
 import { Sun03 } from "./animate-ui/icons/hugeicons/sun-03";
 import { Menu01 } from "./animate-ui/icons/hugeicons/menu-01";
 import { Cancel01 } from "./animate-ui/icons/hugeicons/cancel-01";
+import { UserRound } from "./animate-ui/icons/hugeicons/user-round";
 import { EASE } from "./ui";
 import { Button } from "./Button";
 import { SearchDialog } from "./Search";
@@ -60,8 +62,19 @@ export function ThemeButton({ label }: { label?: boolean }) {
   );
 }
 
+// con la sesión iniciada, la foto del cliente (o un icono) lleva a su biblioteca
+function AccountAvatar({ user, onClick }: { user: LandingUser; onClick?: () => void }) {
+  const { c } = usePrefs();
+  return (
+    <Link className="nav-avatar" to="/cuenta/biblioteca" aria-label={user.name ? `${c.nav.myAccount}: ${user.name}` : c.nav.myAccount} title={c.nav.myAccount} onClick={onClick}>
+      {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : <UserRound size={16} />}
+    </Link>
+  );
+}
+
 export function Nav() {
   const { c } = usePrefs();
+  const user = useLandingSession();
   const [open, setOpen] = useState(false);
   const [searching, setSearching] = useState(false);
   const closeSearch = useCallback(() => setSearching(false), []);
@@ -104,14 +117,18 @@ export function Nav() {
             <ThemeButton />
             <LanguagePicker />
           </div>
-          <div className="acct">
-            <Link className="login up" to="/login">
-              {c.nav.login}
-            </Link>
-            <Button size="sm" className="signup" to="/register">
-              {c.nav.signup}
-            </Button>
-          </div>
+          {user ? (
+            <AccountAvatar user={user} />
+          ) : (
+            <div className="acct">
+              <Link className="login up" to="/login">
+                {c.nav.login}
+              </Link>
+              <Button size="sm" className="signup" to="/register">
+                {c.nav.signup}
+              </Button>
+            </div>
+          )}
           <AnimateIcon animateOnHover asChild>
             <button type="button" className="nic burger" aria-expanded={open} aria-controls="mobile-menu" aria-label={c.nav.menu} onClick={() => setOpen(true)}>
               <Menu01 size={24} />
@@ -170,12 +187,20 @@ export function Nav() {
             </div>
 
             <div className="menu__foot wrap">
-              <Button to="/login" variant="ghost" size="lg" onClick={() => setOpen(false)}>
-                {c.nav.login}
-              </Button>
-              <Button to="/register" size="lg" onClick={() => setOpen(false)}>
-                {c.nav.signup}
-              </Button>
+              {user ? (
+                <Button to="/cuenta/biblioteca" size="lg" onClick={() => setOpen(false)}>
+                  {c.nav.myAccount}
+                </Button>
+              ) : (
+                <>
+                  <Button to="/login" variant="ghost" size="lg" onClick={() => setOpen(false)}>
+                    {c.nav.login}
+                  </Button>
+                  <Button to="/register" size="lg" onClick={() => setOpen(false)}>
+                    {c.nav.signup}
+                  </Button>
+                </>
+              )}
             </div>
           </motion.div>
         )}

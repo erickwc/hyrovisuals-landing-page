@@ -1,14 +1,13 @@
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import { usePrefs } from "../lib/prefs";
-import { supabase } from "../lib/supabase";
-import { useRequireSession } from "../lib/useSession";
+import { useRequireSession, type AccountContext, type SessionInfo } from "../lib/useSession";
+import { rememberProfile } from "../lib/landingSession";
 import { ThemeButton } from "../components/Nav";
 import { LanguagePicker } from "../components/Language";
-import { AnimateIcon } from "../components/animate-ui/icons/icon";
+import { AccountMenu } from "../components/AccountMenu";
 import { Layers01 } from "../components/animate-ui/icons/hugeicons/layers-01";
 import { ShoppingBag } from "../components/animate-ui/icons/hugeicons/shopping-bag";
-import { UserRound } from "../components/animate-ui/icons/hugeicons/user-round";
-import { Logout01 } from "../components/animate-ui/icons/hugeicons/logout-01";
 import "../styles/nav.css";
 import "../styles/auth.css";
 import "../styles/account.css";
@@ -20,33 +19,34 @@ function tabClass({ isActive }: { isActive: boolean }) {
 export function AccountLayout() {
   const { c } = usePrefs();
   const t = c.dashboard.nav;
-  const navigate = useNavigate();
-  const { info, checked } = useRequireSession();
+  const { info: sessionInfo, checked } = useRequireSession();
+  // copia local para que la foto y el nombre de la barra cambien en cuanto se guardan en Configuración
+  const [info, setInfo] = useState<SessionInfo | null>(null);
+
+  useEffect(() => {
+    setInfo(sessionInfo);
+  }, [sessionInfo]);
 
   if (!checked || !info) return null;
 
-  const onLogout = async () => {
-    await supabase?.auth.signOut();
-    navigate("/login", { replace: true });
+  const context: AccountContext = {
+    ...info,
+    updateProfile: (patch) => {
+      const next = { ...info, ...patch };
+      setInfo(next);
+      // la landing muestra la foto nueva sin volver a consultar
+      rememberProfile(next.userId, { name: next.name, avatarUrl: next.avatarUrl });
+    },
   };
 
   return (
     <>
       <header className="top">
-        <div className="wrap authtop__bar">
+        <div className="wrap dash-top">
           <Link className="logo" to="/" aria-label={c.nav.home}>
             HYRO
           </Link>
-          <div className="authtop__icons">
-            <ThemeButton />
-            <LanguagePicker />
-          </div>
-        </div>
-      </header>
-
-      <nav className="dash-tabs" aria-label={t.navLabel}>
-        <div className="wrap dash-tabs__row">
-          <div className="dash-tabs__links">
+          <nav className="dash-top__links" aria-label={t.navLabel}>
             <NavLink to="/cuenta/biblioteca" className={tabClass}>
               <Layers01 size={16} />
               {t.library}
@@ -55,22 +55,17 @@ export function AccountLayout() {
               <ShoppingBag size={16} />
               {t.purchases}
             </NavLink>
-            <NavLink to="/cuenta" end className={tabClass}>
-              <UserRound size={16} />
-              {t.account}
-            </NavLink>
+          </nav>
+          <div className="authtop__icons dash-top__icons">
+            <ThemeButton />
+            <LanguagePicker />
+            <AccountMenu name={info.name} email={info.email} avatarUrl={info.avatarUrl} />
           </div>
-          <AnimateIcon animateOnHover asChild>
-            <button type="button" className="dash-tab dash-tab--logout" onClick={onLogout}>
-              <Logout01 size={16} />
-              {t.logout}
-            </button>
-          </AnimateIcon>
         </div>
-      </nav>
+      </header>
 
       <main className="dash wrap">
-        <Outlet context={info} />
+        <Outlet context={context} />
       </main>
     </>
   );

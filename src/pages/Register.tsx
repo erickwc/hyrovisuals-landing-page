@@ -9,7 +9,7 @@ import { AuthLayout } from "./AuthLayout";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PASSWORD_RE = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
-type FieldErrors = { email?: string; password?: string };
+type FieldErrors = { name?: string; email?: string; password?: string };
 type Status = "idle" | "submitting";
 type Step = "form" | "verify";
 
@@ -21,6 +21,7 @@ export function Register() {
 
   const [step, setStep] = useState<Step>("form");
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -38,8 +39,10 @@ export function Register() {
     e.preventDefault();
     if (status === "submitting") return;
 
+    const trimmedName = name.trim();
     const trimmedEmail = email.trim();
     const nextErrors: FieldErrors = {};
+    if (!trimmedName) nextErrors.name = t.errors.required;
     if (!trimmedEmail) nextErrors.email = t.errors.required;
     else if (!EMAIL_RE.test(trimmedEmail)) nextErrors.email = t.errors.invalidEmail;
     if (!password) nextErrors.password = t.errors.required;
@@ -55,7 +58,7 @@ export function Register() {
 
     setStatus("submitting");
     try {
-      const { error } = await supabase.auth.signUp({ email: trimmedEmail, password });
+      const { error } = await supabase.auth.signUp({ email: trimmedEmail, password, options: { data: { name: trimmedName } } });
       // Un correo ya registrado y confirmado no da error (Supabase devuelve identities: [])
       // para no revelar si existe; solo tratamos como error los fallos reales (contraseña, límite, red).
       if (error && !/already registered/i.test(error.message)) {
@@ -145,14 +148,8 @@ export function Register() {
             {codeError && <p className="field__error">{codeError}</p>}
           </div>
 
-          <Button type="submit" className="auth__submit" disabled={verifyStatus === "submitting"}>
-            {verifyStatus === "submitting" ? (
-              <>
-                <span className="auth__spinner" aria-hidden="true" /> {v.submitting}
-              </>
-            ) : (
-              v.submit
-            )}
+          <Button type="submit" className="auth__submit" loading={verifyStatus === "submitting"}>
+            {verifyStatus === "submitting" ? v.submitting : v.submit}
           </Button>
 
           <p className="auth__msg" role="status" data-tone={verifyStatus === "success" ? "ok" : undefined}>
@@ -182,6 +179,21 @@ export function Register() {
   return (
     <AuthLayout eyebrow={c.auth.login.eyebrow} title={t.title} subtitle={t.subtitle}>
       <form className="auth__form" onSubmit={onSubmit} noValidate>
+        <div className="field" data-invalid={Boolean(fieldErrors.name)}>
+          <label htmlFor="register-name">{t.nameLabel}</label>
+          <div className="field__control">
+            <input
+              id="register-name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={t.namePlaceholder}
+              autoComplete="name"
+            />
+          </div>
+          {fieldErrors.name && <p className="field__error">{fieldErrors.name}</p>}
+        </div>
+
         <div className="field" data-invalid={Boolean(fieldErrors.email)}>
           <label htmlFor="register-email">{t.emailLabel}</label>
           <div className="field__control">
@@ -222,14 +234,8 @@ export function Register() {
           {fieldErrors.password ? <p className="field__error">{fieldErrors.password}</p> : <p className="field__hint">{t.passwordHint}</p>}
         </div>
 
-        <Button type="submit" className="auth__submit" disabled={status === "submitting"}>
-          {status === "submitting" ? (
-            <>
-              <span className="auth__spinner" aria-hidden="true" /> {t.submitting}
-            </>
-          ) : (
-            t.submit
-          )}
+        <Button type="submit" className="auth__submit" loading={status === "submitting"}>
+          {status === "submitting" ? t.submitting : t.submit}
         </Button>
 
         {formError && (

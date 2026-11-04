@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { usePrefs } from "../lib/prefs";
 import { supabase } from "../lib/supabase";
 import { Button } from "../components/Button";
@@ -15,6 +15,9 @@ export function Login() {
   const { c } = usePrefs();
   const t = c.auth.login;
   const navigate = useNavigate();
+  // solo rutas internas: nunca un enlace a otro sitio
+  const requested = (useLocation().state as { returnTo?: string } | null)?.returnTo;
+  const returnTo = requested?.startsWith("/") && !requested.startsWith("//") ? requested : null;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,14 +46,21 @@ export function Login() {
 
     setStatus("submitting");
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email: trimmedEmail, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email: trimmedEmail, password });
       if (error) {
         setStatus("idle");
         setFormError(/invalid/i.test(error.message) ? t.errors.invalidCredentials : t.errors.generic);
         return;
       }
       setStatus("success");
-      navigate("/cuenta", { replace: true });
+
+      // si vino desde el checkout (u otra página que pidió sesión), vuelve ahí
+      let destination = returnTo ?? "/cuenta";
+      if (data.user && !returnTo) {
+        const { data: adminRow } = await supabase.from("admin_users").select("user_id").eq("user_id", data.user.id).maybeSingle();
+        if (adminRow) destination = "/admin";
+      }
+      navigate(destination, { replace: true });
     } catch {
       setStatus("idle");
       setFormError(t.errors.connection);
@@ -106,14 +116,8 @@ export function Login() {
           </Link>
         </div>
 
-        <Button type="submit" className="auth__submit" disabled={status === "submitting"}>
-          {status === "submitting" ? (
-            <>
-              <span className="auth__spinner" aria-hidden="true" /> {t.submitting}
-            </>
-          ) : (
-            t.submit
-          )}
+        <Button type="submit" className="auth__submit" loading={status === "submitting"}>
+          {status === "submitting" ? t.submitting : t.submit}
         </Button>
 
         <p className="auth__msg" role="status" data-tone={formError ? "error" : status === "success" ? "ok" : undefined}>

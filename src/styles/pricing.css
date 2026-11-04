@@ -232,12 +232,51 @@
   font-style: normal;
   color: var(--red);
 }
+.coupon-toggle {
+  display: block;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.coupon-toggle:hover {
+  color: var(--text);
+}
+.coupon-field {
+  margin-top: 14px;
+}
+.coupon-field input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 12px;
+  background: var(--bg);
+  color: var(--text);
+  font: 600 12px / 1 var(--body);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.coupon-field input:focus {
+  outline: none;
+  border-color: var(--text);
+}
 .buy-btn {
   width: 100%;
   height: 54px;
   margin-top: 22px;
   gap: 10px;
   font-size: 13px;
+}
+.buy-error {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--red);
+  text-align: center;
 }
 .pay {
   display: flex;

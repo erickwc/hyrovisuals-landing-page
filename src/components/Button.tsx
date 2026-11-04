@@ -7,20 +7,22 @@ type Common = {
   size?: "sm" | "md" | "lg";
   /** Flecha a la derecha del texto. */
   arrow?: boolean;
+  /** Acción en curso: muestra el loader girando, bloquea el botón y lo deja con el hover puesto. */
+  loading?: boolean;
   className?: string;
   children: ReactNode;
 };
 /** Enlace externo o ancla (#sección, /checkout/): `href`. */
 type AsLink = Common & { href: string; to?: undefined } & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof Common | "href">;
-/** Ruta interna de la app (/login, /cuenta…): `to`, navega con el router y respeta la base /web3/. */
+/** Ruta interna de la app (/login, /cuenta…): `to`, navega con el router y respeta la base del despliegue. */
 type AsRoute = Common & { to: string; href?: undefined } & Omit<LinkProps, keyof Common | "to">;
 type AsButton = Common & { href?: undefined; to?: undefined } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof Common>;
 
 /* Botón de pastilla de toda la página. El relleno rojo es una capa que sube con transform,
    y el fondo base vive dentro del mismo recorte para que no asome borde blanco al hacer hover. */
 export function Button(props: AsLink | AsRoute | AsButton) {
-  const { variant = "solid", size = "md", arrow, className, children, ...rest } = props;
-  const cls = ["btn", variant === "ghost" && "ghost", size !== "md" && size, className].filter(Boolean).join(" ");
+  const { variant = "solid", size = "md", arrow, loading, className, children, ...rest } = props;
+  const cls = ["btn", variant === "ghost" && "ghost", size !== "md" && size, loading && "is-loading", className].filter(Boolean).join(" ");
   const inner = (
     <>
       {variant === "solid" && (
@@ -30,6 +32,7 @@ export function Button(props: AsLink | AsRoute | AsButton) {
         </>
       )}
       <span className="btn__label">
+        {loading && <span className="btn__spinner" aria-hidden="true" />}
         {children}
         {arrow && <Arrow />}
       </span>
@@ -38,20 +41,21 @@ export function Button(props: AsLink | AsRoute | AsButton) {
 
   if ("to" in rest && rest.to !== undefined) {
     return (
-      <Link className={cls} {...(rest as LinkProps)}>
+      <Link className={cls} aria-busy={loading || undefined} {...(rest as LinkProps)}>
         {inner}
       </Link>
     );
   }
   if ("href" in rest && rest.href !== undefined) {
     return (
-      <a className={cls} {...(rest as AnchorHTMLAttributes<HTMLAnchorElement>)}>
+      <a className={cls} aria-busy={loading || undefined} {...(rest as AnchorHTMLAttributes<HTMLAnchorElement>)}>
         {inner}
       </a>
     );
   }
+  const buttonProps = rest as ButtonHTMLAttributes<HTMLButtonElement>;
   return (
-    <button type="button" className={cls} {...(rest as ButtonHTMLAttributes<HTMLButtonElement>)}>
+    <button type="button" className={cls} {...buttonProps} disabled={buttonProps.disabled || loading} aria-busy={loading || undefined}>
       {inner}
     </button>
   );

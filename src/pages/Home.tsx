@@ -1,4 +1,5 @@
 import { TopBar } from "../components/TopBar";
+import { AnnouncementBanner } from "../components/AnnouncementBanner";
 import { Nav } from "../components/Nav";
 import { Hero } from "../components/Hero";
 import { Features, Who, Steps } from "../components/Features";
@@ -13,6 +14,7 @@ export function Home() {
   return (
     <>
       <TopBar />
+      <AnnouncementBanner />
       <Nav />
       <main id="main">
         <Hero />

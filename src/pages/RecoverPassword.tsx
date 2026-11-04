@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { usePrefs } from "../lib/prefs";
 import { supabase } from "../lib/supabase";
 import { Button } from "../components/Button";
@@ -18,10 +18,12 @@ export function RecoverPassword() {
   const v = t.verify;
   const r = t.reset;
   const navigate = useNavigate();
+  // desde «Cambiar contraseña» en Mi cuenta el código ya se envió: se entra directo a escribirlo
+  const fromAccount = useLocation().state as { email?: string; codeSent?: boolean } | null;
 
-  const [step, setStep] = useState<Step>("request");
+  const [step, setStep] = useState<Step>(fromAccount?.codeSent && fromAccount.email ? "verify" : "request");
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(fromAccount?.email ?? "");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
@@ -205,14 +207,8 @@ export function RecoverPassword() {
             {resetErrors.confirm && <p className="field__error">{resetErrors.confirm}</p>}
           </div>
 
-          <Button type="submit" className="auth__submit" disabled={resetStatus === "submitting"}>
-            {resetStatus === "submitting" ? (
-              <>
-                <span className="auth__spinner" aria-hidden="true" /> {r.submitting}
-              </>
-            ) : (
-              r.submit
-            )}
+          <Button type="submit" className="auth__submit" loading={resetStatus === "submitting"}>
+            {resetStatus === "submitting" ? r.submitting : r.submit}
           </Button>
 
           <p className="auth__msg" role="status" data-tone={resetFormError ? "error" : resetStatus === "success" ? "ok" : undefined}>
@@ -243,14 +239,8 @@ export function RecoverPassword() {
             {codeError && <p className="field__error">{codeError}</p>}
           </div>
 
-          <Button type="submit" className="auth__submit" disabled={verifyStatus === "submitting"}>
-            {verifyStatus === "submitting" ? (
-              <>
-                <span className="auth__spinner" aria-hidden="true" /> {v.submitting}
-              </>
-            ) : (
-              v.submit
-            )}
+          <Button type="submit" className="auth__submit" loading={verifyStatus === "submitting"}>
+            {verifyStatus === "submitting" ? v.submitting : v.submit}
           </Button>
         </form>
 
@@ -292,14 +282,8 @@ export function RecoverPassword() {
           {emailError && <p className="field__error">{emailError}</p>}
         </div>
 
-        <Button type="submit" className="auth__submit" disabled={status === "submitting"}>
-          {status === "submitting" ? (
-            <>
-              <span className="auth__spinner" aria-hidden="true" /> {t.submitting}
-            </>
-          ) : (
-            t.submit
-          )}
+        <Button type="submit" className="auth__submit" loading={status === "submitting"}>
+          {status === "submitting" ? t.submitting : t.submit}
         </Button>
 
         {formError && (

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { AnimatePresence, animate, motion, useInView, useReducedMotion } from "motion/react";
+import { useNavigate } from "react-router-dom";
 import { usePrefs } from "../lib/prefs";
 import { plans, type PlanId } from "../data/content";
 import { EASE, Reveal, SplitHeading } from "./ui";
@@ -9,20 +10,67 @@ import "../styles/pricing.css";
 
 const payments = ["Visa", "Mastercard", "PayPal"];
 
+type LandingPlan = { id: string; price: number; keys: number };
+
+// Planes de respaldo (sin Supabase o si la consulta falla). Los reales salen de la tabla plans,
+// así lo que se cree o se oculte en el panel admin aparece aquí sin tocar el código.
+const FALLBACK_PLANS: LandingPlan[] = plans.map((p) => ({ id: p.id, price: p.price, keys: p.keys }));
+const PRODUCT_SLUG = "hyro-visuals";
+
 export function Pricing() {
   const { c } = usePrefs();
   const b = c.buy;
   const reduce = useReducedMotion();
-  const [plan, setPlan] = useState<PlanId>("personal");
-  const cur = plans.find((p) => p.id === plan)!;
+  const [list, setList] = useState<LandingPlan[]>(FALLBACK_PLANS);
+  const [plan, setPlan] = useState<string>("personal");
+  const cur = list.find((p) => p.id === plan) ?? list[0];
   const [amount, setAmount] = useState(0);
+  const [showCoupon, setShowCoupon] = useState(false);
+  const [coupon, setCoupon] = useState("");
+  const navigate = useNavigate();
   const wrap = useRef<HTMLDivElement>(null);
   const pass = useRef<HTMLDivElement>(null);
   const inView = useInView(wrap, { once: true, margin: "0px 0px -15% 0px" });
 
   useEffect(() => {
+    let active = true;
+    (async () => {
+      // supabase-js se carga aparte para no frenar la primera pintura de la landing
+      const { supabase: sb } = await import("../lib/supabase");
+      if (!sb) return;
+      const { data: product } = await sb.from("products").select("id").eq("slug", PRODUCT_SLUG).maybeSingle();
+      if (!product) return;
+      const { data } = await sb.from("plans").select("id, price_usd, license_count").eq("product_id", product.id).eq("active", true).order("price_usd");
+      if (!active || !data || data.length === 0) return;
+      const live = data.map((r) => ({ id: r.id as string, price: Number(r.price_usd), keys: Number(r.license_count) }));
+      setList(live);
+      setPlan((current) => (live.some((p) => p.id === current) ? current : live[0].id));
+    })().catch(() => {
+      /* sin conexión: se quedan los planes de respaldo */
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Textos del plan: los escritos a mano si el plan coincide con el de siempre; si no, se arman con sus claves.
+  const text = (p: LandingPlan) => {
+    const known = plans.find((s) => s.id === p.id && s.keys === p.keys);
+    if (known) return b.plans[known.id as PlanId];
+    return { name: p.id.charAt(0).toUpperCase() + p.id.slice(1).replace(/-/g, " "), ...b.planFallback(p.keys) };
+  };
+  const cents = Math.round((cur.price % 1) * 100)
+    .toString()
+    .padStart(2, "0");
+
+  // el pago se hace en el checkout propio; allí se pide la sesión si falta
+  const onBuy = () => {
+    navigate(`/checkout?plan=${encodeURIComponent(cur.id)}`, { state: { coupon: coupon.trim() || undefined } });
+  };
+
+  useEffect(() => {
     if (!inView) return;
-    const ctrl = animate(amount, cur.price, { duration: reduce ? 0 : 0.8, ease: EASE, onUpdate: (v) => setAmount(Math.round(v)) });
+    const ctrl = animate(amount, Math.floor(cur.price), { duration: reduce ? 0 : 0.8, ease: EASE, onUpdate: (v) => setAmount(Math.round(v)) });
     return () => ctrl.stop();
     // amount se lee solo como punto de partida de la animación
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -40,9 +88,9 @@ export function Pricing() {
   };
 
   const onKey = (e: KeyboardEvent) => {
-    const i = plans.findIndex((p) => p.id === plan);
-    if (["ArrowDown", "ArrowRight"].includes(e.key)) setPlan(plans[(i + 1) % plans.length].id);
-    else if (["ArrowUp", "ArrowLeft"].includes(e.key)) setPlan(plans[(i - 1 + plans.length) % plans.length].id);
+    const i = list.findIndex((p) => p.id === cur.id);
+    if (["ArrowDown", "ArrowRight"].includes(e.key)) setPlan(list[(i + 1) % list.length].id);
+    else if (["ArrowUp", "ArrowLeft"].includes(e.key)) setPlan(list[(i - 1 + list.length) % list.length].id);
     else return;
     e.preventDefault();
   };
@@ -72,8 +120,8 @@ export function Pricing() {
           </Reveal>
           <ul className="perks" aria-live="polite">
             <AnimatePresence mode="popLayout" initial={false}>
-              {b.plans[plan].perks.map((t, i) => (
-                <motion.li key={plan + i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 12 }} transition={{ duration: 0.35, ease: EASE, delay: i * 0.05 }}>
+              {text(cur).perks.map((t, i) => (
+                <motion.li key={cur.id + i} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 12 }} transition={{ duration: 0.35, ease: EASE, delay: i * 0.05 }}>
                   {t}
                 </motion.li>
               ))}
@@ -96,12 +144,20 @@ export function Pricing() {
               <div className="pt">
                 <span className="up">{b.choose}</span>
                 <div role="radiogroup" aria-label={b.choose} onKeyDown={onKey}>
-                  {plans.map((p) => (
-                    <button key={p.id} type="button" role="radio" aria-checked={plan === p.id} tabIndex={plan === p.id ? 0 : -1} className="opt" onClick={() => setPlan(p.id)}>
+                  {list.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={cur.id === p.id}
+                      tabIndex={cur.id === p.id ? 0 : -1}
+                      className="opt"
+                      onClick={() => setPlan(p.id)}
+                    >
                       <span className="r" />
-                      <b>{b.plans[p.id].name}</b>
+                      <b>{text(p).name}</b>
                       <em>{b.keys(p.keys)}</em>
-                      <small>{b.plans[p.id].desc}</small>
+                      <small>{text(p).desc}</small>
                     </button>
                   ))}
                 </div>
@@ -110,12 +166,27 @@ export function Pricing() {
               <div className="perf" />
               <div className="pb">
                 <div className="price">
-                  <b aria-label={`${cur.price},00 US$`}>{amount}</b>
+                  <b aria-label={`${Math.floor(cur.price)},${cents} US$`}>{amount}</b>
                   <span>
-                    ,00 US$<i>{b.once}</i>
+                    ,{cents} US$<i>{b.once}</i>
                   </span>
                 </div>
-                <Button className="buy-btn" href="/checkout/" arrow>
+                {showCoupon ? (
+                  <div className="coupon-field">
+                    <input
+                      type="text"
+                      value={coupon}
+                      onChange={(e) => setCoupon(e.target.value.toUpperCase())}
+                      placeholder={b.couponPlaceholder}
+                      aria-label={b.couponPlaceholder}
+                    />
+                  </div>
+                ) : (
+                  <button type="button" className="coupon-toggle" onClick={() => setShowCoupon(true)}>
+                    {b.couponToggle}
+                  </button>
+                )}
+                <Button className="buy-btn" onClick={onBuy} arrow>
                   {b.buy}
                 </Button>
                 <div className="pay" aria-label={b.pay}>

@@ -308,6 +308,54 @@ main > section:nth-of-type(n + 4) {
 .btn:hover .arrow {
   transform: translateX(4px);
 }
+/* desactivado (falta un dato): apagado y sin el relleno de hover */
+.btn:disabled:not(.is-loading) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn:disabled:not(.is-loading) .btn__fill {
+  transform: translate3d(0, 102%, 0);
+}
+.btn:not(.ghost):disabled:not(.is-loading) {
+  color: var(--btn-text);
+}
+.btn.ghost:disabled:not(.is-loading) {
+  border-color: var(--line);
+}
+/* acción en curso (prop `loading`): loader girando, botón bloqueado y con el hover fijo */
+.btn.is-loading {
+  cursor: progress;
+}
+.btn.is-loading .btn__fill {
+  transform: translate3d(0, 0, 0);
+}
+.btn.is-loading:not(.ghost) {
+  color: #0a0a0a;
+}
+.btn.ghost.is-loading {
+  border-color: var(--text);
+}
+.btn__spinner,
+.ic__spinner {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: btn-spin 0.6s linear infinite;
+}
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn__spinner,
+  .ic__spinner {
+    animation-duration: 1.6s;
+  }
+}
 
 .ic {
   height: 34px;
@@ -328,6 +376,10 @@ main > section:nth-of-type(n + 4) {
 }
 .ic:hover {
   border-color: var(--muted);
+}
+.ic[aria-busy="true"] {
+  border-color: var(--text);
+  cursor: progress;
 }
 .ic svg {
   width: 16px;

@@ -1,35 +1,38 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useInView } from "motion/react";
 import { usePrefs } from "../lib/prefs";
-import { fetchReviews, summarize, type Review, type ReviewRole } from "../lib/reviewsDb";
+import { fetchReviews, summarize, type Review } from "../lib/reviewsDb";
 import { EASE, Reveal, SplitHeading } from "./ui";
 import { Button } from "./Button";
 import "../styles/reviews.css";
 
-type Filter = "all" | ReviewRole;
 const PAGE = 6;
-const roles: ReviewRole[] = ["producer", "dj", "creator"];
 
 export function Reviews() {
   const { c, lang } = usePrefs();
   const r = c.reviews;
   const [list, setList] = useState<Review[] | null>(null);
-  const [filter, setFilter] = useState<Filter>("all");
+  const [failed, setFailed] = useState(false);
   const [shown, setShown] = useState(PAGE);
   const top = useRef<HTMLDivElement>(null);
   const seen = useInView(top, { once: true, margin: "0px 0px -10% 0px" });
 
   useEffect(() => {
     let live = true;
-    fetchReviews().then((l) => live && setList(l));
+    fetchReviews()
+      .then((l) => live && setList(l))
+      .catch(() => {
+        if (!live) return;
+        setFailed(true);
+        setList([]);
+      });
     return () => {
       live = false;
     };
   }, []);
 
   const stats = useMemo(() => (list ? summarize(list) : null), [list]);
-  const filtered = useMemo(() => (list ?? []).filter((x) => filter === "all" || x.role === filter), [list, filter]);
-  const date = (iso: string) => new Date(iso + "T12:00:00").toLocaleDateString(lang, { day: "numeric", month: "short", year: "numeric" });
+  const date = (iso: string) => new Date(iso).toLocaleDateString(lang, { day: "numeric", month: "short", year: "numeric" });
 
   return (
     <section id="resenas" aria-labelledby="reviews-title">
@@ -60,22 +63,6 @@ export function Reviews() {
               );
             })}
           </div>
-          <div className="rvs-tabs" role="group" aria-label={r.title}>
-            {(["all", ...roles] as Filter[]).map((k) => (
-              <button
-                key={k}
-                type="button"
-                className="fl"
-                aria-pressed={filter === k}
-                onClick={() => {
-                  setFilter(k);
-                  setShown(PAGE);
-                }}
-              >
-                {r.filters[k]}
-              </button>
-            ))}
-          </div>
         </div>
 
         {!list ? (
@@ -87,17 +74,20 @@ export function Reviews() {
               </li>
             ))}
           </ul>
-        ) : filtered.length === 0 ? (
-          <p className="sub">{r.empty}</p>
+        ) : list.length === 0 ? (
+          <p className="sub rvs-empty">{failed ? r.error : r.empty}</p>
         ) : (
           <>
             <ul className="rvs-grid" aria-live="polite">
-              {filtered.slice(0, shown).map((x) => (
+              {list.slice(0, shown).map((x) => (
                 <li key={x.id} className="rvs-item">
-                  <blockquote>{x.text}</blockquote>
+                  {x.text && <blockquote>{x.text}</blockquote>}
                   <div className="rvs-foot">
-                    <span>
-                      <b>{x.name}</b> · {r.roles[x.role]} · {date(x.date)}
+                    <span className="rvs-author">
+                      {x.avatarUrl ? <img src={x.avatarUrl} alt="" loading="lazy" decoding="async" /> : <i aria-hidden="true">{(x.name ?? r.anonymous).charAt(0)}</i>}
+                      <span>
+                        <b>{x.name ?? r.anonymous}</b> · {date(x.date)}
+                      </span>
                     </span>
                     <em title={r.verified}>
                       {x.rating}/5<span className="sr-only"> · {r.verified}</span>
@@ -106,7 +96,7 @@ export function Reviews() {
                 </li>
               ))}
             </ul>
-            {shown < filtered.length && (
+            {shown < list.length && (
               <div className="rvs-more">
                 <Button variant="ghost" onClick={() => setShown((s) => s + PAGE)}>
                   {r.more}

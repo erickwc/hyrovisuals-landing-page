@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// base "/" por defecto; para servirla en byhyro.com/web3 se compila con `npm run build:web3`.
+// Se sirve en la raíz de byhyro.com (Cloudflare Pages compila la rama main con `npm run build`).
 export default defineConfig({
   plugins: [react()],
   server: { port: 5173 },

@@ -1,0 +1,399 @@
+/* checkout: el pedido a la izquierda y la tarjeta de pago a la derecha, en el mismo estilo del panel de cliente */
+/* página blanca (siempre en tema claro) para que la tarjeta de Wompi se vea parte del checkout */
+.co {
+  --bg: #ffffff;
+  --panel: #ffffff;
+  min-height: 100vh;
+  background: #ffffff;
+}
+.co__main {
+  padding-block: 32px 72px;
+}
+.co__main--solo {
+  display: grid;
+  place-items: center;
+  min-height: 70vh;
+}
+.co__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.co__back:hover {
+  color: var(--text);
+}
+.co__state {
+  padding: 48px 0;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+/* sin el relleno que base.css da a todo <section> */
+.co__order,
+.co__pay {
+  padding-block: 0;
+}
+.co__grid {
+  display: grid;
+  /* el pedido angosto y el pago hasta 520px: más ancho, la página de Wompi centra su tarjeta con márgenes azules
+     anchos que el recorte no cubre; hasta ese ancho su tarjeta ocupa todo con márgenes fijos */
+  grid-template-columns: minmax(0, 380px) minmax(0, 520px);
+  justify-content: space-between;
+  gap: clamp(32px, 6vw, 80px);
+  align-items: start;
+  margin-top: 24px;
+}
+
+/* pedido */
+.co__eyebrow {
+  color: var(--muted);
+  font-size: 11px;
+}
+.co__product {
+  margin-top: 8px;
+  font: 700 22px/1.2 var(--body);
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.co__plan {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.co__price {
+  margin-top: 20px;
+  font: 800 clamp(34px, 5vw, 44px) / 1 var(--head);
+  letter-spacing: -0.04em;
+}
+.co__price span {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font: 500 12px var(--body);
+  letter-spacing: 0;
+}
+.co__subtitle {
+  margin-top: 28px;
+  font: 700 12px/1 var(--body);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.co__perks {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.co__perks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.co__perks svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--text);
+}
+.co__totals {
+  margin-top: 28px;
+  border-top: 1px solid var(--line);
+}
+.co__totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.co__totals > div > span:first-child {
+  color: var(--muted);
+}
+.co__total {
+  font: 700 15px var(--body);
+}
+.co__totals > .co__total > span:first-child {
+  color: var(--text);
+}
+.co__link {
+  margin-top: 14px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: 500 12px var(--body);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.co__totals .co__link {
+  margin: 0 0 0 6px;
+}
+.co__link:hover {
+  color: var(--text);
+}
+.co__coupon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.co__coupon input {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: 600 12px var(--body);
+  letter-spacing: 0.06em;
+}
+.co__coupon input:focus {
+  outline: none;
+  border-color: var(--muted);
+}
+.co__coupon input[aria-invalid="true"] {
+  border-color: var(--red);
+}
+.co__coupon .co__error {
+  width: 100%;
+}
+
+/* pago */
+.co__pay {
+  display: grid;
+  gap: 16px;
+}
+.co__pay .co__subtitle {
+  margin-top: 4px;
+}
+.co__field {
+  display: grid;
+  gap: 6px;
+}
+.co__field label {
+  color: var(--muted);
+  font: 600 11px var(--body);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.co__field input {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: 500 13px var(--body);
+}
+.co__field input:focus {
+  outline: none;
+  border-color: var(--muted);
+}
+.co__field p {
+  color: var(--muted);
+  font-size: 11px;
+}
+.co__methods {
+  display: grid;
+  gap: 10px;
+}
+.co__method {
+  width: 100%;
+  height: 46px;
+}
+/* botón de PayPal simulado con sus colores de marca */
+.co__paypal {
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffc439;
+  color: #111;
+  font: 600 13px var(--body);
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.co__paypal:hover {
+  filter: brightness(0.95);
+}
+.co__paypal:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+.co__paypal b {
+  font: italic 800 17px/1 Arial, sans-serif;
+  letter-spacing: -0.02em;
+}
+.co__paypal b:first-of-type {
+  margin-left: 2px;
+  color: #003087;
+}
+.co__paypal b + b {
+  margin-left: -6px;
+  color: #009cde;
+}
+.co__note,
+.co__error {
+  font-size: 12px;
+  line-height: 1.45;
+}
+.co__note {
+  color: var(--muted);
+}
+.co__error {
+  color: var(--red);
+}
+.co__secure {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.co__secure svg {
+  flex: none;
+  margin-top: 1px;
+}
+.co__terms {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* cupón del 100%: en lugar de las formas de pago */
+.co__free {
+  display: grid;
+  gap: 12px;
+}
+.co__free .co__subtitle {
+  margin-top: 4px;
+}
+.co__free p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.co__order-id {
+  font: 600 12px var(--body) !important;
+  letter-spacing: 0.08em;
+  color: var(--text) !important;
+}
+
+/* resultado del pago */
+.co__result {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 16px 8px;
+  text-align: center;
+}
+.co__result svg {
+  color: var(--green, #3ecf8e);
+}
+.co__result[data-tone="bad"] svg {
+  color: var(--red);
+}
+.co__result h1,
+.co__result h2 {
+  font: 700 18px/1.3 var(--body);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.co__result p {
+  max-width: 340px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* página de Wompi debajo de los botones: scroll propio y sin el pie del banco */
+.co__wompi {
+  display: grid;
+  gap: 8px;
+}
+.co__wompi-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.co__wompi-head p {
+  font: 700 12px/1 var(--body);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.co__wompi-close {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+.co__wompi-close:hover {
+  color: var(--text);
+  background: var(--rule);
+}
+.co__wompi-close:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+}
+.co__wompi-hint {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+/* ventana fija sobre la página de Wompi: se ve solo su tarjeta blanca y ella hace su propio scroll */
+.co__wompi-view {
+  position: relative;
+  /* bajo a propósito: en los pasos cortos de Wompi su tarjeta blanca llena el recuadro y no se asoma el azul */
+  height: min(500px, calc(100dvh - 140px));
+  overflow: hidden;
+  border-radius: 10px;
+  background: #fff;
+}
+.co__wompi-view iframe {
+  position: absolute;
+  display: block;
+  border: 0;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.co__wompi-view[data-ready="true"] iframe {
+  opacity: 1;
+}
+.co__finishing {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 860px) {
+  .co__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
