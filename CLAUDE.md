@@ -10,6 +10,8 @@ Dos páginas que Vite compila juntas:
   app.js por `window.HyroLanding`. Los precios de respaldo de `PLANS` en app.js deben coincidir con Supabase.
   app.js arranca cada sección con `safe()` y el `<head>` quita la intro si la web no carga: un error en un navegador
   (p. ej. Safari de iPhone) no puede dejar la intro trabada. La landing anterior en React está en la rama `landing-anterior`.
+  **Al cambiar algo de `public/landing/`, sube el `?v=` de sus enlaces en `index.html`**: Cloudflare deja que el
+  navegador guarde esos archivos 4 horas (el HTML no se guarda).
 - **App** (login, registro, recuperar contraseña, checkout, `/cuenta`, `/admin`): `app.html` + React 18 + TypeScript.
   Textos en `src/data/content.ts` (ES/EN), tema e idioma en `src/lib/prefs.tsx` (mismas claves `hyro.theme` y
   `hyro.lang` que la landing).
