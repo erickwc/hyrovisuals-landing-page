@@ -1,10 +1,19 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { MotionConfig } from "motion/react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { PrefsProvider } from "./lib/prefs";
-import { Home } from "./pages/Home";
 
-// Las páginas de cuenta cargan aparte para que la landing no arrastre supabase-js.
+/* La landing es index.html (HTML estático, fuera de React; ver vite.config.ts). Ir a "/" desde la app, o a una
+   ruta que no existe, carga la página completa de la landing (conservando el #sección si lo hay). */
+function ToLanding() {
+  const { pathname, hash } = useLocation();
+  useEffect(() => {
+    window.location.replace(pathname === "/" ? `/${hash}` : "/");
+  }, [pathname, hash]);
+  return null;
+}
+
+// Cada página carga aparte: quien entra al login no descarga el panel admin.
 const Login = lazy(() => import("./pages/Login").then((m) => ({ default: m.Login })));
 const Register = lazy(() => import("./pages/Register").then((m) => ({ default: m.Register })));
 const RecoverPassword = lazy(() => import("./pages/RecoverPassword").then((m) => ({ default: m.RecoverPassword })));
@@ -37,7 +46,7 @@ export function App() {
       <MotionConfig reducedMotion="user">
         <Suspense fallback={null}>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<ToLanding />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/recuperar-contrasena" element={<RecoverPassword />} />
@@ -66,6 +75,7 @@ export function App() {
               <Route path="actividad" element={<ActivityLog />} />
               <Route path="vista-cliente" element={<ClientView />} />
             </Route>
+            <Route path="*" element={<ToLanding />} />
           </Routes>
         </Suspense>
       </MotionConfig>

@@ -29,7 +29,7 @@ export function CheckoutResult() {
       <div className="co__result" data-tone={approved ? "ok" : "bad"} role="status">
         <h1>{approved ? t.approvedTitle : t.rejectedTitle}</h1>
         <p>{approved ? t.approvedBody : t.rejectedBody}</p>
-        <Button to={approved ? "/cuenta/biblioteca" : "/#licencias"} arrow>
+        <Button to={approved ? "/cuenta/biblioteca" : "/#comprar"} arrow>
           {approved ? t.goLibrary : t.tryAgain}
         </Button>
       </div>

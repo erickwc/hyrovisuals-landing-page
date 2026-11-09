@@ -240,7 +240,7 @@ export function Checkout() {
     <div className="co">
       <main className="wrap co__main">
         <AnimateIcon animateOnHover asChild>
-          <Link className="co__back" to="/#licencias">
+          <Link className="co__back" to="/#comprar">
             <ArrowLeft01 size={16} />
             {t.back}
           </Link>

@@ -1,6 +1,18 @@
-# Hyro Visuals — landing
+# Hyro Visuals — web (byhyro.com)
 
-Vite + React 18 + TypeScript. Textos en `src/data/content.ts` (ES/EN), tema e idioma en `src/lib/prefs.tsx`.
+Dos páginas que Vite compila juntas:
+
+- **Landing** (`/`): `index.html`, HTML/CSS/JS sin React. Estilos, scripts, imágenes y fuentes en `public/landing/`
+  (textos ES en el HTML, EN en `public/landing/js/i18n.js`; enlaces a login, registro y checkout en el `CONFIG` de
+  `public/landing/js/app.js`). Lo único que compila Vite ahí es `src/landing/session.ts`: con sesión iniciada cambia
+  «Iniciar sesión / Crear cuenta» por «Mi cuenta». La landing anterior en React quedó en la rama `landing-anterior`.
+- **App** (login, registro, recuperar contraseña, checkout, `/cuenta`, `/admin`): `app.html` + React 18 + TypeScript.
+  Textos en `src/data/content.ts` (ES/EN), tema e idioma en `src/lib/prefs.tsx` (mismas claves `hyro.theme` y
+  `hyro.lang` que la landing).
+- **Rutas**: las de la app se reescriben a `app.html` en `public/_redirects` (Cloudflare) y en `APP_ROUTES` de
+  `vite.config.ts` (dev y preview). Una ruta nueva en `App.tsx` va en los dos. Ir a `/` desde React recarga la landing.
+
+Las reglas de abajo (iconos y botones) son para la app de React.
 
 ## Iconos: una sola librería
 

@@ -1,33 +1,564 @@
 <!doctype html>
 <html lang="es" data-theme="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Hyro Visuals · El mejor visualizador de la industria</title>
-    <meta
-      name="description"
-      content="Hyro Visuals es un visualizador de audio en tiempo real para Mac y Windows: 37 visuales, temáticas, paletas y cada parámetro bajo tu control."
-    />
-    <meta name="theme-color" content="#070707" />
-    <link rel="icon" type="image/png" href="/media/brand/logo-h.png" />
-    <link rel="preload" href="/fonts/PlusJakartaSans-ExtraBold.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <script>
-      try {
-        var t = localStorage.getItem("hyro.theme");
-        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
-        var l = localStorage.getItem("hyro.lang");
-        if (l === "es" || l === "en") document.documentElement.lang = l;
-      } catch (e) {}
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hyro Visuals — Visualizador de audio para productores</title>
+<meta name="description" content="Más de 30 espectros de audio que reaccionan a tu música en tiempo real. Franja, cuadrícula o módulos sueltos. Para Windows y macOS.">
+<meta name="theme-color" content="#050505">
+<link rel="icon" type="image/png" href="/landing/img/favicon.png">
+<script>
+  (function () {
+    var d = document.documentElement;
+    try {
+      // tema e idioma compartidos con el login y los paneles (mismas claves)
+      var t = localStorage.getItem('hyro.theme');
+      if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      d.setAttribute('data-theme', t);
+      var l = localStorage.getItem('hyro.lang');
+      if (l !== 'es' && l !== 'en') l = (navigator.language || 'es').toLowerCase().indexOf('es') === 0 ? 'es' : 'en';
+      d.lang = l;
+      // sesión de Supabase guardada: muestra «Mi cuenta» desde el primer cuadro (src/landing/session.ts la confirma luego)
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && /^sb-.+-auth-token$/.test(k)) {
+          var s = JSON.parse(localStorage.getItem(k) || 'null');
+          if (s && s.refresh_token) d.classList.add('has-session');
+        }
+      }
+    } catch (e) {}
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('is-intro');
+    d.classList.add('js');
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&display=swap">
+<link rel="preload" as="font" href="/landing/fonts/montserrat-black.woff2" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="/landing/img/mascot-atlas.webp" type="image/webp">
+<link rel="stylesheet" href="/landing/css/styles.css?v=20">
+</head>
+<body>
+
+<!-- Intro: onda circular que se expande y revela la web -->
+<div class="intro" id="intro" aria-hidden="true">
+  <canvas class="intro-canvas" id="introCanvas"></canvas>
+  <div class="intro-meta mono">
+    <span>HYRO VISUALS</span>
+    <span id="introPct">000</span>
+  </div>
+</div>
+
+<div class="rails" aria-hidden="true"></div>
+
+<a class="skip" href="#main" data-i18n="a11y.skip">Saltar al contenido</a>
+
+<header class="nav" id="nav">
+  <div class="ticker" aria-hidden="true"><div class="ticker-track" id="tickerTrack"></div></div>
+  <div class="wrap nav-inner">
+    <a class="brand wordmark" href="#inicio" aria-label="Hyro Visuals"><span class="wm-a">HYRO</span></a>
+    <nav class="nav-links" aria-label="Principal" data-i18n-attr="aria-label:a11y.mainnav">
+      <a href="#funciones" data-i18n="nav.features">Funciones</a>
+      <a href="#accion" data-i18n="nav.action">En acción</a>
+      <a href="#resenas" data-i18n="nav.reviews">Reseñas</a>
+      <a href="#preguntas" data-i18n="nav.faq">Preguntas</a>
+      <a href="#comprar" data-i18n="nav.pricing">Precio</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="searchBtn" type="button" aria-label="Buscar" data-i18n-attr="aria-label:a11y.search" aria-haspopup="dialog" aria-controls="search"><svg data-icon="search"></svg></button>
+      <button class="icon-btn theme-btn" id="themeBtn" type="button" aria-label="Cambiar tema" data-i18n-attr="aria-label:a11y.theme"><svg data-icon="sun" class="i-sun"></svg><svg data-icon="moon" class="i-moon"></svg></button>
+      <button class="icon-btn lang-btn" id="langBtn" type="button" aria-label="Cambiar idioma" data-i18n-attr="aria-label:a11y.lang"><svg data-icon="language"></svg><span class="lang-label" id="langLabel">ES</span></button>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <a class="nav-login" href="/login" data-auth="login" data-i18n="nav.login">Iniciar sesión</a>
+      <a class="btn btn-primary btn-sm nav-cta" href="/register" data-auth="signup"><span data-i18n="nav.signup">Crear cuenta</span></a>
+      <a class="icon-btn nav-account" href="/cuenta/biblioteca" data-account aria-label="Mi cuenta" title="Mi cuenta" data-i18n-attr="aria-label:nav.account;title:nav.account"><svg data-icon="user"></svg><img alt="" hidden></a>
+      <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Menú" data-i18n-attr="aria-label:a11y.menu"><svg data-icon="menu" class="i-menu"></svg><svg data-icon="close" class="i-close"></svg></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="wrap">
+      <a href="#funciones"><span class="mono">01</span><span data-i18n="nav.features">Funciones</span></a>
+      <a href="#accion"><span class="mono">02</span><span data-i18n="nav.action">En acción</span></a>
+      <a href="#resenas"><span class="mono">03</span><span data-i18n="nav.reviews">Reseñas</span></a>
+      <a href="#preguntas"><span class="mono">04</span><span data-i18n="nav.faq">Preguntas</span></a>
+      <a href="#comprar"><span class="mono">05</span><span data-i18n="nav.pricing">Precio</span></a>
+      <div class="mm-auth">
+        <a class="btn btn-ghost" href="/login" data-auth="login"><span data-i18n="nav.login">Iniciar sesión</span></a>
+        <a class="btn btn-primary" href="/register" data-auth="signup"><span data-i18n="nav.signup">Crear cuenta</span></a>
+        <a class="btn btn-primary mm-account" href="/cuenta/biblioteca" data-account><span data-i18n="nav.account">Mi cuenta</span></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- 1 · LANDING -->
+<section class="hero" id="inicio">
+  <!-- Tarjetas flotantes a los lados del título (solo escritorio) -->
+  <div class="hero-float hf-l" aria-hidden="true" data-depth="14">
+    <div class="hf-card">
+      <div class="hf-head"><span class="hf-dot"></span><span data-i18n="hf.live">En vivo</span><span class="hf-tag">124 BPM</span></div>
+      <canvas data-vis="vu"></canvas>
+      <div class="hf-foot"><span>VU Meter</span><span>0 VU = −18 dBFS</span></div>
+    </div>
+  </div>
+  <div class="hero-float hf-r" aria-hidden="true" data-depth="-18">
+    <div class="hf-card">
+      <div class="hf-head"><span data-i18n="hf.theme">Temática</span><b data-i18n="hf.brutal">Brutalismo</b></div>
+      <canvas data-vis="orbit"></canvas>
+      <div class="hf-sw"><i style="--c: var(--red)"></i><i style="--c: var(--ink)"></i><i style="--c: #62dbef"></i><i style="--c: #c9b6ff"></i><i style="--c: #f5cf89"></i><span data-i18n="hf.palettes">12 paletas</span></div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="hero-copy">
+      <h1 class="display h1">
+        <span class="line lead-in"><span><span class="pulse"></span><span data-i18n="hero.t0">No es otro visuals, es</span></span></span>
+        <span class="line"><span><span data-i18n="hero.t1a">El</span> <mark class="hl" data-i18n="hero.t1b">mejor</mark></span></span>
+        <span class="line"><span data-i18n="hero.t2">de la industria</span></span>
+      </h1>
+      <p class="lead" data-i18n="hero.lead">Quédate con los mismos visuales de siempre o elige algo que marque la diferencia. Tú decides cómo se ve tu música.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="#comprar"><span data-i18n="hero.cta">Obtener Hyro Visuals</span><svg data-icon="arrowRight"></svg></a>
+        <a class="btn btn-ghost" href="#accion"><span data-i18n="hero.cta2">Míralo en acción</span></a>
+      </div>
+      <ul class="hero-pills">
+        <li data-i18n="hero.p1">30+ espectros</li>
+        <li data-i18n="hero.p2">Windows y macOS</li>
+        <li data-i18n="hero.p3">Pago único</li>
+        <li data-i18n="hero.p4">100 % local</li>
+      </ul>
+    </div>
+
+    <div class="stage" id="stage" data-mode="grid">
+      <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+      <div class="stage-screen" id="stageScreen">
+        <div class="tile" data-vis="pixels" data-w="0.9"><canvas></canvas><span class="tile-name mono" data-name="pixels"></span></div>
+        <div class="tile" data-vis="spectrum" data-w="2.8"><canvas></canvas><span class="tile-name mono" data-name="spectrum"></span></div>
+        <div class="tile" data-vis="mesh" data-w="0.9"><canvas></canvas><span class="tile-name mono" data-name="mesh"></span></div>
+        <div class="tile" data-vis="mascot" data-w="0.9"><canvas></canvas><span class="tile-name mono" data-name="mascot"></span></div>
+        <div class="tile" data-vis="phase" data-w="0.9"><canvas></canvas><span class="tile-name mono" data-name="phase"></span></div>
+        <div class="tile" data-vis="waves3d" data-w="2.2"><canvas></canvas><span class="tile-name mono" data-name="waves3d"></span></div>
+        <div class="tile" data-vis="dynamics" data-w="1.6"><canvas></canvas><span class="tile-name mono" data-name="dynamics"></span></div>
+        <div class="tile" data-vis="geometry" data-w="1"><canvas></canvas><span class="tile-name mono" data-name="geometry"></span></div>
+        <div class="tile" data-vis="spectrogram" data-w="1.5"><canvas></canvas><span class="tile-name mono" data-name="spectrogram"></span></div>
+      </div>
+      <div class="stage-bar">
+        <div class="seg" role="tablist" aria-label="Distribución" data-i18n-attr="aria-label:a11y.layout" id="stageSeg">
+          <span class="seg-thumb"></span>
+          <button type="button" role="tab" data-mode="grid" aria-selected="true"><span data-i18n="stage.grid">Cuadrícula</span></button>
+          <button type="button" role="tab" data-mode="strip" aria-selected="false"><span data-i18n="stage.strip">Franja</span></button>
+          <button type="button" role="tab" data-mode="float" aria-selected="false"><span data-i18n="stage.float">Separados</span></button>
+        </div>
+        <p class="stage-meta mono"><span class="live"></span><span data-i18n="stage.meta">Demo en vivo · 124 BPM</span><span class="stage-desc" id="stageDesc">Cuadrícula autoadaptable: los módulos se reparten solos, sin scroll.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 · FUNCIONES -->
+<section class="sec" id="funciones">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow mono"><span class="idx">[01]</span><span data-i18n="feat.eyebrow">Funciones</span></p>
+      <h2 class="display h2 reveal"><span class="line"><span data-i18n="feat.t1">Hecho para</span></span><span class="line"><span data-i18n="feat.t2">productores</span></span></h2>
+      <p class="sec-lead" data-i18n="feat.lead">Lo esencial de Hyro Visuals en cuatro puntos. Todo lo que ves aquí está funcionando en vivo.</p>
+    </header>
+
+    <div class="bento">
+      <article class="cell c-spectra">
+        <div class="cell-head"><span class="num mono">01.</span><span class="chip-live mono" id="specName">Espectro</span></div>
+        <button class="demo demo-spectra" id="specDemo" type="button" aria-label="Ver el siguiente espectro" data-i18n-attr="aria-label:feat.next">
+          <canvas id="specCanvas"></canvas>
+          <span class="spec-count mono"><b id="specIdx">01</b> / 37</span>
+          <span class="spec-hint mono"><span data-i18n="feat.hint">Clic para cambiar</span><svg data-icon="arrowRight"></svg></span>
+        </button>
+        <div class="marquee mono" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
+        <div class="cell-copy">
+          <h3 data-i18n="feat.1.t">30+ espectros de audio</h3>
+          <p data-i18n="feat.1.d">Más de 30 espectros únicos para elegir.</p>
+        </div>
+      </article>
+
+      <article class="cell c-adapt">
+        <div class="cell-head"><span class="num mono">02.</span><span class="chip-live mono" id="adaptTag" data-i18n="feat.2.tag">Reajustar ventanas</span></div>
+        <div class="demo demo-adapt" id="adapt" aria-hidden="true">
+          <div class="monitor">
+            <div class="mon-screen">
+              <div class="a-strip"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="a-win aw1"><b></b><span></span><span></span><span></span></div>
+              <div class="a-win aw2"><b></b><span></span><span></span></div>
+            </div>
+            <div class="mon-foot"></div>
+          </div>
+          <div class="monitor">
+            <div class="mon-screen">
+              <div class="a-strip"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="a-win aw3"><b></b><span></span><span></span><span></span></div>
+            </div>
+            <div class="mon-foot"></div>
+          </div>
+        </div>
+        <div class="cell-copy">
+          <h3 data-i18n="feat.2.t">Se adapta completamente a tu pantalla</h3>
+          <p data-i18n="feat.2.d">Acomoda automáticamente las apps que tengas abiertas, en uno o varios monitores.</p>
+        </div>
+      </article>
+
+      <article class="cell c-custom">
+        <div class="cell-head"><span class="num mono">03.</span><span class="chip-live mono" id="customTag">Brutalismo</span></div>
+        <div class="demo demo-custom">
+          <div class="custom-screen"><canvas id="customCanvas"></canvas><canvas id="customCanvas2"></canvas></div>
+          <div class="custom-ctrl">
+            <div class="chips" id="customChips"></div>
+            <div class="swatches" id="customSwatches"></div>
+          </div>
+        </div>
+        <div class="cell-copy">
+          <h3 data-i18n="feat.3.t">Totalmente personalizable</h3>
+          <p data-i18n="feat.3.d">Hyro Visuals no tiene un solo estilo: se personaliza para la esencia de cada productor.</p>
+        </div>
+      </article>
+
+      <article class="cell c-os">
+        <div class="cell-head"><span class="num mono">04.</span><span class="chip-live mono">Windows · macOS</span></div>
+        <div class="demo demo-os">
+          <div class="os-win os-w">
+            <div class="os-bar"><svg data-icon="windows"></svg><span>Hyro Visuals</span><span class="os-ctl"><i></i><i></i><i></i></span></div>
+            <canvas data-vis="waveform"></canvas>
+          </div>
+          <div class="os-win os-m">
+            <div class="os-bar"><span class="lights"><i></i><i></i><i></i></span><span>Hyro Visuals</span><svg data-icon="apple"></svg></div>
+            <canvas data-vis="rta"></canvas>
+          </div>
+          <ul class="os-specs mono">
+            <li><svg data-icon="windows"></svg><span data-i18n="feat.4.win">Windows 10 · 11 (64 bits)</span></li>
+            <li><svg data-icon="apple"></svg><span data-i18n="feat.4.mac">macOS 13+ · Apple Silicon e Intel</span></li>
+          </ul>
+        </div>
+        <div class="cell-copy">
+          <h3 data-i18n="feat.4.t">Creado para Windows y Mac</h3>
+          <p data-i18n="feat.4.d">Sin límites de sistema. La misma experiencia en los dos.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · MÍRALO EN ACCIÓN -->
+<section class="sec" id="accion">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow mono"><span class="idx">[02]</span><span data-i18n="act.eyebrow">En acción</span></p>
+      <h2 class="display h2 reveal"><span class="line"><span data-i18n="act.t1">Míralo en</span></span><span class="line"><span data-i18n="act.t2">acción</span></span></h2>
+      <p class="sec-lead" data-i18n="act.lead">Recorre la app por secciones. Elige un título y mira cómo se mueve dentro del programa.</p>
+    </header>
+
+    <div class="tour" id="tour">
+      <div class="tour-view" id="tourView">
+        <div class="mk" id="mk">
+          <!-- Barra superior que aparece al pasar el cursor -->
+          <div class="mk-bar" id="mkBar">
+            <span class="mk-grip"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="mk-title">HYRO VISUALS</span>
+            <span class="mk-bar-btns">
+              <span class="mk-ib" id="mkCustomize"><svg data-icon="sliders"></svg><span data-i18n="mk.customize">Personalizar</span></span>
+              <span class="mk-ib"><svg data-icon="layout"></svg></span>
+              <span class="mk-ib"><svg data-icon="monitor"></svg></span>
+              <span class="mk-ib"><svg data-icon="close"></svg></span>
+            </span>
+          </div>
+          <div class="mk-strip" id="mkStrip"></div>
+
+          <div class="mk-panel">
+            <div class="mk-tool" id="mkTool">
+              <span class="mk-btn" id="mkSource"><svg data-icon="headphones"></svg><span data-i18n="mk.source">Elegir fuente de audio</span></span>
+              <span class="mk-btn mk-lang"><svg data-icon="language"></svg><b>ES</b><span>EN</span></span>
+              <span class="mk-btn"><svg data-icon="key"></svg><span data-i18n="mk.license">Administrar mi licencia</span></span>
+              <span class="mk-status mono" id="mkStatus"><i></i><span id="mkStatusTxt">Audio del sistema</span></span>
+              <span class="mk-x"><svg data-icon="close"></svg></span>
+              <div class="mk-dd" id="mkDD">
+                <span class="mk-dd-i" data-src="system"><svg data-icon="monitor"></svg><span data-i18n="mk.src1">Audio del sistema</span><svg data-icon="tick" class="ok"></svg></span>
+                <span class="mk-dd-i" data-src="input"><svg data-icon="headphones"></svg><span data-i18n="mk.src2">Entrada de audio</span><svg data-icon="tick" class="ok"></svg></span>
+                <span class="mk-dd-i" data-src="file"><svg data-icon="download"></svg><span data-i18n="mk.src3">Archivo de audio</span><svg data-icon="tick" class="ok"></svg></span>
+                <span class="mk-dd-i" data-src="demo"><svg data-icon="play"></svg><span data-i18n="mk.src4">Demo</span><svg data-icon="tick" class="ok"></svg></span>
+              </div>
+            </div>
+            <div class="mk-body">
+              <div class="mk-gen">
+                <h5 data-i18n="mk.general">Ajustes generales</h5>
+                <div class="mk-sec" id="mkThemes">
+                  <div class="mk-lab"><span data-i18n="mk.theme">Temática</span><span class="mk-grid"><span data-i18n="mk.gridlbl">Cuadrícula</span><i class="mk-chip on" data-i18n="mk.yes">Sí</i><i class="mk-chip" data-i18n="mk.no">No</i></span></div>
+                  <div class="mk-chips" id="mkThemeChips"></div>
+                </div>
+                <div class="mk-sec" id="mkPalette">
+                  <div class="mk-lab"><span data-i18n="mk.palette">Paleta</span></div>
+                  <div class="mk-chips" id="mkPaletteChips"></div>
+                  <div class="mk-sw">
+                    <span class="mk-sw-i"><i id="mkSw1"></i><span data-i18n="mk.primary">Principal</span><code id="mkHex1">#ff2a3d</code></span>
+                    <span class="mk-sw-i"><i class="ink"></i><span data-i18n="mk.secondary">Secundario</span><code>#f3f1ec</code></span>
+                  </div>
+                </div>
+                <div class="mk-sec" id="mkMode">
+                  <div class="mk-lab"><span data-i18n="mk.mode">Modo</span></div>
+                  <div class="mk-chips">
+                    <span class="mk-chip" data-i18n="mk.m1">Blanco nube</span><span class="mk-chip" data-i18n="mk.m2">Space Gray</span><span class="mk-chip" data-i18n="mk.m3">Space Black</span><span class="mk-chip on" data-i18n="mk.m4">Según sistema</span>
+                  </div>
+                </div>
+                <div class="mk-sliders" id="mkSliders">
+                  <div class="mk-sl" id="mkSens"><div class="mk-sl-h"><span data-i18n="mk.s1">Sensibilidad</span><code id="mkSensVal">+4.0 dB</code></div><div class="mk-track"><b style="width:58%"></b><i style="left:58%"></i></div></div>
+                  <div class="mk-sl"><div class="mk-sl-h"><span data-i18n="mk.s2">Movimiento</span><code>1.40×</code></div><div class="mk-track"><b style="width:56%"></b><i style="left:56%"></i></div></div>
+                  <div class="mk-sl"><div class="mk-sl-h"><span data-i18n="mk.s3">Suavizado del espectro</span><code>0%</code></div><div class="mk-track"><b style="width:0%"></b><i style="left:0%"></i></div></div>
+                  <div class="mk-sl"><div class="mk-sl-h"><span data-i18n="mk.s4">Referencia del VU</span><code>0 VU = -9 dBFS</code></div><div class="mk-track"><b style="width:80%"></b><i style="left:80%"></i></div></div>
+                  <div class="mk-sl"><div class="mk-sl-h"><span data-i18n="mk.s5">Altura de la franja</span><code>180 px</code></div><div class="mk-track"><b style="width:28%"></b><i style="left:28%"></i></div></div>
+                  <label class="mk-check"><i class="on"><svg data-icon="tick"></svg></i><span data-i18n="mk.s6">Ajustar automáticamente aplicaciones en uso.</span></label>
+                </div>
+              </div>
+              <div class="mk-col">
+                <h5 data-i18n="mk.collection">Espectros y gráficas</h5>
+                <div class="mk-edit">
+                  <div><small data-i18n="mk.editing">Editando</small><b data-i18n="mk.pick">Selecciona una gráfica</b></div>
+                  <div><small data-i18n="mk.theme">Temática</small><span class="mk-field" data-i18n="mk.general2">Temática general</span></div>
+                </div>
+                <h6 data-i18n="mk.search">Buscar por nombre</h6>
+                <div class="mk-list" id="mkList"></div>
+              </div>
+            </div>
+            <div class="mk-presets" id="mkPresets">
+              <span class="mk-presets-l" data-i18n="mk.presets">Presets</span>
+              <span class="mk-chip mk-pchip">Bellakita · @prodbykassy</span>
+              <span class="mk-chip mk-pchip" id="mkNewPreset" hidden><span data-i18n="mk.mine">Mi preset</span> 01</span>
+              <span class="mk-chip" id="mkSave" data-i18n="mk.save">Guardar nuevo preset</span>
+              <span class="mk-chip" id="mkExport" data-i18n="mk.export">Exportar</span>
+              <span class="mk-chip" data-i18n="mk.import">Importar</span>
+              <span class="mk-toast mono" id="mkToast"><svg data-icon="tick"></svg>hyro-preset.json</span>
+            </div>
+          </div>
+
+          <div class="mk-hots" id="mkHots"></div>
+          <div class="mk-focus" id="mkFocus"></div>
+          <div class="mk-cursor" id="mkCursor"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6 1.6L10 19z"/></svg><span class="mk-click"></span></div>
+        </div>
+      </div>
+
+      <div class="tour-nav">
+        <div class="tour-cards" id="tourCards" role="tablist" aria-label="Secciones" data-i18n-attr="aria-label:a11y.sections"></div>
+        <div class="tour-arrows">
+          <button class="round-btn" id="tourPrev" type="button" aria-label="Anterior" data-i18n-attr="aria-label:a11y.prev"><svg data-icon="arrowLeft"></svg></button>
+          <button class="round-btn" id="tourNext" type="button" aria-label="Siguiente" data-i18n-attr="aria-label:a11y.next"><svg data-icon="arrowRight"></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · RESEÑAS
+     Contenido de ejemplo: reemplaza las reseñas en public/landing/js/i18n.js (REVIEWS) por opiniones reales antes de publicar. -->
+<section class="sec" id="resenas">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow mono"><span class="idx">[03]</span><span data-i18n="rev.eyebrow">Reseñas</span></p>
+      <h2 class="display h2 reveal"><span class="line"><span data-i18n="rev.t1">Lo que dicen</span></span><span class="line"><span data-i18n="rev.t2">los productores</span></span></h2>
+      <p class="sec-lead" data-i18n="rev.lead">Productores, DJs y creadores que ya tienen Hyro Visuals abierto en cada sesión.</p>
+    </header>
+  </div>
+  <div class="reviews" id="reviews">
+    <div class="rv-row"><div class="rv-track" data-row="0"></div></div>
+  </div>
+</section>
+
+<!-- 5 · PREGUNTAS -->
+<section class="sec" id="preguntas">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow mono"><span class="idx">[04]</span><span data-i18n="faq.eyebrow">Preguntas</span></p>
+      <h2 class="display h2 reveal"><span class="line"><span data-i18n="faq.t1">Preguntas</span></span><span class="line"><span data-i18n="faq.t2">frecuentes</span></span></h2>
+      <p class="sec-lead" data-i18n="faq.lead">Todo lo que necesitas saber antes de comprar.</p>
+    </header>
+    <div class="faq" id="faq">
+     <div class="faq-col">
+      <div class="faq-item"><h3><button class="faq-q" type="button" aria-expanded="false"><span class="faq-t" data-i18n="faq.q1">¿Cuándo recibo mi clave y los instaladores?</span><svg data-icon="arrowDownRight" class="faq-i"></svg></button></h3><div class="faq-a"><div><p data-i18n="faq.a1">Al instante. En cuanto se confirma el pago recibes un correo con tu clave de activación y los enlaces de descarga para Windows y macOS.</p></div></div></div>
+      <div class="faq-item"><h3><button class="faq-q" type="button" aria-expanded="false"><span class="faq-t" data-i18n="faq.q2">¿Puedo volver a descargar los instaladores?</span><svg data-icon="arrowDownRight" class="faq-i"></svg></button></h3><div class="faq-a"><div><p data-i18n="faq.a2">Sí. Usa el enlace de tu correo de compra cuando lo necesites, por ejemplo al cambiar de equipo o al reinstalar.</p></div></div></div>
+      <div class="faq-item"><h3><button class="faq-q" type="button" aria-expanded="false"><span class="faq-t" data-i18n="faq.q3">¿HYRO funciona en Windows y macOS?</span><svg data-icon="arrowDownRight" class="faq-i"></svg></button></h3><div class="faq-a"><div><p data-i18n="faq.a3">Sí. Hay instaladores para Windows 10 y 11 de 64 bits y para macOS 13 o posterior, tanto en Mac con Apple Silicon como con Intel.</p></div></div></div>
+      <div class="faq-item"><h3><button class="faq-q" type="button" aria-expanded="false"><span class="faq-t" data-i18n="faq.q4">¿En cuántos equipos puedo usar la licencia?</span><svg data-icon="arrowDownRight" class="faq-i"></svg></button></h3><div class="faq-a"><div><p data-i18n="faq.a4">Cada clave activa un equipo a la vez. Personal incluye 1 clave y Equipos incluye 3. Si cambias de computadora, desvincula la anterior y activa la nueva.</p></div></div></div>
+      <div class="faq-item"><h3><button class="faq-q" type="button" aria-expanded="false"><span class="faq-t" data-i18n="faq.q5">¿Necesito configurar algo para que escuche mi música?</span><svg data-icon="arrowDownRight" class="faq-i"></svg></button></h3><div class="faq-a"><div><p data-i18n="faq.a5">No. Hyro Visuals escucha el audio del sistema en cuanto se abre. En macOS 14.2 o posterior solo tienes que autorizar la grabación de audio del sistema la primera vez. También puedes elegir una entrada de tu interfaz o un archivo.</p></div></div></div>
+     </div>
+     <div class="faq-col">
+      <div class="faq-item"><h3><button class="faq-q" type="button" aria-expanded="false"><span class="faq-t" data-i18n="faq.q6">¿Qué sistemas necesito?</span><svg data-icon="arrowDownRight" class="faq-i"></svg></button></h3><div class="faq-a"><div><p data-i18n="faq.a6">Windows 10 u 11 de 64 bits, o macOS 13 o posterior. La captura directa del audio del sistema en Mac requiere macOS 14.2 o posterior; en versiones anteriores puedes usar una entrada loopback o un archivo.</p></div></div></div>
+      <div class="faq-item"><h3><button class="faq-q" type="button" aria-expanded="false"><span class="faq-t" data-i18n="faq.q7">¿Mis archivos o mi audio se suben a algún servidor?</span><svg data-icon="arrowDownRight" class="faq-i"></svg></button></h3><div class="faq-a"><div><p data-i18n="faq.a7">No. Todo el procesamiento ocurre en tu equipo. Hyro Visuals no sube archivos, no graba tu pantalla y no incluye analítica. Solo se conecta para validar tu licencia.</p></div></div></div>
+      <div class="faq-item"><h3><button class="faq-q" type="button" aria-expanded="false"><span class="faq-t" data-i18n="faq.q8">¿Puedo guardar y compartir mis ajustes?</span><svg data-icon="arrowDownRight" class="faq-i"></svg></button></h3><div class="faq-a"><div><p data-i18n="faq.a8">Sí. Guarda tus combinaciones como presets y expórtalas o impórtalas como archivo para compartirlas con otros productores.</p></div></div></div>
+      <div class="faq-item"><h3><button class="faq-q" type="button" aria-expanded="false"><span class="faq-t" data-i18n="faq.q9">¿Es una suscripción?</span><svg data-icon="arrowDownRight" class="faq-i"></svg></button></h3><div class="faq-a"><div><p data-i18n="faq.a9">No. Pagas una sola vez y la licencia es tuya de por vida.</p></div></div></div>
+      <div class="faq-item"><h3><button class="faq-q" type="button" aria-expanded="false"><span class="faq-t" data-i18n="faq.q10">¿Cuál es la diferencia entre Personal y Equipos?</span><svg data-icon="arrowDownRight" class="faq-i"></svg></button></h3><div class="faq-a"><div><p data-i18n="faq.a10">Solo la cantidad de claves de activación. Personal incluye 1 clave y Equipos incluye 3 claves independientes, administradas desde tu cuenta. Las funciones son exactamente las mismas.</p></div></div></div>
+     </div>
+    </div>
+  </div>
+</section>
+
+<!-- Cintas cruzadas con texto infinito -->
+<div class="ribbons" aria-hidden="true">
+  <div class="ribbon r-red"><div class="ribbon-track" data-ribbon="b"></div></div>
+  <div class="ribbon r-dark"><div class="ribbon-track" data-ribbon="a"></div></div>
+</div>
+
+<!-- 5 · COMPRA -->
+<section class="sec" id="comprar">
+  <div class="wrap buy">
+    <div class="buy-copy">
+      <header class="sec-head">
+        <p class="eyebrow mono"><span class="idx">[05]</span><span data-i18n="buy.eyebrow">Licencia</span></p>
+        <h2 class="display h2 reveal"><span class="line"><span data-i18n="buy.t1">Compra</span></span><span class="line"><span>Hyro Visuals</span></span></h2>
+        <p class="sec-lead" data-i18n="buy.lead">Pago único y licencia de por vida. Los dos planes incluyen todo: solo cambia la cantidad de claves.</p>
+      </header>
+      <div class="plans-compare" id="planCompare">
+        <button class="pc" type="button" data-plan="personal" aria-pressed="true">
+          <span class="pc-dot"></span><span class="pc-name" data-i18n="buy.personal">Personal</span>
+          <span class="pc-keys" data-i18n="buy.keys1">1 clave de activación</span><span class="pc-price">$20</span>
+        </button>
+        <button class="pc" type="button" data-plan="teams" aria-pressed="false">
+          <span class="pc-dot"></span><span class="pc-name" data-i18n="buy.teams">Equipos</span>
+          <span class="pc-keys" data-i18n="buy.keys3">3 claves de activación</span><span class="pc-price">$49.99</span>
+        </button>
+      </div>
+      <ul class="incl">
+        <li><svg data-icon="tick"></svg><span data-i18n="buy.i1">Más de 30 espectros y gráficas</span></li>
+        <li><svg data-icon="tick"></svg><span data-i18n="buy.i2">Temáticas, paletas y presets</span></li>
+        <li><svg data-icon="tick"></svg><span data-i18n="buy.i3">Instaladores para Windows y macOS</span></li>
+        <li><svg data-icon="tick"></svg><span data-i18n="buy.i4">Procesamiento 100 % local</span></li>
+        <li><svg data-icon="tick"></svg><span data-i18n="buy.i5">Sin suscripciones</span></li>
+      </ul>
+    </div>
+
+    <div class="ticket-wrap">
+      <span class="sticker mono" data-i18n="buy.lifetime">De por vida</span>
+      <div class="ticket" id="ticket">
+        <div class="tk-glow"></div>
+        <div class="tk-head">
+          <div class="tk-brand"><span class="wordmark"><span class="wm-a">HYRO</span></span><small class="mono" data-i18n="buy.software">Licencia de software</small></div>
+          <div class="tk-no mono"><span data-i18n="buy.invoice">Factura</span><b id="tkNo">N.º HV-26-0001</b><span id="tkDate"></span></div>
+        </div>
+
+        <p class="tk-label mono" data-i18n="buy.choose">Elige tu licencia</p>
+        <div class="tk-plans" role="radiogroup" aria-label="Licencia" data-i18n-attr="aria-label:buy.choose">
+          <label class="tk-plan">
+            <input type="radio" name="plan" value="personal" checked>
+            <span class="tk-plan-top"><b data-i18n="buy.personal">Personal</b><span class="tk-plan-price">$20</span></span>
+            <small data-i18n="buy.k1">1 clave</small>
+          </label>
+          <label class="tk-plan">
+            <input type="radio" name="plan" value="teams">
+            <span class="tk-plan-top"><b data-i18n="buy.teams">Equipos</b><span class="tk-plan-price">$49.99</span></span>
+            <small data-i18n="buy.k3">3 claves</small>
+          </label>
+        </div>
+
+        <div class="tk-lines mono">
+          <div class="tk-row"><span>Hyro Visuals · <b id="tkPlanName" data-plan-name>Personal</b></span><span id="tkLine">20.00</span></div>
+          <div class="tk-row"><span><span data-i18n="buy.keysrow">Claves de activación</span> × <b id="tkKeys">1</b></span><span data-i18n="buy.incl">Incluido</span></div>
+          <div class="tk-row"><span data-i18n="buy.osrow">Windows + macOS</span><span data-i18n="buy.incl">Incluido</span></div>
+        </div>
+
+        <div class="tk-perf" id="tkPerf"></div>
+
+        <div class="tk-total">
+          <span class="tk-label mono" data-i18n="buy.total">Total</span>
+          <div class="tk-price">
+            <span class="tk-cur display">$</span>
+            <span class="tk-int display" id="tkInt" aria-live="polite">20</span>
+            <span class="tk-dec"><b class="mono" id="tkDec">.00 USD</b><em class="mono" data-i18n="buy.once">Pago único</em></span>
+          </div>
+          <p class="tk-coupon" data-i18n="buy.coupon">¿Tienes un cupón? Lo aplicas al finalizar el pago.</p>
+        </div>
+
+        <a class="btn btn-primary btn-lg tk-cta" id="buyBtn" href="#comprar"><span data-i18n="buy.cta">Comprar ahora</span><svg data-icon="arrowRight"></svg></a>
+
+        <div class="tk-pay">
+          <span class="pay mono">VISA</span><span class="pay mono">MASTERCARD</span><span class="pay mono">PAYPAL</span>
+          <span class="tk-secure mono"><svg data-icon="lock"></svg><span data-i18n="buy.secure">Pago seguro</span></span>
+        </div>
+        <div class="tk-barcode"><svg id="barcode" preserveAspectRatio="none" aria-hidden="true"></svg><span class="mono" id="barcodeTxt">HV-PER-0001-2026</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- 6 · FOOTER -->
+<footer class="footer" id="footer">
+  <div class="wrap">
+    <div class="foot-cta">
+      <h2 class="display h2 reveal"><span class="line"><span data-i18n="foot.t1">¿Listo para ver</span></span><span class="line"><span data-i18n="foot.t2">tu sonido?</span></span></h2>
+      <a class="btn btn-primary btn-lg" href="#comprar"><span data-i18n="hero.cta">Obtener Hyro Visuals</span><svg data-icon="arrowRight"></svg></a>
+    </div>
+
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="mascot-box" id="mascotBox" aria-hidden="true"><canvas id="mascotCanvas" data-vis="mascot"></canvas></div>
+        <p data-i18n="foot.desc">Visualizador de audio modular para Windows y macOS. Hecho para que veas lo que escuchas.</p>
+      </div>
+      <nav class="foot-col" aria-label="Mapa del sitio" data-i18n-attr="aria-label:foot.map">
+        <h4 class="mono" data-i18n="foot.map">Mapa del sitio</h4>
+        <a href="#inicio" data-i18n="foot.home">Inicio</a>
+        <a href="#funciones" data-i18n="nav.features">Funciones</a>
+        <a href="#accion" data-i18n="nav.action">En acción</a>
+        <a href="#preguntas" data-i18n="nav.faq">Preguntas</a>
+        <a href="#comprar" data-i18n="foot.buy">Comprar</a>
+      </nav>
+      <nav class="foot-col" aria-label="Legal">
+        <h4 class="mono">Legal</h4>
+        <a href="#" data-i18n="foot.privacy">Privacidad</a>
+        <a href="#" data-i18n="foot.terms">Términos</a>
+        <a href="#" data-i18n="foot.license">Licencia</a>
+      </nav>
+      <nav class="foot-col" aria-label="Redes" data-i18n-attr="aria-label:foot.social">
+        <h4 class="mono" data-i18n="foot.social">Redes</h4>
+        <a href="#"><svg data-icon="instagram"></svg>Instagram</a>
+        <a href="#"><svg data-icon="youtube"></svg>YouTube</a>
+        <a href="#"><svg data-icon="tiktok"></svg>TikTok</a>
+      </nav>
+      <form class="news" id="newsForm" novalidate>
+        <h4 class="mono" data-i18n="foot.news">Suscríbete</h4>
+        <p data-i18n="foot.newsd">Nuevos espectros, presets y novedades. Sin spam.</p>
+        <div class="news-field">
+          <svg data-icon="mail"></svg>
+          <label class="sr" for="newsEmail" data-i18n="foot.email">Correo electrónico</label>
+          <input id="newsEmail" name="email" type="email" autocomplete="email" placeholder="tu@correo.com" data-i18n-attr="placeholder:foot.ph" required>
+          <button class="btn btn-primary btn-sm" type="submit"><span data-i18n="foot.sub">Suscribirme</span></button>
+        </div>
+        <p class="news-msg mono" id="newsMsg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <div class="foot-bottom mono">
+      <span>© 2026 Hyro Visuals. <span data-i18n="foot.rights">Todos los derechos reservados.</span></span>
+      <span class="foot-made" data-i18n="foot.made">Hecho para productores</span>
+      <a href="#inicio" class="to-top"><span data-i18n="foot.top">Volver arriba</span><svg data-icon="arrowUpRight"></svg></a>
+    </div>
+  </div>
+</footer>
+
+<!-- Búsqueda en la web -->
+<div class="search" id="search" hidden>
+  <div class="search-backdrop" data-close></div>
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="Buscar en Hyro Visuals" data-i18n-attr="aria-label:search.title">
+    <div class="search-field">
+      <svg data-icon="search"></svg>
+      <input id="searchInput" type="text" placeholder="Busca funciones, preguntas, espectros…" data-i18n-attr="placeholder:search.ph" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="searchResults" aria-autocomplete="list">
+      <button class="search-esc" type="button" data-close>ESC</button>
+    </div>
+    <ul class="search-results" id="searchResults" role="listbox"></ul>
+    <div class="search-foot"><span><kbd>↑</kbd><kbd>↓</kbd> <span data-i18n="search.nav">navegar</span></span><span><kbd>Enter</kbd> <span data-i18n="search.open">abrir</span></span><span><kbd>Esc</kbd> <span data-i18n="search.close">cerrar</span></span></div>
+  </div>
+</div>
+
+<canvas class="walker" id="walker" aria-hidden="true"></canvas>
+
+<script src="/landing/js/icons.js?v=20"></script>
+<script src="/landing/js/audio.js?v=20"></script>
+<script src="/landing/js/visuals.js?v=20"></script>
+<script src="/landing/js/i18n.js?v=20"></script>
+<script src="/landing/js/app.js?v=20"></script>
+<!-- Sesión del cliente (Supabase): único módulo que compila Vite en esta página -->
+<script type="module" src="/src/landing/session.ts"></script>
+</body>
 </html>

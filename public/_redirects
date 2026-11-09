@@ -1,2 +1,17 @@
 /web3 / 301
 /web3/* /:splat 301
+
+# La landing es index.html; la app de React (app.html) atiende estas rutas.
+# Mantener igual que APP_ROUTES en vite.config.ts. El destino va sin ".html" para que Pages no redirija.
+/login /app 200
+/login/* /app 200
+/register /app 200
+/register/* /app 200
+/recuperar-contrasena /app 200
+/recuperar-contrasena/* /app 200
+/checkout /app 200
+/checkout/* /app 200
+/cuenta /app 200
+/cuenta/* /app 200
+/admin /app 200
+/admin/* /app 200
