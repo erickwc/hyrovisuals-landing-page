@@ -16,6 +16,8 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
   const t = k => I18N.t(k);
+  // Ejecuta una parte de la web sin que su error detenga a las demás (ver "Arranque").
+  const safe = (name, fn) => { try { fn(); return true; } catch (err) { console.error('[Hyro] ' + name, err); return false; } };
 
   /* ---------- Íconos (Hugeicons en línea) ---------- */
   function icons(scope = document) {
@@ -27,7 +29,7 @@
       svg.innerHTML = d; svg.dataset.done = '1';
     });
   }
-  icons();
+  safe('icons', icons);
 
   /* ---------- Tema ---------- */
   function readTheme() {
@@ -35,24 +37,40 @@
     HV.setTheme({ ink: v('--ink'), red: v('--red'), panel: v('--panel'), dim: v('--ink-3'), key: root.dataset.theme });
     const meta = $('meta[name="theme-color"]'); if (meta) meta.content = v('--bg');
   }
-  readTheme();
+  safe('tema', readTheme);
   $('#themeBtn').addEventListener('click', () => {
     root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
     try { localStorage.setItem('hyro.theme', root.dataset.theme); } catch (e) {}
-    readTheme();
+    safe('tema', readTheme);
   });
 
   /* ---------- Idioma ---------- */
-  I18N.collect();
+  safe('textos', () => I18N.collect());
   const listeners = [];
   const onLang = fn => { listeners.push(fn); };
-  document.addEventListener('langchange', () => listeners.forEach(fn => fn(I18N.lang)));
+  document.addEventListener('langchange', () => listeners.forEach(fn => safe('idioma', () => fn(I18N.lang))));
   $('#langBtn').addEventListener('click', () => I18N.apply(I18N.lang === 'es' ? 'en' : 'es'));
   onLang(l => { $('#langLabel').textContent = l.toUpperCase(); });
 
-  /* ---------- Bucle de animación ---------- */
+  /* ---------- Bucle de animación ----------
+     Un error en un cuadro (un navegador que no soporta algo) no puede detener el bucle: se registra, se quita
+     esa animación y, si la intro sigue en pantalla, se termina para mostrar la web. */
   const frameHooks = [];
-  function loop(now) { HV.frame(now); for (const fn of frameHooks) fn(now); requestAnimationFrame(loop); }
+  let frameErr = false;
+  function loop(now) {
+    try { HV.frame(now); } catch (err) { if (!frameErr) { frameErr = true; console.error('[Hyro] visuales', err); } }
+    for (let i = 0; i < frameHooks.length; i++) {
+      try { frameHooks[i](now); } catch (err) { console.error('[Hyro] animación', err); frameHooks.splice(i--, 1); endIntro(); }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  /* Quita la intro de golpe y deja la web lista (si la intro falla o no puede correr). */
+  function endIntro() {
+    const el = $('#intro'); if (el) el.remove();
+    root.classList.remove('is-intro'); root.classList.add('is-ready');
+    HV.paused = false;
+  }
 
   /* ---------- Intro: onda circular que se expande ---------- */
   function intro() {
@@ -173,7 +191,9 @@
     };
     let userMoved = false;
     ['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, () => { userMoved = true; }, { once: true, passive: true }));
-    const apply = () => { if (!userMoved) scrollTo({ top: Math.max(0, Math.round(target())), behavior: 'instant' }); };
+    // behavior 'instant' no existe en Safari antiguo (lanza un error): ahí se usa scrollTo(x, y), que también es inmediato
+    const jump = top => { try { scrollTo({ top, behavior: 'instant' }); } catch (e) { scrollTo(0, top); } };
+    const apply = () => { if (!userMoved) jump(Math.max(0, Math.round(target()))); };
     apply(); requestAnimationFrame(apply);
     document.fonts && document.fonts.ready.then(() => requestAnimationFrame(apply));
     setTimeout(apply, 400);
@@ -1005,11 +1025,12 @@
     });
   }
 
-  /* ---------- Arranque ---------- */
-  if (I18N.lang === 'en') I18N.apply('en'); else document.dispatchEvent(new CustomEvent('langchange', { detail: 'es' }));
-  scrollMemory();
-  intro();
-  nav(); rails(); marquees(); reviews(); auth(); walker(); search(); heroFloats(); hero(); features(); tour(); faq(); pricing(); newsletter(); reveals(); footer();
+  /* ---------- Arranque ----------
+     Cada sección arranca por separado: si una falla en algún navegador, las demás y la intro siguen funcionando. */
+  safe('idioma', () => { if (I18N.lang === 'en') I18N.apply('en'); else document.dispatchEvent(new CustomEvent('langchange', { detail: 'es' })); });
+  safe('scrollMemory', scrollMemory);
+  if (!safe('intro', intro)) endIntro();
+  [nav, rails, marquees, reviews, auth, walker, search, heroFloats, hero, features, tour, faq, pricing, newsletter, reveals, footer].forEach(fn => safe(fn.name, fn));
   $('#langLabel').textContent = I18N.lang.toUpperCase();
   requestAnimationFrame(loop);
 })();
