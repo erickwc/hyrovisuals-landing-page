@@ -62,41 +62,28 @@
       'stage.d.grid': 'Cuadrícula autoadaptable: los módulos se reparten solos, sin scroll.',
       'stage.d.float': 'Separa cada visual como un cuadro independiente.',
       'news.ok': '¡Listo! Te avisaremos de las novedades.', 'news.err': 'Escribe un correo válido.', 'news.fail': 'No se pudo enviar. Inténtalo de nuevo.',
+      'rv.verified': 'Cliente verificado', 'rv.anon': 'Cliente de Hyro', 'rv.empty': 'Todavía no hay reseñas. Los clientes pueden dejar la suya desde su biblioteca.', 'rv.error': 'No pudimos cargar las reseñas.',
       'mk.nosrc': 'Sin fuente', 'mk.src1': 'Audio del sistema',
       ticker: ['Pago único', 'Desde 20 US$', 'Acceso de por vida', 'Windows y Mac', 'Para productores, DJs y creadores', '30+ espectros de audio'],
       ribbonA: ['Para productores', 'DJs', 'Creadores'], ribbonB: ['Un solo pago', 'Acceso de por vida'],
       months: ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'],
       plan: { personal: 'Personal', teams: 'Equipos' }, invoiceNo: 'N.º',
-      'search.empty': 'Sin resultados para', 'search.suggest': 'Sugerencias', 'search.module': 'Espectro disponible en Hyro Visuals', 'search.step': 'Paso del recorrido', 'search.plan1': '1 clave de activación · $20', 'search.plan3': '3 claves de activación · $49,99'
+      'search.empty': 'Sin resultados para', 'search.suggest': 'Sugerencias', 'search.module': 'Espectro disponible en Hyro Visuals', 'search.step': 'Paso del recorrido', 'search.plan1': '1 clave de activación · {p}', 'search.plan3': '3 claves de activación · {p}'
     },
     en: {
       'stage.d.strip': 'The strip lives at the top and your apps fit below it.',
       'stage.d.grid': 'Self-adapting grid: modules spread out on their own, no scrolling.',
       'stage.d.float': 'Pull each visual apart as an independent square.',
       'news.ok': 'Done! We’ll keep you posted.', 'news.err': 'Enter a valid email.', 'news.fail': 'Couldn’t send it. Please try again.',
+      'rv.verified': 'Verified customer', 'rv.anon': 'Hyro customer', 'rv.empty': 'No reviews yet. Customers can leave theirs from their library.', 'rv.error': 'We couldn’t load the reviews.',
       'mk.nosrc': 'No source', 'mk.src1': 'System audio',
       ticker: ['One-time payment', 'From 20 US$', 'Lifetime access', 'Mac and Windows', 'For producers, DJs and creators', '30+ audio spectrums'],
       ribbonA: ['For producers', 'DJs', 'Creators'], ribbonB: ['One purchase', 'Lifetime access'],
       months: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
       plan: { personal: 'Personal', teams: 'Teams' }, invoiceNo: 'No.',
-      'search.empty': 'No results for', 'search.suggest': 'Suggestions', 'search.module': 'Spectrum available in Hyro Visuals', 'search.step': 'Tour step', 'search.plan1': '1 activation key · $20', 'search.plan3': '3 activation keys · $49.99'
+      'search.empty': 'No results for', 'search.suggest': 'Suggestions', 'search.module': 'Spectrum available in Hyro Visuals', 'search.step': 'Tour step', 'search.plan1': '1 activation key · {p}', 'search.plan3': '3 activation keys · {p}'
     }
   };
-
-  // Reseñas de EJEMPLO — reemplázalas por opiniones reales antes de publicar.
-  // [iniciales, rol ES, rol EN, detalle, texto ES, texto EN]
-  const REVIEWS = [
-    ['PT', 'Productor de trap', 'Trap producer', 'Windows', 'Lo tengo abierto en cada sesión. La franja arriba del DAW ya es parte de mi flujo.', 'It’s open in every session. The strip above my DAW is part of my workflow now.'],
-    ['DS', 'DJ y streamer', 'DJ & streamer', 'macOS', 'Por fin un visualizador que no se ve genérico. Brutalismo con mi paleta queda increíble en stream.', 'Finally a visualizer that doesn’t look generic. Brutalism with my palette looks amazing on stream.'],
-    ['IM', 'Ingeniero de mezcla', 'Mix engineer', 'Windows', 'Tener True Peak y LUFS a la vista me ahorra abrir otro plugin solo para revisar niveles.', 'Having True Peak and LUFS in view saves me opening another plugin just to check levels.'],
-    ['DT', 'DJ de techno', 'Techno DJ', 'macOS', 'Separo los visuales en cuadros y armo mi propia pantalla detrás de la cabina.', 'I split the visuals into squares and build my own screen behind the booth.'],
-    ['BM', 'Beatmaker', 'Beatmaker', 'Windows', 'Pagué una vez y listo. Sin suscripciones, eso se agradece muchísimo.', 'Paid once and done. No subscriptions, which I really appreciate.'],
-    ['CC', 'Creadora de contenido', 'Content creator', 'macOS', 'La mascota bailando al ritmo es lo que más me preguntan cuando grabo.', 'The mascot dancing to the beat is what people ask about most when I record.'],
-    ['PR', 'Productor de reggaetón', 'Reggaeton producer', 'Windows', 'Se acomodó solo con mis dos monitores. No tuve que configurar nada.', 'It arranged itself across my two monitors. I didn’t have to set anything up.'],
-    ['EP', 'Estudio de producción', 'Production studio', 'Equipos', 'Compartimos presets entre todo el equipo y así todos usamos el mismo look.', 'We share presets across the whole team, so everyone uses the same look.'],
-    ['PH', 'Productora de house', 'House producer', 'macOS', 'Los espectros responden rapidísimo. Es como ver la mezcla en tiempo real.', 'The spectrums respond instantly. It’s like watching the mix in real time.'],
-    ['LF', 'Productor de lo-fi', 'Lo-fi producer', 'Windows', 'Lo dejo corriendo horas mientras produzco y se siente ligero.', 'I leave it running for hours while I produce and it feels light.']
-  ];
 
   // Catálogo completo de módulos de la app (37)
   const MODULES = [
@@ -164,7 +151,7 @@
 
   window.I18N = {
     collect, apply, t, get lang() { return lang; },
-    js: k => JS[lang][k], MODULES, THEMES, PALETTES, STEPS, REVIEWS,
+    js: k => JS[lang][k], MODULES, THEMES, PALETTES, STEPS,
     moduleName: name(MODULES), themeName: name(THEMES), paletteName: name(PALETTES)
   };
 })();

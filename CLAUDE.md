@@ -4,8 +4,12 @@ Dos páginas que Vite compila juntas:
 
 - **Landing** (`/`): `index.html`, HTML/CSS/JS sin React. Estilos, scripts, imágenes y fuentes en `public/landing/`
   (textos ES en el HTML, EN en `public/landing/js/i18n.js`; enlaces a login, registro y checkout en el `CONFIG` de
-  `public/landing/js/app.js`). Lo único que compila Vite ahí es `src/landing/session.ts`: con sesión iniciada cambia
-  «Iniciar sesión / Crear cuenta» por «Mi cuenta». La landing anterior en React quedó en la rama `landing-anterior`.
+  `public/landing/js/app.js`). Lo único que compila Vite ahí es `src/landing/main.ts`: `session.ts` (con sesión
+  iniciada cambia «Iniciar sesión / Crear cuenta» por «Mi cuenta») y `data.ts` (precios de la tabla `plans`, reseñas
+  de `public_reviews` y newsletter en `newsletter_subscribers`, por fetch a la API REST), que le pasa los datos a
+  app.js por `window.HyroLanding`. Los precios de respaldo de `PLANS` en app.js deben coincidir con Supabase.
+  app.js arranca cada sección con `safe()` y el `<head>` quita la intro si la web no carga: un error en un navegador
+  (p. ej. Safari de iPhone) no puede dejar la intro trabada. La landing anterior en React está en la rama `landing-anterior`.
 - **App** (login, registro, recuperar contraseña, checkout, `/cuenta`, `/admin`): `app.html` + React 18 + TypeScript.
   Textos en `src/data/content.ts` (ES/EN), tema e idioma en `src/lib/prefs.tsx` (mismas claves `hyro.theme` y
   `hyro.lang` que la landing).

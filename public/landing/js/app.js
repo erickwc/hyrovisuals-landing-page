@@ -6,9 +6,17 @@
   const CONFIG = {
     // checkout propio (Wompi): pide la sesión si falta. "equipos" es el id del plan Equipos en Supabase.
     checkout: { personal: '/checkout?plan=personal', teams: '/checkout?plan=equipos' },
-    auth: { login: '/login', signup: '/register' }, // Iniciar sesión y Crear cuenta
-    newsletterEndpoint: ''                    // URL que recibe POST {email}
+    auth: { login: '/login', signup: '/register' } // Iniciar sesión y Crear cuenta
   };
+
+  /* ===== Datos reales =====
+     src/landing/data.ts (Supabase) los entrega por window.HyroLanding cuando la web arranca:
+     setPlans (precios de la tabla plans), setReviews (reseñas publicadas) y subscribe (newsletter).
+     Estos precios son el respaldo mientras llegan (o si no hay conexión): mantenerlos iguales a Supabase. */
+  const PLANS = { personal: { int: '20', dec: '00', keys: 1, code: 'PER' }, teams: { int: '50', dec: '00', keys: 3, code: 'TEA' } };
+  const api = { setPlans: () => {}, setReviews: () => {}, subscribe: null };
+  const sep = () => (I18N.lang === 'en' ? '.' : ',');
+  const money = p => (+p.int).toString() + (p.dec === '00' ? '' : sep() + p.dec);
 
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -707,14 +715,14 @@
 
   /* ---------- Compra (factura) ---------- */
   function pricing() {
-    const PLANS = { personal: { int: '20', dec: '00', keys: 1, code: 'PER' }, teams: { int: '49', dec: '99', keys: 3, code: 'TEA' } };
     const ticket = $('#ticket'), intEl = $('#tkInt'), perf = $('#tkPerf');
     let plan = 'personal';
-    const sep = () => (I18N.lang === 'en' ? '.' : ',');
-    const money = p => (+p.int).toString() + (p.dec === '00' ? '' : sep() + p.dec);
 
-    intEl.innerHTML = PLANS.personal.int.split('').map(() => `<span class="dg"><span class="dg-col">${'0123456789'.split('').map(n => `<span>${n}</span>`).join('')}</span></span>`).join('');
+    // una columna de dígitos por cifra del precio (se rehace si el precio cambia de 2 a 3 cifras)
+    const buildDigits = n => { intEl.innerHTML = Array.from({ length: n }, () => `<span class="dg"><span class="dg-col">${'0123456789'.split('').map(d => `<span>${d}</span>`).join('')}</span></span>`).join(''); };
+    buildDigits(PLANS.personal.int.length);
     function digits(str, instant) {
+      if ($$('.dg-col', intEl).length !== str.length) { buildDigits(str.length); instant = true; }
       $$('.dg-col', intEl).forEach((col, i) => {
         if (instant) col.style.transition = 'none';
         col.style.transform = `translateY(${-0.86 * +str[i]}em)`;
@@ -761,23 +769,36 @@
     onLang(() => render(true));
     addEventListener('resize', notch);
     document.fonts && document.fonts.ready.then(notch);
+
+    // precios reales: { personal: { price, keys }, teams: { price, keys } } (solo los planes que lleguen)
+    api.setPlans = live => {
+      for (const id of Object.keys(PLANS)) {
+        const p = live && live[id];
+        if (!p || !(p.price > 0)) continue;
+        const [int, dec] = Number(p.price).toFixed(2).split('.');
+        Object.assign(PLANS[id], { int, dec, keys: p.keys || PLANS[id].keys });
+      }
+      render(true);
+    };
   }
 
   /* ---------- Newsletter ---------- */
   function newsletter() {
-    const form = $('#newsForm'), input = $('#newsEmail'), msg = $('#newsMsg');
+    const form = $('#newsForm'), input = $('#newsEmail'), msg = $('#newsMsg'), btn = $('button[type="submit"]', form);
     form.addEventListener('submit', async e => {
       e.preventDefault();
-      const email = input.value.trim();
+      const email = input.value.trim().toLowerCase();
       msg.classList.remove('err');
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { msg.textContent = t('news.err'); msg.classList.add('err'); input.focus(); return; }
+      if (btn.disabled) return;
+      btn.disabled = true;
       try {
-        if (CONFIG.newsletterEndpoint) {
-          const r = await fetch(CONFIG.newsletterEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
-          if (!r.ok) throw new Error(r.status);
-        } else console.info('[Hyro] Configura CONFIG.newsletterEndpoint en assets/js/app.js');
+        // se guarda en Supabase (tabla newsletter_subscribers); sin conexión se avisa del error, nunca un falso «listo»
+        if (!api.subscribe) throw new Error('newsletter sin conexión');
+        await api.subscribe(email, I18N.lang);
         msg.textContent = t('news.ok'); form.reset();
-      } catch (err) { msg.textContent = t('news.fail'); msg.classList.add('err'); }
+      } catch (err) { console.error('[Hyro] newsletter', err); msg.textContent = t('news.fail'); msg.classList.add('err'); }
+      btn.disabled = false;
     });
   }
 
@@ -834,19 +855,29 @@
   }
 
   /* ---------- Reseñas: dos filas en movimiento que se detienen al pasar el cursor ---------- */
+  /* Reseñas reales: las que dejan los clientes con compra pagada desde su biblioteca (Supabase, función
+     public_reviews; las que oculta un admin no llegan). Con pocas se muestran quietas; desde 4, en cinta infinita. */
   function reviews() {
-    const track = $('#reviews .rv-track');
-    const star = window.HI && HI.star ? `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">${HI.star}</svg>` : '<i class="star"></i>';
-    const card = (r, i) => {
-      const en = I18N.lang === 'en', handle = (en ? '@user' : '@usuario') + String(i + 1).padStart(2, '0');
-      return `<article class="rv"><div class="rv-stars" role="img" aria-label="5/5">${star.repeat(5)}</div><p class="rv-q">“${en ? r[5] : r[4]}”</p><div class="rv-who"><span class="rv-av">${r[0]}</span><span><b>${en ? r[2] : r[1]}</b><small>${handle}</small></span></div></article>`;
-    };
+    const box = $('#reviews'), track = $('#reviews .rv-track');
+    if (!box || !track) return;
+    const path = window.HI && HI.star ? HI.star : '';
+    const stars = n => Array.from({ length: 5 }, (_, i) => `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"${i < n ? '' : ' class="off"'}>${path}</svg>`).join('');
+    // el texto lo escriben los clientes: siempre se escapa antes de ponerlo en el HTML
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+    const initials = name => (name || 'H').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    const card = r => `<article class="rv"><div class="rv-stars" role="img" aria-label="${r.rating}/5">${stars(r.rating)}</div><p class="rv-q">“${esc(r.text)}”</p><div class="rv-who"><span class="rv-av">${r.avatarUrl ? `<img src="${esc(r.avatarUrl)}" alt="" loading="lazy" decoding="async">` : esc(initials(r.name))}</span><span><b>${esc(r.name || t('rv.anon'))}</b><small>${t('rv.verified')}</small></span></div></article>`;
+    let list = null, failed = false; // null: todavía no llegan
     const render = () => {
-      if (!track) return;
-      const group = I18N.REVIEWS.map(card).join('');
-      track.innerHTML = group + group;
+      const few = !list || list.length < 4;
+      box.classList.toggle('is-static', few);
+      if (!list || !list.length) { track.innerHTML = list || failed ? `<p class="rv-empty">${t(failed ? 'rv.error' : 'rv.empty')}</p>` : ''; return; }
+      const group = list.map(card).join('');
+      // cinta infinita: se desplaza media pista, así que cada mitad debe ser más ancha que la pantalla
+      const half = few ? group : group.repeat(Math.ceil(8 / list.length));
+      track.innerHTML = few ? half : half + half;
     };
     render(); onLang(render);
+    api.setReviews = next => { if (next) list = next; else failed = true; render(); };
   }
 
   /* ---------- Mascota que aparece por las orillas (izquierda / derecha) ---------- */
@@ -952,7 +983,7 @@
       $$('.bento .cell').forEach(cell => items.push({ t: clean($('h3', cell).textContent), d: clean($('.cell-copy p', cell).textContent), tag: label('funciones'), go: () => goTo(cell) }));
       I18N.STEPS.forEach((st, i) => { const [t, d] = st[I18N.lang]; items.push({ t, d, tag: label('accion'), go: () => { goTo($('#tour')); document.dispatchEvent(new CustomEvent('tour:go', { detail: i })); } }); });
       $$('.faq-item').forEach(it => items.push({ t: clean($('.faq-t', it).textContent), d: clean($('.faq-a p', it).textContent), tag: label('preguntas'), go: () => { goTo(it); const q = $('.faq-q', it); if (q.getAttribute('aria-expanded') !== 'true') q.click(); } }));
-      [['personal', 'search.plan1'], ['teams', 'search.plan3']].forEach(([p, k]) => items.push({ t: I18N.js('plan')[p], d: I18N.js(k), tag: label('comprar'), go: () => { goTo($('#ticket')); const b = $(`#planCompare .pc[data-plan="${p}"]`); b && b.click(); } }));
+      [['personal', 'search.plan1'], ['teams', 'search.plan3']].forEach(([p, k]) => items.push({ t: I18N.js('plan')[p], d: I18N.js(k).replace('{p}', '$' + money(PLANS[p])), tag: label('comprar'), go: () => { goTo($('#ticket')); const b = $(`#planCompare .pc[data-plan="${p}"]`); b && b.click(); } }));
       I18N.MODULES.forEach(m => items.push({ t: I18N.moduleName(m[0]), d: I18N.js('search.module'), tag: label('funciones'), go: () => { goTo($('.c-spectra')); document.dispatchEvent(new CustomEvent('spec:show', { detail: m[0] })); } }));
       items.forEach(it => { it.nt = norm(it.t); it.n = norm(it.t + ' ' + it.d + ' ' + it.tag); });
     }
@@ -1032,5 +1063,8 @@
   if (!safe('intro', intro)) endIntro();
   [nav, rails, marquees, reviews, auth, walker, search, heroFloats, hero, features, tour, faq, pricing, newsletter, reveals, footer].forEach(fn => safe(fn.name, fn));
   $('#langLabel').textContent = I18N.lang.toUpperCase();
+  // punto de entrada de los datos reales (src/landing/data.ts)
+  window.HyroLanding = api;
+  document.dispatchEvent(new CustomEvent('hyro:landing-ready'));
   requestAnimationFrame(loop);
 })();

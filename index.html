@@ -363,7 +363,7 @@
 </section>
 
 <!-- 4 · RESEÑAS
-     Contenido de ejemplo: reemplaza las reseñas en public/landing/js/i18n.js (REVIEWS) por opiniones reales antes de publicar. -->
+     Reseñas reales de Supabase (las publicadas por clientes con compra): las dibuja reviews() en public/landing/js/app.js. -->
 <section class="sec" id="resenas">
   <div class="wrap">
     <header class="sec-head">
@@ -426,7 +426,7 @@
         </button>
         <button class="pc" type="button" data-plan="teams" aria-pressed="false">
           <span class="pc-dot"></span><span class="pc-name" data-i18n="buy.teams">Equipos</span>
-          <span class="pc-keys" data-i18n="buy.keys3">3 claves de activación</span><span class="pc-price">$49.99</span>
+          <span class="pc-keys" data-i18n="buy.keys3">3 claves de activación</span><span class="pc-price">$50</span>
         </button>
       </div>
       <ul class="incl">
@@ -456,7 +456,7 @@
           </label>
           <label class="tk-plan">
             <input type="radio" name="plan" value="teams">
-            <span class="tk-plan-top"><b data-i18n="buy.teams">Equipos</b><span class="tk-plan-price">$49.99</span></span>
+            <span class="tk-plan-top"><b data-i18n="buy.teams">Equipos</b><span class="tk-plan-price">$50</span></span>
             <small data-i18n="buy.k3">3 claves</small>
           </label>
         </div>
@@ -568,7 +568,7 @@
 <script src="/landing/js/visuals.js?v=21"></script>
 <script src="/landing/js/i18n.js?v=21"></script>
 <script src="/landing/js/app.js?v=21"></script>
-<!-- Sesión del cliente (Supabase): único módulo que compila Vite en esta página -->
-<script type="module" src="/src/landing/session.ts"></script>
+<!-- Sesión del cliente, precios, reseñas y newsletter (Supabase): único módulo que compila Vite en esta página -->
+<script type="module" src="/src/landing/main.ts"></script>
 </body>
 </html>
