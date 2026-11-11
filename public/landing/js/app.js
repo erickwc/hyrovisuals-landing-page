@@ -4,7 +4,7 @@
 
   /* ===== Configuración: enlaces a la app (React) que vive en las mismas rutas del sitio ===== */
   const CONFIG = {
-    // checkout propio (Wompi): pide la sesión si falta. "equipos" es el id del plan Equipos en Supabase.
+    // checkout propio: pide la sesión si falta. "equipos" es el id del plan Equipos en Supabase.
     checkout: { personal: '/checkout?plan=personal', teams: '/checkout?plan=equipos' },
     auth: { login: '/login', signup: '/register' } // Iniciar sesión y Crear cuenta
   };

@@ -3,13 +3,26 @@ import { supabase } from "./supabase";
 
 export type Platform = "windows" | "mac";
 
+export type Activation = {
+  id: string;
+  /** Nombre del equipo tal como lo reporta la app (hostname). */
+  deviceName: string | null;
+  platform: string | null;
+  lastSeenAt: string;
+};
+
 export type License = {
   id: string;
   planId: PlanId;
   key: string;
-  /** Activada en un equipo ahora mismo. El servidor de licencias de la app todavía no lo guarda en esta base: siempre false. */
+  /** Activada en un equipo ahora mismo (la app de escritorio la registra al activar). */
   inUse: boolean;
+  activation: Activation | null;
 };
+
+/** Nombre legible del sistema que reporta la app (process.platform). */
+export const platformName = (platform: string | null) =>
+  platform === "win32" ? "Windows" : platform === "darwin" ? "macOS" : platform === "linux" ? "Linux" : platform ?? "";
 
 export type Product = {
   id: string;
@@ -41,7 +54,8 @@ export type Purchase = {
   couponCode: string | null;
   currency: string;
   status: PurchaseStatus;
-  platform: "wompi" | "paypal";
+  /** Pasarela que cobró (null en pedidos gratis con cupón o emitidos sin cobro). */
+  provider: string | null;
   /** Número de la transacción en la pasarela. */
   reference: string | null;
   invoiceUrl: string | null;
@@ -73,8 +87,10 @@ export async function fetchLibrary(): Promise<Product[]> {
 
   const { data, error } = await sb
     .from("licenses")
-    .select("id, plan_id, license_key, products(id, slug, name, version, image_path)")
+    .select("id, plan_id, license_key, products(id, slug, name, version, image_path), license_activations(id, device_name, platform, last_seen_at, released_at)")
     .eq("user_id", userId)
+    .eq("status", "active") // una clave revocada (reembolso, abuso) ya no se muestra
+    .is("license_activations.released_at", null)
     .order("created_at", { ascending: false }); // la clave más reciente va primero en la biblioteca
   if (error) throw error;
 
@@ -95,7 +111,14 @@ export async function fetchLibrary(): Promise<Product[]> {
         licenses: [],
       });
     }
-    byProduct.get(p.id)!.licenses.push({ id: row.id, planId: row.plan_id as PlanId, key: row.license_key, inUse: false });
+    const act = (row.license_activations as unknown as { id: string; device_name: string | null; platform: string | null; last_seen_at: string }[] | null)?.[0];
+    byProduct.get(p.id)!.licenses.push({
+      id: row.id,
+      planId: row.plan_id as PlanId,
+      key: row.license_key,
+      inUse: Boolean(act),
+      activation: act ? { id: act.id, deviceName: act.device_name, platform: act.platform, lastSeenAt: act.last_seen_at } : null,
+    });
   }
 
   const products = Array.from(byProduct.values());
@@ -117,6 +140,12 @@ export async function fetchLibrary(): Promise<Product[]> {
   }
 
   return products;
+}
+
+/** Libera el equipo que usa una clave (p. ej. una computadora perdida). La app de ese equipo se bloquea en su próxima verificación. */
+export async function releaseActivation(activationId: string): Promise<void> {
+  const { error } = await db().rpc("release_my_activation", { p_activation_id: activationId });
+  if (error) throw new Error(error.message.includes("release_limit") ? "release_limit" : error.message);
 }
 
 export async function fetchDownloadUrl(productId: string, platform: Platform): Promise<string> {
@@ -146,7 +175,7 @@ export async function fetchPurchases(): Promise<Purchase[]> {
   const [{ data, error }, { data: coupons }] = await Promise.all([
     db()
       .from("purchases")
-      .select("id, amount, discount_amount, currency, status, platform, plan_id, wompi_transaction_id, invoice_url, created_at, paid_at, products(slug, name, image_path)")
+      .select("id, amount, discount_amount, currency, status, provider, plan_id, provider_ref, invoice_url, created_at, paid_at, products(slug, name, image_path)")
       .eq("user_id", userId)
       .eq("status", "paid")
       .order("created_at", { ascending: false }),
@@ -170,8 +199,8 @@ export async function fetchPurchases(): Promise<Purchase[]> {
       couponCode: couponByPurchase.get(row.id) ?? null,
       currency: row.currency,
       status: row.status as PurchaseStatus,
-      platform: row.platform as Purchase["platform"],
-      reference: row.wompi_transaction_id,
+      provider: row.provider,
+      reference: row.provider_ref,
       invoiceUrl: row.invoice_url,
     };
   });

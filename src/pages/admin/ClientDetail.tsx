@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchClientDetail, type ClientDetail as ClientDetailData } from "../../lib/admin-data";
 import { formatMoney, formatDate, formatTime } from "./periods";
@@ -9,6 +9,7 @@ import { Calendar } from "../../components/animate-ui/icons/hugeicons/calendar";
 import { ShoppingBag } from "../../components/animate-ui/icons/hugeicons/shopping-bag";
 import { Wallet } from "../../components/animate-ui/icons/hugeicons/wallet";
 import { Key01 } from "../../components/animate-ui/icons/hugeicons/key-01";
+import { LicensesBoard } from "./LicensesBoard";
 
 type Status = "loading" | "ready" | "error";
 
@@ -17,7 +18,7 @@ export function ClientDetail() {
   const [data, setData] = useState<ClientDetailData | null>(null);
   const [status, setStatus] = useState<Status>("loading");
 
-  useEffect(() => {
+  const load = useCallback(() => {
     fetchClientDetail(id)
       .then((d) => {
         setData(d);
@@ -25,6 +26,7 @@ export function ClientDetail() {
       })
       .catch(() => setStatus("error"));
   }, [id]);
+  useEffect(load, [load]);
 
   const paid = data?.purchases.filter((p) => p.status === "paid") ?? [];
   const spent = Math.round(paid.reduce((a, p) => a + Number(p.amount), 0) * 100) / 100;
@@ -78,8 +80,8 @@ export function ClientDetail() {
                     <Key01 size={14} />
                     Licencias
                   </p>
-                  <p className="kpi__value">{data.licenses.length}</p>
-                  <p className="kpi__foot">Claves de activación generadas</p>
+                  <p className="kpi__value">{data.licenses.filter((l) => l.status === "active").length}</p>
+                  <p className="kpi__foot">{data.licenses.filter((l) => l.activation).length} activadas en un equipo</p>
                 </div>
               </div>
             </div>
@@ -137,40 +139,10 @@ export function ClientDetail() {
               )}
             </div>
 
+            <LicensesBoard userId={id} licenses={data.licenses} onChanged={load} />
+
             <div className="board">
               <div className="board__main">
-                <section className="board__cell">
-                  <p className="board__title">
-                    Licencias <span className="board__count">{data.licenses.length}</span>
-                  </p>
-                  {data.licenses.length === 0 ? (
-                    <p className="board__empty">Sin licencias.</p>
-                  ) : (
-                    <div className="inner-table">
-                      <table className="admin-table">
-                        <thead>
-                          <tr>
-                            <th>Clave</th>
-                            <th>Plan</th>
-                            <th>Creada</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {data.licenses.map((l) => (
-                            <tr key={l.id}>
-                              <td className="mono">{l.license_key}</td>
-                              <td>
-                                <PlanCell planId={l.plan_id} />
-                              </td>
-                              <td className="is-muted">{formatDate(l.created_at)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </section>
-
                 <section className="board__cell">
                   <p className="board__title">
                     Reseñas <span className="board__count">{data.reviews.length}</span>

@@ -22,7 +22,6 @@ const AccountSettings = lazy(() => import("./pages/AccountSettings").then((m) =>
 const Library = lazy(() => import("./pages/Library").then((m) => ({ default: m.Library })));
 const Purchases = lazy(() => import("./pages/Purchases").then((m) => ({ default: m.Purchases })));
 const Checkout = lazy(() => import("./pages/Checkout").then((m) => ({ default: m.Checkout })));
-const CheckoutResult = lazy(() => import("./pages/CheckoutResult").then((m) => ({ default: m.CheckoutResult })));
 
 // Panel administrativo: carpeta aparte, acceso restringido a socios.
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout").then((m) => ({ default: m.AdminLayout })));
@@ -51,7 +50,6 @@ export function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/recuperar-contrasena" element={<RecoverPassword />} />
             <Route path="/checkout" element={<Checkout />} />
-            <Route path="/checkout/resultado" element={<CheckoutResult />} />
             <Route path="/cuenta" element={<AccountLayout />}>
               <Route index element={<AccountSettings />} />
               <Route path="biblioteca" element={<Library />} />

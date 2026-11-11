@@ -36,15 +36,14 @@ insert into public.products (slug, name, version, image_path, windows_url, mac_u
   ('hyro-visuals', 'Hyro Visuals', '1.4.2', 'media/productos/hyro-visuals.jpg', null, null);
 
 -- ---------------------------------------------------------------------------
--- compras (las crea el frontend en estado 'pending'; el webhook de Wompi las marca 'paid')
+-- compras (solo las escribe el servidor: confirm_purchase al confirmarse un pago, o un pedido gratis con cupón)
 -- ---------------------------------------------------------------------------
 create table public.purchases (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
   product_id uuid not null references public.products (id),
   plan_id text not null references public.plans (id),
-  wompi_link_id text,
-  wompi_transaction_id text unique,
+  provider_ref text unique, -- id de la transacción en la pasarela (evita registrar dos veces el mismo pago)
   amount numeric(10, 2) not null,
   currency text not null default 'USD',
   status text not null default 'pending' check (status in ('pending', 'paid', 'failed', 'refunded')),
@@ -136,7 +135,7 @@ create trigger purchases_handle_paid
 
 -- ---------------------------------------------------------------------------
 -- RLS: cada cliente solo ve lo suyo; compras/licencias las escribe el backend
--- (service role, desde las Edge Functions de Wompi), nunca el cliente.
+-- (funciones del servidor), nunca el cliente.
 -- ---------------------------------------------------------------------------
 alter table public.plans enable row level security;
 alter table public.products enable row level security;

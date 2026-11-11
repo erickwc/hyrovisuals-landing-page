@@ -2,7 +2,7 @@
 // Solo administradores. El frontend ya creó la fila en product_installers (vía RLS)
 // antes de llamar esto; esta función no toca la base de datos, solo firma la URL.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { firstKeyFrom } from "../_shared/wompi.ts";
+import { firstKeyFrom } from "../_shared/keys.ts";
 import { presignR2Url } from "../_shared/r2.ts";
 
 const CORS_HEADERS = {

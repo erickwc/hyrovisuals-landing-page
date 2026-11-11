@@ -382,6 +382,45 @@
   flex: none;
   margin-left: auto;
 }
+/* equipo donde está activada la clave + liberar */
+.key-device {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-top: 10px;
+  color: var(--muted);
+  font: 500 12px/1.4 var(--body);
+}
+.key-device__name strong {
+  color: var(--text);
+  font-weight: 600;
+}
+.key-device__release {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: 600 12px/1.4 var(--body);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.key-device__release:hover,
+.key-device__release[data-confirm="true"] {
+  color: var(--red, #e5484d);
+}
+.key-device__release:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.key-device__error {
+  flex-basis: 100%;
+  color: var(--red, #e5484d);
+}
+.mini-keys .key-device {
+  margin: 6px 0 0 12px;
+}
 .mini-keys__plan {
   color: var(--muted);
   font: 700 10px var(--body);

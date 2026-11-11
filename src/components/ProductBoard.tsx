@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { usePrefs } from "../lib/prefs";
 import { asset } from "../lib/asset";
-import { deleteReview, fetchDownloadUrl, fetchReview, markVersionSeen, saveReview } from "../lib/account-data";
+import { deleteReview, fetchDownloadUrl, fetchReview, markVersionSeen, platformName, releaseActivation, saveReview } from "../lib/account-data";
 import type { License, Product } from "../lib/account-data";
 import { Button } from "./Button";
 import { MiniModal } from "./MiniModal";
@@ -30,6 +30,11 @@ export function ProductBoard({ product }: { product: Product }) {
   const [shownKeys, setShownKeys] = useState<Set<string>>(() => new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [keysAnchor, setKeysAnchor] = useState<HTMLElement | null>(null);
+  // liberar un equipo: primer clic pide confirmar, el segundo libera
+  const [released, setReleased] = useState<Set<string>>(() => new Set());
+  const [confirmRelease, setConfirmRelease] = useState<string | null>(null);
+  const [releasing, setReleasing] = useState<string | null>(null);
+  const [releaseError, setReleaseError] = useState<{ id: string; text: string } | null>(null);
 
   const [reviewAnchor, setReviewAnchor] = useState<HTMLElement | null>(null);
   const [saved, setSaved] = useState({ rating: 0, comment: "" });
@@ -40,7 +45,9 @@ export function ProductBoard({ product }: { product: Product }) {
   const [reviewNotice, setReviewNotice] = useState<"saved" | "deleted" | null>(null);
 
   // la que está activada primero; las demás de la más reciente a la más antigua
-  const keys = [...product.licenses].sort((a, b) => Number(b.inUse) - Number(a.inUse));
+  const keys = product.licenses
+    .map((l) => (released.has(l.id) ? { ...l, inUse: false, activation: null } : l))
+    .sort((a, b) => Number(b.inUse) - Number(a.inUse));
   const license = keys[0];
   // en la mini ventana, las claves agrupadas por plan: el nombre del plan una sola vez
   const groups = keys.reduce<{ planId: License["planId"]; items: License[] }[]>((acc, item) => {
@@ -93,6 +100,49 @@ export function ProductBoard({ product }: { product: Product }) {
       setTimeout(() => setCopiedId((cur) => (cur === item.id ? null : cur)), 2000);
     });
   };
+
+  const onRelease = async (item: License) => {
+    if (!item.activation) return;
+    if (confirmRelease !== item.id) return setConfirmRelease(item.id);
+    setReleasing(item.id);
+    setReleaseError(null);
+    try {
+      await releaseActivation(item.activation.id);
+      setReleased((cur) => new Set(cur).add(item.id));
+      setConfirmRelease(null);
+    } catch (err) {
+      const limit = err instanceof Error && err.message === "release_limit";
+      setReleaseError({ id: item.id, text: limit ? t.releaseLimit : t.releaseError });
+    } finally {
+      setReleasing(null);
+    }
+  };
+
+  // en qué equipo está activada la clave, con el botón para liberarlo
+  const deviceRow = (item: License) =>
+    item.activation && (
+      <div className="key-device">
+        <span className="key-device__name">
+          {t.activeOn} <strong>{item.activation.deviceName || t.unknownDevice}</strong>
+          {item.activation.platform && ` · ${platformName(item.activation.platform)}`}
+        </span>
+        <button
+          type="button"
+          className="key-device__release"
+          data-confirm={confirmRelease === item.id}
+          disabled={releasing === item.id}
+          onClick={() => onRelease(item)}
+          onBlur={() => setConfirmRelease((cur) => (cur === item.id && releasing !== item.id ? null : cur))}
+        >
+          {releasing === item.id ? t.releasing : confirmRelease === item.id ? t.releaseConfirm : t.release}
+        </button>
+        {releaseError?.id === item.id && (
+          <span className="key-device__error" role="alert">
+            {releaseError.text}
+          </span>
+        )}
+      </div>
+    );
 
   const inUseTag = (item: License) =>
     item.inUse && (
@@ -232,6 +282,7 @@ export function ProductBoard({ product }: { product: Product }) {
                 </Button>
               )}
             </div>
+            {deviceRow(license)}
           </section>
         )}
       </div>
@@ -275,9 +326,12 @@ export function ProductBoard({ product }: { product: Product }) {
         <ul className="mini-keys__list">
           {groups.map((group) => (
             <li key={group.planId} className="mini-keys__group">
-              <span className="mini-keys__plan">{c.buy.plans[group.planId].name}</span>
+              <span className="mini-keys__plan">{c.buy.plans[group.planId]?.name ?? group.planId}</span>
               {group.items.map((item) => (
-                <div key={item.id}>{keyField(item, true)}</div>
+                <div key={item.id} className="mini-keys__item">
+                  {keyField(item, true)}
+                  {deviceRow(item)}
+                </div>
               ))}
             </li>
           ))}

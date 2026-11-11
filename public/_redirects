@@ -10,7 +10,6 @@
 /recuperar-contrasena /app 200
 /recuperar-contrasena/* /app 200
 /checkout /app 200
-/checkout/* /app 200
 /cuenta /app 200
 /cuenta/* /app 200
 /admin /app 200

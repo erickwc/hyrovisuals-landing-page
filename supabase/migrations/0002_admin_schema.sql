@@ -24,12 +24,12 @@ $$;
 -- comisiones por pasarela (editable; lo aplicado a cada venta se congela en purchases)
 -- ---------------------------------------------------------------------------
 create table public.gateway_fees (
-  platform text primary key,
+  provider text primary key,
   fee_percent numeric(5, 2) not null,
   updated_at timestamptz not null default now()
 );
 
-insert into public.gateway_fees (platform, fee_percent) values ('wompi', 3.50);
+-- Sin filas: se agrega la de la pasarela cuando se conecte una.
 
 -- ---------------------------------------------------------------------------
 -- cortes (reparto 50/50 entre los dos socios)
@@ -53,10 +53,10 @@ create table public.settlements (
 );
 
 -- ---------------------------------------------------------------------------
--- compras: plataforma, comisión congelada y a qué corte pertenecen
+-- compras: pasarela, comisión congelada y a qué corte pertenecen
 -- ---------------------------------------------------------------------------
 alter table public.purchases
-  add column platform text not null default 'wompi' check (platform in ('wompi', 'paypal')),
+  add column provider text, -- pasarela que cobró; null en pedidos gratis o emitidos sin cobro
   add column fee_percent numeric(5, 2),
   add column fee_amount numeric(10, 2),
   add column net_amount numeric(10, 2),

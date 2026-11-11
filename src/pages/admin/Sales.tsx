@@ -13,7 +13,7 @@ import { CreditCard } from "../../components/animate-ui/icons/hugeicons/credit-c
 import { Tag } from "../../components/animate-ui/icons/hugeicons/tag";
 
 type Status = "loading" | "ready" | "error";
-type SearchColumn = "all" | "client" | "plan" | "platform" | "discount" | "id";
+type SearchColumn = "all" | "client" | "plan" | "provider" | "discount" | "id";
 const PAGE_SIZE = 12;
 
 // "Todo el historial" deja el rango vacío: fetchSales no filtra por fecha.
@@ -23,7 +23,7 @@ const SEARCH_COLUMNS: { value: SearchColumn; label: string }[] = [
   { value: "all", label: "Todo" },
   { value: "client", label: "Cliente" },
   { value: "plan", label: "Plan" },
-  { value: "platform", label: "Pasarela" },
+  { value: "provider", label: "Pasarela" },
   { value: "discount", label: "Descuento" },
   { value: "id", label: "ID" },
 ];
@@ -31,20 +31,20 @@ const SEARCH_COLUMNS: { value: SearchColumn; label: string }[] = [
 function cellText(r: SaleRow, col: Exclude<SearchColumn, "all">): string {
   if (col === "client") return r.profiles?.email ?? "";
   if (col === "plan") return r.plan_id;
-  if (col === "platform") return r.platform;
+  if (col === "provider") return r.provider ?? "";
   if (col === "discount") return r.coupons?.code ?? "";
   return r.id;
 }
 
 function toCsv(rows: SaleRow[]): string {
-  const header = ["id", "fecha", "cliente", "plan", "plataforma", "importe", "cupon", "descuento", "comision", "neto", "estado"];
+  const header = ["id", "fecha", "cliente", "plan", "pasarela", "importe", "cupon", "descuento", "comision", "neto", "estado"];
   const lines = rows.map((r) =>
     [
       r.id,
       r.created_at,
       r.profiles?.email ?? "",
       r.plan_id,
-      r.platform,
+      r.provider ?? "",
       r.amount,
       r.coupons?.code ?? "",
       r.discount_amount ?? "",
@@ -86,7 +86,7 @@ export function Sales() {
   const filtered = useMemo(() => {
     const needle = search.trim().toLowerCase();
     if (!needle) return rows;
-    const columns = searchColumn === "all" ? (["client", "plan", "platform", "discount", "id"] as const) : [searchColumn];
+    const columns = searchColumn === "all" ? (["client", "plan", "provider", "discount", "id"] as const) : [searchColumn];
     return rows.filter((r) => columns.some((c) => cellText(r, c).toLowerCase().includes(needle)));
   }, [rows, search, searchColumn]);
 
@@ -263,7 +263,7 @@ export function Sales() {
                           <td>
                             <PlanCell planId={row.plan_id} />
                           </td>
-                          <td>{capitalize(row.platform)}</td>
+                          <td className={row.provider ? "" : "is-muted"}>{row.provider ? capitalize(row.provider) : "Sin cobro"}</td>
                           <td className="is-num">{formatMoney(Number(row.amount))}</td>
                           <td>
                             {row.coupons?.code ? (

@@ -24,7 +24,7 @@ alter table public.coupons enable row level security;
 create policy "admins administran cupones" on public.coupons
   for all using (public.is_admin()) with check (public.is_admin());
 
--- Valida y marca un uso del cupón de forma atómica. Lo llama el webhook al confirmar el pago,
+-- Valida y marca un uso del cupón de forma atómica. Solo lo llaman funciones del servidor al confirmar un pedido,
 -- nunca el cliente directo (no hay policy pública de lectura sobre coupons).
 create or replace function public.redeem_coupon(p_code text, p_product_id uuid)
 returns public.coupons

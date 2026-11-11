@@ -1,7 +1,7 @@
 // Devuelve una URL de descarga presignada (de corta duración) para el instalador
 // de la versión publicada de un producto, solo si el usuario tiene una licencia de ese producto.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { firstKeyFrom } from "../_shared/wompi.ts";
+import { firstKeyFrom } from "../_shared/keys.ts";
 import { presignR2Url } from "../_shared/r2.ts";
 
 const CORS_HEADERS = {
@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
 
     // Un plan puede traer varias claves (varias filas en licenses para el mismo producto),
     // así que no se puede usar maybeSingle() aquí: fallaría al encontrar más de una fila.
-    const { data: licenses } = await admin.from("licenses").select("id").eq("user_id", user.id).eq("product_id", productId).limit(1);
+    const { data: licenses } = await admin.from("licenses").select("id").eq("user_id", user.id).eq("product_id", productId).eq("status", "active").limit(1);
     if (!licenses || licenses.length === 0) return json({ error: "No tienes una licencia de este producto" }, 403);
 
     const { data: version } = await admin.from("product_versions").select("id").eq("product_id", productId).eq("status", "published").maybeSingle();

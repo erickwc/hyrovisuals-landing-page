@@ -25,12 +25,12 @@ export function Settings() {
     load();
   }, [load]);
 
-  const onSave = async (platform: string) => {
+  const onSave = async (provider: string) => {
     const value = Number(draft);
     if (Number.isNaN(value) || value < 0) return;
     setSaving(true);
     try {
-      await updateGatewayFee(platform, value);
+      await updateGatewayFee(provider, value);
       setEditing(null);
       load();
     } finally {
@@ -55,18 +55,25 @@ export function Settings() {
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Plataforma</th>
+                <th>Pasarela</th>
                 <th>Comisión</th>
                 <th>Actualizada</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
+              {fees.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="is-muted">
+                    Aún no hay una pasarela de pago conectada. Su comisión aparecerá aquí al conectarla.
+                  </td>
+                </tr>
+              )}
               {fees.map((fee) => (
-                <tr key={fee.platform}>
-                  <td style={{ textTransform: "capitalize" }}>{fee.platform}</td>
+                <tr key={fee.provider}>
+                  <td style={{ textTransform: "capitalize" }}>{fee.provider}</td>
                   <td>
-                    {editing === fee.platform ? (
+                    {editing === fee.provider ? (
                       <input
                         value={draft}
                         onChange={(e) => setDraft(e.target.value)}
@@ -87,9 +94,9 @@ export function Settings() {
                   </td>
                   <td>{formatDateTime(fee.updated_at)}</td>
                   <td>
-                    {editing === fee.platform ? (
+                    {editing === fee.provider ? (
                       <div style={{ display: "flex", gap: 10 }}>
-                        <button type="button" className="lnk" disabled={saving} onClick={() => onSave(fee.platform)}>
+                        <button type="button" className="lnk" disabled={saving} onClick={() => onSave(fee.provider)}>
                           {saving ? "Guardando…" : "Guardar"}
                         </button>
                         <button type="button" className="lnk" onClick={() => setEditing(null)}>
@@ -101,7 +108,7 @@ export function Settings() {
                         type="button"
                         className="lnk"
                         onClick={() => {
-                          setEditing(fee.platform);
+                          setEditing(fee.provider);
                           setDraft(String(fee.fee_percent));
                         }}
                       >

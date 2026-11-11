@@ -25,7 +25,7 @@ type RawPurchase = {
   fee_amount: number | null;
   net_amount: number | null;
   status: PurchaseStatus;
-  platform: string;
+  provider: string | null;
   plan_id: string;
   settlement_id: string | null;
   user_id: string;
@@ -40,7 +40,7 @@ type RawPurchase = {
 // incrustar profiles(email) automáticamente (no hay llave foránea entre esas dos tablas).
 // Se consulta profiles aparte y se mezcla en el cliente.
 const PURCHASE_SELECT =
-  "id, created_at, paid_at, amount, fee_amount, net_amount, status, platform, plan_id, settlement_id, user_id, coupon_id, discount_amount, settlements(status), coupons(code)";
+  "id, created_at, paid_at, amount, fee_amount, net_amount, status, provider, plan_id, settlement_id, user_id, coupon_id, discount_amount, settlements(status), coupons(code)";
 
 async function attachEmails<T extends { user_id: string }>(rows: T[]): Promise<(T & { profiles: { email: string } | null })[]> {
   const ids = Array.from(new Set(rows.map((r) => r.user_id)));
@@ -188,7 +188,7 @@ export async function markPurchaseRefunded(purchaseId: string) {
   await logAudit("mark_refunded", "purchase", purchaseId);
 }
 
-export type PlatformBreakdown = { platform: string; count: number; gross: number; fees: number; net: number };
+export type ProviderBreakdown = { provider: string | null; count: number; gross: number; fees: number; net: number };
 
 export type FinancesSummary = {
   count: number;
@@ -197,14 +197,14 @@ export type FinancesSummary = {
   net: number;
   partnerAShare: number;
   partnerBShare: number;
-  byPlatform: PlatformBreakdown[];
+  byProvider: ProviderBreakdown[];
 };
 
 export async function fetchFinancesSummary(startDate: string, endExclusive: string): Promise<FinancesSummary> {
   const sb = db();
   const { data, error } = await sb
     .from("purchases")
-    .select("platform, amount, fee_amount, net_amount")
+    .select("provider, amount, fee_amount, net_amount")
     .eq("status", "paid")
     .is("settlement_id", null)
     .gte("paid_at", startDate)
@@ -212,16 +212,16 @@ export async function fetchFinancesSummary(startDate: string, endExclusive: stri
   if (error) throw error;
   const rows = data ?? [];
 
-  const byPlatformMap = new Map<string, PlatformBreakdown>();
+  const byProviderMap = new Map<string | null, ProviderBreakdown>();
   for (const r of rows) {
-    const entry = byPlatformMap.get(r.platform) ?? { platform: r.platform, count: 0, gross: 0, fees: 0, net: 0 };
+    const entry = byProviderMap.get(r.provider) ?? { provider: r.provider, count: 0, gross: 0, fees: 0, net: 0 };
     entry.count += 1;
     entry.gross += Number(r.amount);
     entry.fees += Number(r.fee_amount ?? 0);
     entry.net += Number(r.net_amount ?? 0);
-    byPlatformMap.set(r.platform, entry);
+    byProviderMap.set(r.provider, entry);
   }
-  const byPlatform = Array.from(byPlatformMap.values()).map((p) => ({
+  const byProvider = Array.from(byProviderMap.values()).map((p) => ({
     ...p,
     gross: Math.round(p.gross * 100) / 100,
     fees: Math.round(p.fees * 100) / 100,
@@ -233,22 +233,22 @@ export async function fetchFinancesSummary(startDate: string, endExclusive: stri
   const net = sum(rows.map((r) => Number(r.net_amount ?? 0)));
   const partnerAShare = Math.round((net / 2) * 100) / 100;
 
-  return { count: rows.length, gross, fees, net, partnerAShare, partnerBShare: net - partnerAShare, byPlatform };
+  return { count: rows.length, gross, fees, net, partnerAShare, partnerBShare: net - partnerAShare, byProvider };
 }
 
-export type GatewayFee = { platform: string; fee_percent: number; updated_at: string };
+export type GatewayFee = { provider: string; fee_percent: number; updated_at: string };
 
 export async function fetchGatewayFees(): Promise<GatewayFee[]> {
-  const { data, error } = await db().from("gateway_fees").select("*").order("platform");
+  const { data, error } = await db().from("gateway_fees").select("*").order("provider");
   if (error) throw error;
   return data ?? [];
 }
 
-export async function updateGatewayFee(platform: string, feePercent: number) {
+export async function updateGatewayFee(provider: string, feePercent: number) {
   const sb = db();
-  const { error } = await sb.from("gateway_fees").update({ fee_percent: feePercent, updated_at: new Date().toISOString() }).eq("platform", platform);
+  const { error } = await sb.from("gateway_fees").update({ fee_percent: feePercent, updated_at: new Date().toISOString() }).eq("provider", provider);
   if (error) throw error;
-  await logAudit("update_fee", "gateway_fee", platform, { feePercent });
+  await logAudit("update_fee", "gateway_fee", provider, { feePercent });
 }
 
 export type Settlement = {
@@ -387,10 +387,57 @@ export async function fetchClients(): Promise<ClientRow[]> {
   });
 }
 
+export type AdminLicense = {
+  id: string;
+  license_key: string;
+  plan_id: string;
+  product_id: string;
+  created_at: string;
+  status: "active" | "revoked";
+  source: "purchase" | "manual";
+  note: string | null;
+  products: { name: string } | null;
+  /** Equipo que la usa ahora mismo (solo la activación vigente). */
+  activation: { id: string; device_name: string | null; platform: string | null; app_version: string | null; last_seen_at: string } | null;
+};
+
+const LICENSE_SELECT =
+  "id, license_key, plan_id, product_id, created_at, status, source, note, products(name), license_activations(id, device_name, platform, app_version, last_seen_at, released_at)";
+
+type LicenseRow = Omit<AdminLicense, "activation"> & {
+  license_activations: (NonNullable<AdminLicense["activation"]> & { released_at: string | null })[] | null;
+};
+const toAdminLicense = ({ license_activations, ...l }: LicenseRow): AdminLicense => ({
+  ...l,
+  activation: (license_activations ?? []).find((a) => !a.released_at) ?? null,
+});
+
+/** Emite tantas claves como dice el plan, sin compra (regalos, soporte, pruebas). */
+export async function adminIssueLicenses(input: { userId: string; productId: string; planId: string; note: string }) {
+  const { error } = await db().rpc("admin_issue_licenses", {
+    p_user_id: input.userId,
+    p_product_id: input.productId,
+    p_plan_id: input.planId,
+    p_note: input.note,
+  });
+  if (error) throw error;
+}
+
+/** Revocar saca a la app del equipo en su próxima verificación (≤ 30 s). */
+export async function adminSetLicenseStatus(licenseId: string, status: "active" | "revoked") {
+  const { error } = await db().rpc("admin_set_license_status", { p_license_id: licenseId, p_status: status });
+  if (error) throw error;
+}
+
+export async function adminReleaseActivation(activationId: string) {
+  const { error } = await db().rpc("admin_release_activation", { p_activation_id: activationId });
+  if (error) throw error;
+}
+
 export type ClientDetail = {
   profile: { id: string; email: string; createdAt: string };
   purchases: SaleRow[];
-  licenses: { id: string; license_key: string; plan_id: string; created_at: string }[];
+  licenses: AdminLicense[];
   reviews: { id: string; rating: number; comment: string; created_at: string }[];
 };
 
@@ -399,7 +446,7 @@ export async function fetchClientDetail(userId: string): Promise<ClientDetail> {
   const [{ data: profile, error: profileError }, { data: purchases }, { data: licenses }, { data: reviews }] = await Promise.all([
     sb.from("profiles").select("id, email, created_at").eq("id", userId).single(),
     sb.from("purchases").select(PURCHASE_SELECT).eq("user_id", userId).order("created_at", { ascending: false }),
-    sb.from("licenses").select("id, license_key, plan_id, created_at").eq("user_id", userId),
+    sb.from("licenses").select(LICENSE_SELECT).eq("user_id", userId).order("created_at", { ascending: false }),
     sb.from("reviews").select("id, rating, comment, created_at").eq("user_id", userId),
   ]);
   if (profileError) throw profileError;
@@ -408,7 +455,7 @@ export async function fetchClientDetail(userId: string): Promise<ClientDetail> {
   return {
     profile: { id: profile!.id, email, createdAt: profile!.created_at },
     purchases: ((purchases ?? []) as unknown as Omit<SaleRow, "profiles">[]).map((p) => ({ ...p, profiles: { email } })),
-    licenses: licenses ?? [],
+    licenses: ((licenses ?? []) as unknown as LicenseRow[]).map(toAdminLicense),
     reviews: reviews ?? [],
   };
 }

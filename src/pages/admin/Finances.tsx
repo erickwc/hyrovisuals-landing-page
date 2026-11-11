@@ -136,7 +136,7 @@ export function Finances() {
                   <div className="board__cell-head">
                     <p className="board__title">Desglose por pasarela</p>
                   </div>
-                  {summary.byPlatform.length === 0 ? (
+                  {summary.byProvider.length === 0 ? (
                     <p className="board__empty">Sin ventas sin cortar en este periodo.</p>
                   ) : (
                     <div className="inner-table">
@@ -151,9 +151,9 @@ export function Finances() {
                           </tr>
                         </thead>
                         <tbody>
-                          {summary.byPlatform.map((p) => (
-                            <tr key={p.platform}>
-                              <td>{capitalize(p.platform)}</td>
+                          {summary.byProvider.map((p) => (
+                            <tr key={p.provider ?? "none"}>
+                              <td>{p.provider ? capitalize(p.provider) : "Sin cobro (cupón o emitida)"}</td>
                               <td className="is-num">{p.count}</td>
                               <td className="is-num">{formatMoney(p.gross)}</td>
                               <td className="is-num">{formatMoney(p.fees)}</td>

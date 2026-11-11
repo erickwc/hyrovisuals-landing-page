@@ -1,5 +1,5 @@
 // Firma de URLs presignadas S3-compatibles para Cloudflare R2 (AWS SigV4, hecha a mano
-// con crypto.subtle — sin el SDK de AWS, mismo estilo liviano que _shared/wompi.ts).
+// con crypto.subtle — sin el SDK de AWS, sin dependencias externas).
 // Referencia: docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html
 
 function toHex(buf: ArrayBuffer): string {

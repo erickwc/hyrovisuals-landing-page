@@ -1,7 +1,8 @@
 import { supabase } from "./supabase";
 
-/* Datos del checkout: el plan elegido, la vista previa del cupón y el inicio del pago con Wompi.
-   El precio final siempre lo calcula la función wompi-create-link (el cliente nunca decide el monto). */
+/* Datos del checkout: el plan elegido, la vista previa del cupón y los pedidos gratis (cupón del 100 %).
+   El total siempre lo calcula la base (checkout_quote): el navegador nunca decide el monto.
+   El cobro con tarjeta se conecta aquí cuando haya pasarela; su servidor registra el pago con confirm_purchase. */
 
 export const PRODUCT_SLUG = "hyro-visuals";
 
@@ -13,8 +14,6 @@ export type CheckoutPlan = {
 };
 
 export type CouponPreview = { code: string; discount: number; amount: number };
-
-export type PaymentStart = { kind: "redirect"; url: string } | { kind: "free" };
 
 function db() {
   if (!supabase) throw new Error("Falta configurar Supabase.");
@@ -36,33 +35,20 @@ export async function fetchCheckoutPlan(planId: string): Promise<CheckoutPlan | 
   return { productName: product.name, planId: plan.id, price: Number(plan.price_usd), keys: Number(plan.license_count) };
 }
 
-// Mensaje de error que devuelve la función (cupón vencido, agotado…) o null si no trae uno.
-async function functionError(error: unknown): Promise<string | null> {
-  const context = (error as { context?: Response } | null)?.context;
-  if (!context) return null;
-  try {
-    const body = await context.json();
-    return typeof body?.error === "string" ? body.error : null;
-  } catch {
-    return null;
-  }
-}
+type Quote = { amount: number; discount: number; code: string | null; error?: string };
 
 export async function previewCoupon(planId: string, code: string): Promise<CouponPreview> {
-  const { data, error } = await db().functions.invoke<{ amount: number; discount: number; code: string }>("wompi-create-link", {
-    body: { preview: true, planId, productSlug: PRODUCT_SLUG, couponCode: code },
-  });
-  if (error || !data) throw new Error((await functionError(error)) ?? "Cupón inválido");
-  return { code: data.code, discount: Number(data.discount), amount: Number(data.amount) };
+  const { data, error } = await db().rpc("checkout_quote", { p_product_slug: PRODUCT_SLUG, p_plan_id: planId, p_coupon: code });
+  const quote = data as Quote | null;
+  if (error || !quote) throw new Error("");
+  if (quote.error || !quote.code) throw new Error(quote.error ?? "Cupón inválido");
+  return { code: quote.code, discount: Number(quote.discount), amount: Number(quote.amount) };
 }
 
-/** Crea la compra y el enlace de Wompi (solo tarjeta). Al terminar, Wompi vuelve a `returnUrl`. */
-export async function startPayment(planId: string, couponCode: string | null, returnUrl: string): Promise<PaymentStart> {
-  const { data, error } = await db().functions.invoke<{ checkoutUrl?: string; free?: boolean }>("wompi-create-link", {
-    body: { planId, productSlug: PRODUCT_SLUG, couponCode: couponCode ?? undefined, returnUrl },
-  });
-  if (error) throw new Error((await functionError(error)) ?? "");
-  if (data?.free) return { kind: "free" };
-  if (!data?.checkoutUrl) throw new Error("");
-  return { kind: "redirect", url: data.checkoutUrl };
+/** Pedido de $0 con un cupón del 100 %: queda pagado y las claves aparecen en la biblioteca. */
+export async function claimFreeOrder(planId: string, couponCode: string): Promise<string> {
+  const { data, error } = await db().rpc("checkout_claim_free", { p_product_slug: PRODUCT_SLUG, p_plan_id: planId, p_coupon: couponCode });
+  const result = data as { purchaseId?: string; error?: string } | null;
+  if (error || !result?.purchaseId) throw new Error(result?.error && result.error !== "payment_required" ? result.error : "");
+  return result.purchaseId;
 }

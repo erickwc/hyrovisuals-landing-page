@@ -47,7 +47,8 @@ export function Purchases() {
   const formatTime = (iso: string) => new Intl.DateTimeFormat(lang, { timeStyle: "short" }).format(new Date(iso));
   const formatAmount = (amount: number, currency: string) => new Intl.NumberFormat(lang, { style: "currency", currency }).format(amount);
   const planName = (planId: string) => c.buy.plans[planId as PlanId]?.name ?? planId;
-  const methodName = (platform: Purchase["platform"]) => (platform === "paypal" ? "PayPal" : "Wompi");
+  const methodName = (purchase: Purchase) =>
+    purchase.provider ? purchase.provider.charAt(0).toUpperCase() + purchase.provider.slice(1) : purchase.amount === 0 ? t.methodCoupon : t.methodNone;
 
   const onInvoice = (e: MouseEvent, purchase: Purchase) => {
     e.stopPropagation();
@@ -57,7 +58,7 @@ export function Purchases() {
     }
     setInvoiceError(null);
     setGenerating(purchase);
-    downloadInvoicePdf({ purchase, customer: { name: account.name, email: account.email }, planName: planName(purchase.planId), methodName: methodName(purchase.platform), t, lang })
+    downloadInvoicePdf({ purchase, customer: { name: account.name, email: account.email }, planName: planName(purchase.planId), methodName: methodName(purchase), t, lang })
       .catch(() => setInvoiceError(purchase.id))
       .finally(() => setGenerating(null));
   };
@@ -188,7 +189,7 @@ export function Purchases() {
                           <h3 className="lib-product__title purch__title">{t.payment}</h3>
                           <dl className="purch-dl">
                             {row(t.order, `#${orderNumber(purchase)}`)}
-                            {row(t.methodLabel, methodName(purchase.platform))}
+                            {row(t.methodLabel, methodName(purchase))}
                             {row(t.dateLabel, formatDate(purchase.date))}
                             {row(t.timeLabel, formatTime(purchase.date))}
                             {purchase.reference && row(t.referenceLabel, purchase.reference)}
