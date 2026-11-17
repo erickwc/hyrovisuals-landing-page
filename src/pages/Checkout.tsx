@@ -2,9 +2,22 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { usePrefs } from "../lib/prefs";
 import { supabase } from "../lib/supabase";
-import { claimFreeOrder, fetchCheckoutPlan, previewCoupon, type CheckoutPlan, type CouponPreview } from "../lib/checkout";
+import {
+  capturePaypalOrder,
+  claimFreeOrder,
+  createPaypalOrder,
+  fetchCheckoutPlan,
+  fetchPaypalConfig,
+  previewCoupon,
+  type CheckoutPlan,
+  type CouponPreview,
+  type PaypalConfig,
+} from "../lib/checkout";
+import { PaypalButtons } from "../components/PaypalButtons";
+import { celebrate } from "../lib/celebrate";
 import type { PlanId } from "../data/content";
 import { Button } from "../components/Button";
+import { Modal } from "../components/Modal";
 import { AnimateIcon } from "../components/animate-ui/icons/icon";
 import { ArrowLeft01 } from "../components/animate-ui/icons/hugeicons/arrow-left-01";
 import { Check } from "../components/animate-ui/icons/hugeicons/check";
@@ -17,7 +30,8 @@ import "../styles/checkout.css";
 
 /* Checkout propio, sin barra de arriba y en el idioma que el cliente ya tenía: el pedido a la izquierda y el pago
    a la derecha. El total lo calcula la base (cupón incluido). Con un cupón del 100 % el pedido se confirma aquí
-   mismo y las claves aparecen en la biblioteca; el cobro con tarjeta se activa cuando se conecte la pasarela. */
+   mismo; si no, se paga con PayPal (cuenta o tarjeta) cuando está encendido en el panel admin. En los dos casos
+   las claves aparecen en la biblioteca. */
 export function Checkout() {
   const { c, lang, theme } = usePrefs();
   const t = c.checkout;
@@ -39,15 +53,11 @@ export function Checkout() {
 
   const [claiming, setClaiming] = useState(false);
   const [claimError, setClaimError] = useState<string | null>(null);
-  const [freeOrder, setFreeOrder] = useState<string | null>(null);
+  const [done, setDone] = useState<{ id: string; paid: boolean } | null>(null);
 
-  // el checkout siempre se ve claro y limpio (no cambia la preferencia guardada)
-  useEffect(() => {
-    document.documentElement.dataset.theme = "light";
-    return () => {
-      document.documentElement.dataset.theme = theme;
-    };
-  }, [theme]);
+  const [paypal, setPaypal] = useState<PaypalConfig | null>(null);
+  const [capturing, setCapturing] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
 
   // sesión obligatoria: sin ella se inicia sesión y se vuelve aquí con el mismo plan
   useEffect(() => {
@@ -61,6 +71,10 @@ export function Checkout() {
         return;
       }
       setEmail(data.session.user.email ?? "");
+      // si PayPal está apagado o no responde, se ve el aviso de «muy pronto»
+      fetchPaypalConfig()
+        .then((config) => active && setPaypal(config))
+        .catch(() => undefined);
       try {
         const found = await fetchCheckoutPlan(planId);
         if (!active) return;
@@ -74,6 +88,17 @@ export function Checkout() {
       active = false;
     };
   }, [planId, navigate]);
+
+  // compra lista (pagada o con cupón del 100 %): modal de felicitaciones y confeti, una sola vez.
+  // Al cerrar el modal queda el mismo aviso en la columna de pago.
+  const [doneModal, setDoneModal] = useState(false);
+  useEffect(() => {
+    if (!done) return;
+    setDoneModal(true);
+    celebrate().catch(() => undefined);
+    // solo al confirmarse el pedido, no al cambiar de tema
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done]);
 
   // el cupón que venía de la landing se aplica solo, una vez cargado el plan
   useEffect(() => {
@@ -108,11 +133,21 @@ export function Checkout() {
     setClaimError(null);
     try {
       const purchaseId = await claimFreeOrder(plan.planId, coupon.code);
-      setFreeOrder(purchaseId.slice(0, 8).toUpperCase());
+      setDone({ id: purchaseId.slice(0, 8).toUpperCase(), paid: false });
     } catch (err) {
       setClaimError(err instanceof Error && err.message ? err.message : t.claimError);
     } finally {
       setClaiming(false);
+    }
+  };
+
+  const onPaypalApprove = async (orderId: string) => {
+    setCapturing(true);
+    try {
+      const purchaseId = await capturePaypalOrder(orderId);
+      setDone({ id: purchaseId.slice(0, 8).toUpperCase(), paid: true });
+    } finally {
+      setCapturing(false);
     }
   };
 
@@ -212,12 +247,12 @@ export function Checkout() {
 
             {/* pago */}
             <section className="co__pay" aria-labelledby="co-pay-title">
-              {freeOrder ? (
+              {done ? (
                 <div className="co__result" role="status">
                   <CircleCheckBig size={28} />
-                  <h2>{t.freeTitle}</h2>
-                  <p>{t.freeBody}</p>
-                  <p className="co__order-id">{t.orderLabel(freeOrder)}</p>
+                  <h2>{done.paid ? t.paidTitle : t.freeTitle}</h2>
+                  <p>{done.paid ? t.paidBody : t.freeBody}</p>
+                  <p className="co__order-id">{t.orderLabel(done.id)}</p>
                   <Button to="/cuenta/biblioteca" arrow>
                     {t.download}
                   </Button>
@@ -240,6 +275,32 @@ export function Checkout() {
                       <Button className="co__method" onClick={onClaimFree} loading={claiming} arrow={!claiming}>
                         {claiming ? t.preparing : t.payFree}
                       </Button>
+                    </div>
+                  ) : paypal?.enabled && paypal.clientId ? (
+                    <div className="co__free">
+                      <h2 className="co__subtitle" id="co-pay-title">
+                        {t.payTitle}
+                      </h2>
+                      <p>{t.paypalNote}</p>
+                      {paypal.env === "sandbox" && <p className="co__sandbox">{t.sandboxNote}</p>}
+                      <div className="co__paypal-wrap" aria-busy={capturing}>
+                        {/* el pedido se vuelve a crear con el cupón actual: los botones solo piden, el servidor pone el monto */}
+                        <PaypalButtons
+                          clientId={paypal.clientId}
+                          theme={theme}
+                          createOrder={() => createPaypalOrder(plan.planId, coupon?.code ?? null)}
+                          onApprove={onPaypalApprove}
+                          onError={(message) => setPayError(message === null ? null : message || t.payError)}
+                          loadError={t.paypalLoadError}
+                          moreLabel={t.payMore}
+                        />
+                        {capturing && <p className="co__capturing">{t.capturing}</p>}
+                      </div>
+                      {payError && (
+                        <p className="co__error" role="alert">
+                          {payError}
+                        </p>
+                      )}
                     </div>
                   ) : (
                     <div className="co__free">
@@ -265,6 +326,22 @@ export function Checkout() {
           </div>
         )}
       </main>
+
+      {done && (
+        <Modal
+          open={doneModal}
+          onClose={() => setDoneModal(false)}
+          title={done.paid ? t.paidTitle : t.freeTitle}
+          className="dlg--sm co__done"
+        >
+          <CircleCheckBig size={36} className="co__done-icon" />
+          <p className="co__done-body">{done.paid ? t.paidBody : t.freeBody}</p>
+          <p className="co__order-id">{t.orderLabel(done.id)}</p>
+          <Button to="/cuenta/biblioteca" arrow data-autofocus>
+            {t.download}
+          </Button>
+        </Modal>
+      )}
     </div>
   );
 }

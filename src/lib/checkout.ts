@@ -50,5 +50,49 @@ export async function claimFreeOrder(planId: string, couponCode: string): Promis
   const { data, error } = await db().rpc("checkout_claim_free", { p_product_slug: PRODUCT_SLUG, p_plan_id: planId, p_coupon: couponCode });
   const result = data as { purchaseId?: string; error?: string } | null;
   if (error || !result?.purchaseId) throw new Error(result?.error && result.error !== "payment_required" ? result.error : "");
+  // aviso por correo al equipo (si falla, el pedido ya quedó hecho)
+  db()
+    .functions.invoke("sale-notify", { body: { purchaseId: result.purchaseId } })
+    .catch(() => undefined);
   return result.purchaseId;
+}
+
+/* PayPal: el servidor (función paypal) crea el pedido con el total de checkout_quote y, al aprobarlo el cliente,
+   lo cobra, comprueba el monto y lo registra; las claves salen del trigger de compras. */
+
+export class PaymentError extends Error {
+  code: string | null;
+  constructor(message: string, code: string | null = null) {
+    super(message);
+    this.code = code;
+  }
+}
+
+/** Llama a una Edge Function y devuelve su JSON; si responde con error, lanza su mensaje. */
+export async function callFunction<T>(name: string, body: Record<string, unknown>): Promise<T> {
+  const { data, error } = await db().functions.invoke<T & { error?: string; code?: string }>(name, { body });
+  if (error) {
+    let detail: { error?: string; code?: string } | null = null;
+    const response = (error as { context?: Response }).context;
+    if (response && typeof response.json === "function") detail = await response.json().catch(() => null);
+    throw new PaymentError(detail?.error ?? "", detail?.code ?? null);
+  }
+  if (!data || data.error) throw new PaymentError(data?.error ?? "", data?.code ?? null);
+  return data;
+}
+
+export type PaypalConfig = { enabled: boolean; clientId: string | null; env: "live" | "sandbox" };
+
+export function fetchPaypalConfig(): Promise<PaypalConfig> {
+  return callFunction<PaypalConfig>("paypal", { action: "config" });
+}
+
+export async function createPaypalOrder(planId: string, coupon: string | null): Promise<string> {
+  const { orderId } = await callFunction<{ orderId: string }>("paypal", { action: "create", productSlug: PRODUCT_SLUG, planId, coupon });
+  return orderId;
+}
+
+export async function capturePaypalOrder(orderId: string): Promise<string> {
+  const { purchaseId } = await callFunction<{ purchaseId: string }>("paypal", { action: "capture", orderId });
+  return purchaseId;
 }

@@ -1449,3 +1449,103 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* casilla con su texto en un formulario de Configuración */
+.form-body > .check-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+/* etiquetas que son frases (Configuración): sin mayúscula en cada palabra */
+.status-pill.is-sentence {
+  text-transform: none;
+}
+
+/* menú colapsable (computadora): un riel de 57px con solo iconos; al pasar el mouse (o al llegar con el teclado)
+   el menú se despliega encima del contenido, sin moverlo. En teléfono sigue siendo el cajón de la hamburguesa. */
+.admin__nav-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (min-width: 881px) {
+  .admin__rail {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    flex: none;
+    width: 57px;
+    height: 100vh;
+  }
+  .admin__rail .admin__sidebar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 57px;
+    height: 100%;
+    overflow-x: hidden;
+    transition:
+      width 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 0.22s ease;
+  }
+  .admin__rail:hover .admin__sidebar,
+  .admin__rail:focus-within .admin__sidebar {
+    width: 264px;
+    box-shadow: 12px 0 32px rgba(0, 0, 0, 0.28);
+    /* un instante antes de abrir: pasar el mouse de camino no lo despliega */
+    transition-delay: 0.08s;
+  }
+  /* con el menú cerrado solo se ven los iconos y la foto */
+  .admin__rail .admin__nav-text,
+  .admin__rail .admin__nav-label,
+  .admin__rail .admin__profile-text,
+  .admin__rail .admin__logout {
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+  .admin__rail:hover .admin__nav-text,
+  .admin__rail:hover .admin__nav-label,
+  .admin__rail:hover .admin__profile-text,
+  .admin__rail:hover .admin__logout,
+  .admin__rail:focus-within .admin__nav-text,
+  .admin__rail:focus-within .admin__nav-label,
+  .admin__rail:focus-within .admin__profile-text,
+  .admin__rail:focus-within .admin__logout {
+    opacity: 1;
+    transition-delay: 0.12s;
+  }
+}
+@media (max-width: 880px) {
+  .admin__rail {
+    display: contents;
+  }
+}
+@media (min-width: 881px) and (prefers-reduced-motion: reduce) {
+  .admin__rail .admin__sidebar,
+  .admin__rail .admin__nav-text,
+  .admin__rail .admin__nav-label,
+  .admin__rail .admin__profile-text,
+  .admin__rail .admin__logout {
+    transition: none;
+  }
+}
+
+/* elemento activo del menú: fondo de la cabecera de los tableros, borde del color de las líneas e icono en blanco.
+   Cada opción mide 32px de alto y no pasa del ancho del menú: cerrado, el activo es un cuadrito de 32×32. */
+.admin__nav,
+.admin__nav-group {
+  grid-template-columns: minmax(0, 1fr);
+}
+.admin__nav-link {
+  min-width: 0;
+  height: 32px;
+}
+.admin__nav-link.active {
+  background: var(--selected);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--text);
+}
+.admin__nav-link.active svg {
+  color: var(--text);
+}

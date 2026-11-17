@@ -45,7 +45,7 @@ export function useRequireSession() {
   return { info, checked };
 }
 
-export type AdminSessionInfo = { email: string; createdAt: string };
+export type AdminSessionInfo = { email: string; createdAt: string; name: string | null; avatarUrl: string | null };
 
 export function useRequireAdmin() {
   const navigate = useNavigate();
@@ -65,13 +65,21 @@ export function useRequireAdmin() {
         navigate("/login", { replace: true });
         return;
       }
-      const { data: adminRow } = await supabase!.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle();
+      const [{ data: adminRow }, { data: profile }] = await Promise.all([
+        supabase!.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle(),
+        supabase!.from("profiles").select("name, avatar_url").eq("id", session.user.id).maybeSingle(),
+      ]);
       if (!active) return;
       if (!adminRow) {
         navigate("/", { replace: true });
         return;
       }
-      setInfo({ email: session.user.email ?? "", createdAt: session.user.created_at });
+      setInfo({
+        email: session.user.email ?? "",
+        createdAt: session.user.created_at,
+        name: profile?.name ?? null,
+        avatarUrl: profile?.avatar_url ?? null,
+      });
       setChecked(true);
     });
     return () => {

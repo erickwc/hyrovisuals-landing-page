@@ -251,6 +251,91 @@ export async function updateGatewayFee(provider: string, feePercent: number) {
   await logAudit("update_fee", "gateway_fee", provider, { feePercent });
 }
 
+// ---------------------------------------------------------------------------
+// formas de pago (PayPal) y avisos de venta por correo
+// ---------------------------------------------------------------------------
+
+export type PaymentMode = "live" | "sandbox";
+export type PaymentMethod = { provider: string; enabled: boolean; mode: PaymentMode; updated_at: string };
+
+/** Real (cobra dinero) o pruebas (sandbox de PayPal, sin dinero real). */
+export async function setPaymentMethodMode(provider: string, mode: PaymentMode) {
+  const { data, error } = await db()
+    .from("payment_methods")
+    .update({ mode, updated_at: new Date().toISOString() })
+    .eq("provider", provider)
+    .select("provider");
+  if (error) throw error;
+  if (!data?.length) throw new Error("No tienes permiso para cambiar esto.");
+  await logAudit("set_payment_mode", "payment_method", provider, { mode });
+}
+
+export async function fetchPaymentMethods(): Promise<PaymentMethod[]> {
+  const { data, error } = await db().from("payment_methods").select("*").order("provider");
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function setPaymentMethodEnabled(provider: string, enabled: boolean) {
+  const { data, error } = await db()
+    .from("payment_methods")
+    .update({ enabled, updated_at: new Date().toISOString() })
+    .eq("provider", provider)
+    .select("provider");
+  if (error) throw error;
+  if (!data?.length) throw new Error("No tienes permiso para cambiar esto.");
+  await logAudit(enabled ? "enable_payment_method" : "disable_payment_method", "payment_method", provider);
+}
+
+/** Lo que el panel no puede leer de la base: si los secretos de PayPal y del correo están cargados en Supabase. */
+export type CredentialsCheck = {
+  configured: boolean;
+  /** null si faltan los secretos; false si PayPal los rechazó */
+  credentialsOk: boolean | null;
+};
+export type PaymentStatus = CredentialsCheck & {
+  env: PaymentMode;
+  live: CredentialsCheck;
+  sandbox: CredentialsCheck;
+  emailConfigured: boolean;
+  emailFrom: string;
+};
+
+export async function fetchPaymentStatus(): Promise<PaymentStatus> {
+  const { data, error } = await db().functions.invoke<PaymentStatus>("paypal", { body: { action: "status" } });
+  if (error || !data) throw new Error(error?.message ?? "Sin respuesta");
+  return data;
+}
+
+export type SaleNotifications = { enabled: boolean; emails: string[]; updated_at: string };
+
+export async function fetchSaleNotifications(): Promise<SaleNotifications | null> {
+  const { data, error } = await db().from("sale_notifications").select("enabled, emails, updated_at").maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateSaleNotifications(enabled: boolean, emails: string[]) {
+  const { data, error } = await db()
+    .from("sale_notifications")
+    .update({ enabled, emails, updated_at: new Date().toISOString() })
+    .eq("id", true)
+    .select("id");
+  if (error) throw error;
+  if (!data?.length) throw new Error("No tienes permiso para cambiar esto.");
+  await logAudit("update_sale_notifications", "sale_notifications", "1", { enabled, emails });
+}
+
+export async function sendTestSaleEmail(): Promise<string[]> {
+  const { data, error } = await db().functions.invoke<{ sentTo?: string[]; error?: string }>("sale-notify", { body: { test: true } });
+  if (error) {
+    const response = (error as { context?: Response }).context;
+    const detail = response && typeof response.json === "function" ? await response.json().catch(() => null) : null;
+    throw new Error(detail?.error ?? "No se pudo enviar el correo de prueba.");
+  }
+  return data?.sentTo ?? [];
+}
+
 export type Settlement = {
   id: string;
   period_start: string;

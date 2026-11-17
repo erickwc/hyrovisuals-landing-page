@@ -1,10 +1,12 @@
 /* checkout: el pedido a la izquierda y la tarjeta de pago a la derecha, en el mismo estilo del panel de cliente */
-/* página blanca (siempre en tema claro): el checkout se ve limpio aunque la web esté en oscuro */
+/* sigue el tema de quien compra; en claro, la página va en blanco puro para que se vea limpia */
 .co {
+  min-height: 100vh;
+  background: var(--bg);
+}
+:root[data-theme="light"] .co {
   --bg: #ffffff;
   --panel: #ffffff;
-  min-height: 100vh;
-  background: #ffffff;
 }
 .co__main {
   padding-block: 32px 72px;
@@ -259,4 +261,127 @@
   .co__grid {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* botones de PayPal: mientras se confirma el cobro quedan tapados con el aviso */
+.co__paypal-wrap {
+  position: relative;
+  min-height: 46px;
+}
+.co__paypal {
+  position: relative;
+  z-index: 0;
+  display: grid;
+  gap: 10px;
+}
+/* en oscuro, el marco de PayPal pinta un fondo blanco: se recorta a la forma de píldora (y el formulario de
+   tarjeta, que viene en blanco, queda como una tarjeta redondeada) */
+.co__paypal > div {
+  border-radius: 4px;
+  overflow: hidden;
+}
+/* logos de PayPal, Visa, Mastercard… centrados debajo de los botones (sin recorte ni panel) */
+.co__paypal > .co__marks {
+  border-radius: 0;
+  overflow: visible;
+}
+.co__marks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.co__mark {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 22px;
+  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+}
+.co__mark--paypal {
+  background: #eef3fb;
+}
+.co__mark--visa {
+  background: #1a1f71;
+  border-color: #1a1f71;
+  color: #ffffff;
+  font: italic 800 10px/1 Arial, sans-serif;
+  letter-spacing: 0.02em;
+}
+.co__marks-more {
+  color: var(--muted);
+  font-size: 12px;
+}
+/* con el mismo esquema de color que su contenido, el navegador deja el marco transparente */
+.co__paypal iframe {
+  color-scheme: light;
+}
+/* formulario de tarjeta abierto: en un panel blanco, porque sus textos vienen en oscuro */
+.co__paypal-card.is-open {
+  padding: 12px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+}
+/* el formulario de PayPal trae su propio foco: sin el contorno rojo de la web alrededor */
+.co__paypal :focus,
+.co__paypal :focus-visible {
+  outline: none;
+}
+.co__capturing {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  color: var(--text) !important;
+  font-weight: 600;
+}
+
+/* PayPal en modo pruebas: aviso visible para no confundirlo con un cobro real */
+.co__free .co__sandbox {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--red-soft);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* compra lista: modal centrado, con el ícono arriba del título y la X en la esquina */
+.dlg.co__done {
+  position: relative;
+  justify-items: center;
+  gap: 10px;
+  padding: 28px 24px 24px;
+  text-align: center;
+}
+.co__done .dlg__head {
+  justify-content: center;
+}
+.co__done .dlg__title {
+  font: 700 18px/1.3 var(--body);
+}
+.co__done .dlg__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  margin: 0;
+}
+.co__done-icon {
+  order: -1;
+  color: var(--green, #3ecf8e);
+}
+.co__done-body {
+  max-width: 320px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.co__done .co__order-id {
+  margin-bottom: 6px;
 }

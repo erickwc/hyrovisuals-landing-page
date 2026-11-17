@@ -51,15 +51,15 @@ const NAV = [
   },
 ];
 
-// Perfil simulado: el nombre y la foto saldrán de la base de datos más adelante; el correo ya es el de la sesión.
-const PROFILE: { name: string; avatarUrl: string | null } = { name: "Administrador", avatarUrl: null };
-
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w.charAt(0).toUpperCase())
-    .join("");
+/* La foto del perfil del admin; sin foto (o si no carga), el icono de usuario. */
+function Avatar({ url }: { url: string | null }) {
+  const [broken, setBroken] = useState(false);
+  if (url && !broken) return <img className="admin__avatar" src={url} alt="" onError={() => setBroken(true)} />;
+  return (
+    <span className="admin__avatar">
+      <UserRound size={16} />
+    </span>
+  );
 }
 
 export function AdminLayout() {
@@ -101,10 +101,12 @@ export function AdminLayout() {
           </button>
         </AnimateIcon>
         <span className="admin__mobilebar-title">Panel de Hyro</span>
-        {PROFILE.avatarUrl ? <img className="admin__avatar" src={PROFILE.avatarUrl} alt="" /> : <span className="admin__avatar">{initials(PROFILE.name)}</span>}
+        <Avatar url={info.avatarUrl} />
       </header>
       {menuOpen && <div className="admin__backdrop" onClick={() => setMenuOpen(false)} aria-hidden="true" />}
 
+      {/* en computadora: riel angosto de iconos que se despliega encima del contenido al pasar el mouse */}
+      <div className="admin__rail">
       <aside className="admin__sidebar" id="admin-menu" data-open={menuOpen}>
         <AnimateIcon animateOnHover asChild>
           <button type="button" className="admin__burger admin__menu-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú">
@@ -112,13 +114,9 @@ export function AdminLayout() {
           </button>
         </AnimateIcon>
         <div className="admin__profile">
-          {PROFILE.avatarUrl ? (
-            <img className="admin__avatar" src={PROFILE.avatarUrl} alt="" />
-          ) : (
-            <span className="admin__avatar">{initials(PROFILE.name)}</span>
-          )}
+          <Avatar url={info.avatarUrl} />
           <div className="admin__profile-text">
-            <p className="admin__profile-name">{PROFILE.name}</p>
+            <p className="admin__profile-name">{info.name || "Administrador"}</p>
             <p className="admin__profile-email">{info.email}</p>
           </div>
           <AnimateIcon animateOnHover asChild>
@@ -133,9 +131,15 @@ export function AdminLayout() {
             <div className="admin__nav-group" key={group.label}>
               <p className="admin__nav-label">{group.label}</p>
               {group.items.map((item) => (
-                <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => "admin__nav-link" + (isActive ? " active" : "")}>
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  aria-label={item.label}
+                  className={({ isActive }) => "admin__nav-link" + (isActive ? " active" : "")}
+                >
                   <item.icon size={15} />
-                  {item.label}
+                  <span className="admin__nav-text">{item.label}</span>
                 </NavLink>
               ))}
             </div>
@@ -144,21 +148,22 @@ export function AdminLayout() {
 
         <div className="admin__sidebar-foot">
           <AnimateIcon animateOnHover asChild>
-            <button type="button" className="admin__nav-link" onClick={toggleTheme}>
+            <button type="button" className="admin__nav-link" onClick={toggleTheme} aria-label={theme === "dark" ? "Modo claro" : "Modo oscuro"}>
               {theme === "dark" ? <Sun03 size={15} /> : <Moon02 size={15} />}
-              {theme === "dark" ? "Modo claro" : "Modo oscuro"}
+              <span className="admin__nav-text">{theme === "dark" ? "Modo claro" : "Modo oscuro"}</span>
             </button>
           </AnimateIcon>
-          <NavLink to="/admin/vista-cliente" className={({ isActive }) => "admin__nav-link" + (isActive ? " active" : "")}>
+          <NavLink to="/admin/vista-cliente" aria-label="Ver como cliente" className={({ isActive }) => "admin__nav-link" + (isActive ? " active" : "")}>
             <UserRound size={15} />
-            Ver como cliente
+            <span className="admin__nav-text">Ver como cliente</span>
           </NavLink>
-          <a className="admin__nav-link" href="/">
+          <a className="admin__nav-link" href="/" aria-label="Volver al sitio">
             <ArrowLeft02 size={15} />
-            Volver al sitio
+            <span className="admin__nav-text">Volver al sitio</span>
           </a>
         </div>
       </aside>
+      </div>
 
       <main className="admin__main">
         <Outlet />
