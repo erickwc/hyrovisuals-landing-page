@@ -35,6 +35,17 @@ export async function fetchCheckoutPlan(planId: string): Promise<CheckoutPlan | 
   return { productName: product.name, planId: plan.id, price: Number(plan.price_usd), keys: Number(plan.license_count) };
 }
 
+/** Todos los planes activos del producto (del más barato al más caro): para cambiar de licencia en el checkout. */
+export async function fetchCheckoutPlans(): Promise<CheckoutPlan[]> {
+  const sb = db();
+  const { data: product } = await sb.from("products").select("id, name").eq("slug", PRODUCT_SLUG).maybeSingle();
+  if (!product) return [];
+  const { data } = await sb.from("plans").select("id, price_usd, license_count").eq("product_id", product.id).eq("active", true);
+  return (data ?? [])
+    .map((p) => ({ productName: product.name, planId: p.id, price: Number(p.price_usd), keys: Number(p.license_count) }))
+    .sort((a, b) => a.price - b.price);
+}
+
 type Quote = { amount: number; discount: number; code: string | null; error?: string };
 
 export async function previewCoupon(planId: string, code: string): Promise<CouponPreview> {

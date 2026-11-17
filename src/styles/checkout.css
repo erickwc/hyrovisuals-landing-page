@@ -1,15 +1,40 @@
-/* checkout: el pedido a la izquierda y la tarjeta de pago a la derecha, en el mismo estilo del panel de cliente */
-/* sigue el tema de quien compra; en claro, la página va en blanco puro para que se vea limpia */
+/* checkout al estilo de las tiendas: a la izquierda PayPal exprés, contacto y tarjeta; a la derecha, en un panel
+   gris de borde a borde, el producto, el cupón y el total. Sigue el tema de quien compra (en claro, blanco puro). */
 .co {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: var(--bg);
+  --co-side: #0b0b0b;
+  --co-field: var(--bg);
 }
 :root[data-theme="light"] .co {
   --bg: #ffffff;
   --panel: #ffffff;
+  --co-side: #f5f5f5;
 }
-.co__main {
-  padding-block: 32px 72px;
+
+/* barra: logo y volver */
+.co__top {
+  border-bottom: 1px solid var(--line);
+}
+/* mismas dos mitades que el contenido: el logo alineado con el pago y «Volver» con el final del resumen */
+.co__top-in {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  height: 72px;
+}
+.co__top-in .logo {
+  justify-self: end;
+  width: min(500px, 100% - 2 * clamp(24px, 4vw, 56px));
+  margin-right: clamp(24px, 4vw, 56px);
+}
+.co__top-in .co__back {
+  justify-self: start;
+  justify-content: flex-end;
+  width: min(400px, 100% - 2 * clamp(24px, 4vw, 56px));
+  margin-left: clamp(24px, 4vw, 56px);
 }
 .co__back {
   display: inline-flex;
@@ -24,173 +49,211 @@
   color: var(--text);
 }
 .co__state {
-  padding: 48px 0;
+  padding: 64px 0;
   color: var(--muted);
   font-size: 13px;
   text-align: center;
 }
-/* sin el relleno que base.css da a todo <section> */
-.co__order,
-.co__pay {
-  padding-block: 0;
-}
-.co__grid {
-  display: grid;
-  /* el pedido angosto y el pago hasta 520px */
-  grid-template-columns: minmax(0, 380px) minmax(0, 520px);
-  justify-content: space-between;
-  gap: clamp(32px, 6vw, 80px);
-  align-items: start;
-  margin-top: 24px;
-}
 
-/* pedido */
-.co__eyebrow {
-  color: var(--muted);
-  font-size: 11px;
-}
-.co__product {
-  margin-top: 8px;
-  font: 700 22px/1.2 var(--body);
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-.co__plan {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 13px;
-}
-.co__price {
-  margin-top: 20px;
-  font: 800 clamp(34px, 5vw, 44px) / 1 var(--head);
-  letter-spacing: -0.04em;
-}
-.co__price span {
-  display: block;
-  margin-top: 8px;
-  color: var(--muted);
-  font: 500 12px var(--body);
-  letter-spacing: 0;
-}
-.co__subtitle {
-  margin-top: 28px;
-  font: 700 12px/1 var(--body);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-.co__perks {
-  display: grid;
-  gap: 10px;
-  margin: 14px 0 0;
-  padding: 0;
-  list-style: none;
-}
-.co__perks li {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.45;
-}
-.co__perks svg {
-  flex: none;
-  margin-top: 2px;
-  color: var(--text);
-}
-.co__totals {
-  margin-top: 28px;
-  border-top: 1px solid var(--line);
-}
-.co__totals > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-  font-size: 13px;
-}
-.co__totals > div > span:first-child {
-  color: var(--muted);
-}
-.co__total {
-  font: 700 15px var(--body);
-}
-.co__totals > .co__total > span:first-child {
-  color: var(--text);
-}
-.co__link {
-  margin-top: 14px;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--muted);
-  font: 500 12px var(--body);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-}
-.co__totals .co__link {
-  margin: 0 0 0 6px;
-}
-.co__link:hover {
-  color: var(--text);
-}
-.co__coupon {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 16px;
-}
-.co__coupon input {
+/* dos mitades: la de la derecha en gris hasta el borde de la ventana */
+.co__split {
   flex: 1;
-  min-width: 0;
-  height: 34px;
-  padding: 0 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--bg);
-  color: var(--text);
-  font: 600 12px var(--body);
-  letter-spacing: 0.06em;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
-.co__coupon input:focus {
-  outline: none;
-  border-color: var(--muted);
+.co__left {
+  display: flex;
+  justify-content: flex-end;
+  padding: 36px clamp(24px, 4vw, 56px) 72px;
 }
-.co__coupon input[aria-invalid="true"] {
-  border-color: var(--red);
+.co__summary {
+  display: flex;
+  justify-content: flex-start;
+  padding: 36px clamp(24px, 4vw, 56px) 72px;
+  background: var(--co-side);
+  border-left: 1px solid var(--line);
 }
-.co__coupon .co__error {
-  width: 100%;
+.co__left .co__col {
+  width: min(500px, 100%);
+}
+.co__summary .co__col {
+  position: sticky;
+  top: 36px;
+  align-self: flex-start;
+  width: min(400px, 100%);
+}
+.co__col {
+  display: grid;
+  gap: 18px;
+  align-content: start;
 }
 
-/* pago */
-.co__pay {
+/* títulos de bloque (Contacto, Pago) */
+.co__block {
   display: grid;
-  gap: 16px;
+  gap: 10px;
+  padding: 0;
 }
-.co__pay .co__subtitle {
-  margin-top: 4px;
+.co__h {
+  font: 600 18px/1.3 var(--body);
+  letter-spacing: 0;
+  text-transform: none;
 }
+.co__pay-head {
+  display: grid;
+  gap: 2px;
+  margin-top: 10px;
+}
+.co__pay-head p,
+.co__note {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* pago exprés: PayPal arriba, con su título centrado */
+.co__express {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+}
+.co__express-label {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+/* separador «O» */
+.co__or {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 6px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.co__or::before,
+.co__or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
 .co__field {
   display: grid;
   gap: 6px;
 }
-.co__field label {
+/* correo con el icono de información dentro; el aviso sale en un globo al pasar el cursor o enfocar */
+.co__email {
+  position: relative;
+}
+.co__email input {
+  width: 100%;
+  padding-right: 44px !important;
+}
+.co__tip {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+}
+.co__tip-btn {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
   color: var(--muted);
-  font: 600 11px var(--body);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  cursor: help;
+  transition: color 0.15s;
+}
+.co__tip-btn:hover,
+.co__tip-btn:focus-visible {
+  color: var(--text);
+}
+.co__tip-box {
+  position: absolute;
+  z-index: 20;
+  right: -4px;
+  bottom: calc(100% + 8px);
+  width: 240px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--text);
+  color: var(--bg);
+  font: 500 12px/1.45 var(--body);
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.co__tip-box::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 15px;
+  border: 6px solid transparent;
+  border-top-color: var(--text);
+}
+.co__tip:hover .co__tip-box,
+.co__tip:focus-within .co__tip-box {
+  opacity: 1;
+  transform: none;
+}
+/* check de avisos por correo */
+.co__check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+.co__check input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.co__check-box {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--line);
+  border-radius: 5px;
+  color: #fff;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.co__check-box svg {
+  transform: scale(0);
+  transition: transform 0.15s;
+}
+.co__check input:checked + .co__check-box {
+  background: var(--red);
+  border-color: var(--red);
+}
+.co__check input:checked + .co__check-box svg {
+  transform: scale(1);
+}
+.co__check input:focus-visible + .co__check-box {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+.co__check:hover {
+  color: var(--text);
 }
 .co__field input {
-  height: 40px;
-  padding: 0 12px;
+  height: 46px;
+  padding: 0 14px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--bg);
+  background: var(--co-field);
   color: var(--text);
-  font: 500 13px var(--body);
+  font: 500 14px var(--body);
 }
 .co__field input:focus {
   outline: none;
@@ -198,11 +261,37 @@
 }
 .co__field p {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
+}
+
+/* caja de la tarjeta: encabezado con los logos y el botón/formulario de PayPal dentro */
+.co__cardbox {
+  margin-top: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.co__cardbox-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--text) 3%, transparent);
+  font-size: 14px;
+  font-weight: 600;
+}
+.co__cardbox .co__paypal-card {
+  padding: 14px 16px;
+}
+/* botón de tarjeta en gris: el negro de PayPal aclarado (solo cerrado; el formulario abierto queda como viene) */
+.co__cardbox .co__paypal-card:not(.is-open) iframe {
+  filter: brightness(1.55);
 }
 .co__method {
   width: 100%;
-  height: 46px;
+  height: 48px;
 }
 .co__error {
   color: var(--red);
@@ -214,18 +303,248 @@
   font-size: 11px;
 }
 
-/* cupón del 100%: en lugar de las formas de pago */
-.co__free {
+/* resumen: producto con su miniatura y la cantidad en una burbuja */
+.co__item {
   display: grid;
-  gap: 12px;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
 }
-.co__free .co__subtitle {
-  margin-top: 4px;
+.co__thumb {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #0a0a0a;
 }
-.co__free p {
+.co__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.co__item-txt {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.co__product {
+  font: 600 14px/1.3 var(--body);
+}
+.co__item-txt small {
   color: var(--muted);
+  font-size: 12px;
+}
+.co__item-price {
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* licencia: el texto del producto abre una lista sencilla para cambiarla */
+.co__lic {
+  position: relative;
+  justify-self: start;
+}
+.co__lic-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: 400 12px var(--body);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.co__lic-btn:hover,
+.co__lic-btn[aria-expanded="true"] {
+  color: var(--text);
+}
+.co__lic-btn svg {
+  transition: transform 0.2s;
+}
+.co__lic-btn[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.co__lic-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 250px;
+  padding: 4px;
+  display: grid;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: 0 16px 40px -16px rgba(0, 0, 0, 0.5);
+  animation: co-pop 0.14s ease-out;
+}
+@keyframes co-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+.co__lic-opt {
+  display: grid;
+  grid-template-columns: 16px auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--muted);
+  font: 500 13px var(--body);
+  text-align: left;
+  cursor: pointer;
+}
+.co__lic-opt:hover,
+.co__lic-opt:focus-visible {
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  color: var(--text);
+  outline: none;
+}
+.co__lic-opt[aria-selected="true"] {
+  color: var(--text);
+}
+.co__lic-tick {
+  display: grid;
+  place-items: center;
+  color: var(--red);
+}
+.co__lic-name {
+  font-weight: 600;
+}
+.co__lic-opt small {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+.co__lic-price {
+  font-variant-numeric: tabular-nums;
+}
+
+/* cupón: «Aplicar» va dentro del campo, a la derecha */
+.co__coupon {
+  display: grid;
+  gap: 8px;
+  margin-top: 6px;
+}
+.co__coupon-field {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 5px 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  transition: border-color 0.15s;
+}
+.co__coupon-field:focus-within {
+  border-color: var(--muted);
+}
+.co__coupon-field[aria-invalid="true"] {
+  border-color: var(--red);
+}
+.co__coupon-field input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: 500 14px var(--body);
+}
+.co__coupon-field input:focus {
+  outline: none;
+}
+.co__coupon-field input::placeholder {
+  color: var(--muted);
+}
+.co__coupon-apply {
+  flex: none;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text);
+  font: 600 12px var(--body);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.co__coupon-apply:hover:not(:disabled) {
+  background: var(--text);
+  color: var(--bg);
+}
+.co__coupon-apply:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+.co__applied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 12px 14px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
   font-size: 13px;
-  line-height: 1.5;
+  font-weight: 600;
+}
+/* botón pequeño sin subrayado (p. ej. «Quitar» el cupón) */
+.co__chip {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: 600 12px var(--body);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.co__chip:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+
+/* totales */
+.co__totals {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+.co__totals > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.co__totals > div > span:first-child {
+  color: var(--muted);
+}
+.co__totals > .co__total {
+  margin-top: 6px;
+  font: 600 18px var(--body);
+}
+.co__totals > .co__total > span:first-child {
+  color: var(--text);
+}
+.co__total small {
+  margin-right: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
 }
 .co__order-id {
   font: 600 12px var(--body) !important;
@@ -257,9 +576,39 @@
   line-height: 1.5;
 }
 
+/* móvil: primero el resumen (arriba, en gris) y después el pago */
 @media (max-width: 860px) {
-  .co__grid {
+  .co__top-in {
+    display: flex;
+    justify-content: space-between;
+    padding-inline: clamp(16px, 5vw, 24px);
+  }
+  .co__top-in .logo,
+  .co__top-in .co__back {
+    width: auto;
+    margin: 0;
+  }
+  .co__left,
+  .co__summary {
+    padding-inline: clamp(16px, 5vw, 24px);
+  }
+  .co__split {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .co__summary {
+    order: -1;
+    justify-content: center;
+    padding-block: 24px;
+    border-left: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .co__left {
+    justify-content: center;
+    padding-top: 28px;
+  }
+  .co__summary .co__col {
+    position: static;
+    width: min(500px, 100%);
   }
 }
 
@@ -272,25 +621,19 @@
   position: relative;
   z-index: 0;
   display: grid;
-  gap: 10px;
+  gap: 18px;
 }
 /* en oscuro, el marco de PayPal pinta un fondo blanco: se recorta a la forma de píldora (y el formulario de
    tarjeta, que viene en blanco, queda como una tarjeta redondeada) */
-.co__paypal > div {
+.co__paypal-btn {
   border-radius: 4px;
   overflow: hidden;
 }
-/* logos de PayPal, Visa, Mastercard… centrados debajo de los botones (sin recorte ni panel) */
-.co__paypal > .co__marks {
-  border-radius: 0;
-  overflow: visible;
-}
+/* logos de PayPal, Visa, Mastercard… en el encabezado de la caja de la tarjeta */
 .co__marks {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 6px;
-  margin-top: 2px;
 }
 .co__mark {
   display: inline-grid;
@@ -311,20 +654,13 @@
   font: italic 800 10px/1 Arial, sans-serif;
   letter-spacing: 0.02em;
 }
-.co__marks-more {
-  color: var(--muted);
-  font-size: 12px;
-}
 /* con el mismo esquema de color que su contenido, el navegador deja el marco transparente */
 .co__paypal iframe {
   color-scheme: light;
 }
 /* formulario de tarjeta abierto: en un panel blanco, porque sus textos vienen en oscuro */
-.co__paypal-card.is-open {
-  padding: 12px;
-  border-radius: 16px;
+.co__cardbox .co__paypal-card.is-open {
   background: #ffffff;
-  border: 1px solid var(--line);
 }
 /* el formulario de PayPal trae su propio foco: sin el contorno rojo de la web alrededor */
 .co__paypal :focus,
@@ -343,7 +679,8 @@
 }
 
 /* PayPal en modo pruebas: aviso visible para no confundirlo con un cobro real */
-.co__free .co__sandbox {
+.co__sandbox {
+  margin-bottom: 14px;
   padding: 8px 10px;
   border-radius: 6px;
   background: var(--red-soft);

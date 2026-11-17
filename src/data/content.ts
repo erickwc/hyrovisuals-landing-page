@@ -81,7 +81,7 @@ const spectraEn = [
 ];
 
 const es = {
-  meta: { title: "Hyro Visuals · El mejor visualizador de la industria" },
+  meta: { title: "Hyro Visuals" },
   nav: {
     links: [
       { href: "#funciones", label: "Funciones" },
@@ -287,6 +287,10 @@ const es = {
       viewAllKeys: "Ver todas",
       inUse: "En uso",
       activeOn: "Activa en",
+      device: "Equipo",
+      system: "Sistema",
+      showDevice: "Ver en qué equipo está activada",
+      hideDevice: "Ocultar el equipo",
       unknownDevice: "un equipo",
       release: "Liberar equipo",
       releaseConfirm: "¿Liberar? Confirmar",
@@ -603,7 +607,16 @@ const es = {
     discount: (code: string) => `Cupón ${code}`,
     total: "Total a pagar",
     couponToggle: "¿Tienes un cupón?",
-    couponPlaceholder: "Código de cupón",
+    couponPlaceholder: "Código de descuento",
+    changePlan: "Cambiar",
+    newsOptIn: "Avísame por correo de nuevas versiones de Hyro Visuals",
+    choosePlan: "Elige tu licencia",
+    express: "Pago exprés",
+    or: "O",
+    contact: "Contacto",
+    secure: "Todas las transacciones son seguras y cifradas.",
+    cardLabel: "Tarjeta de crédito o débito",
+    qty: (n: number) => `Cantidad: ${n}`,
     couponApply: "Aplicar",
     couponApplying: "Aplicando…",
     couponRemove: "Quitar",
@@ -659,7 +672,7 @@ const es = {
 export type Content = typeof es;
 
 const en: Content = {
-  meta: { title: "Hyro Visuals · The best visualizer in the industry" },
+  meta: { title: "Hyro Visuals" },
   nav: {
     links: [
       { href: "#funciones", label: "Features" },
@@ -865,6 +878,10 @@ const en: Content = {
       viewAllKeys: "View all",
       inUse: "In use",
       activeOn: "Active on",
+      device: "Computer",
+      system: "System",
+      showDevice: "See which computer it's active on",
+      hideDevice: "Hide the computer",
       unknownDevice: "a computer",
       release: "Release computer",
       releaseConfirm: "Release? Confirm",
@@ -1180,7 +1197,16 @@ const en: Content = {
     discount: (code: string) => `Coupon ${code}`,
     total: "Total due",
     couponToggle: "Have a coupon?",
-    couponPlaceholder: "Coupon code",
+    couponPlaceholder: "Discount code",
+    changePlan: "Change",
+    newsOptIn: "Email me about new versions of Hyro Visuals",
+    choosePlan: "Choose your license",
+    express: "Express checkout",
+    or: "OR",
+    contact: "Contact",
+    secure: "All transactions are secure and encrypted.",
+    cardLabel: "Credit or debit card",
+    qty: (n: number) => `Quantity: ${n}`,
     couponApply: "Apply",
     couponApplying: "Applying…",
     couponRemove: "Remove",

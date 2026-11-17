@@ -116,12 +116,13 @@ export function Login() {
           </Link>
         </div>
 
-        <Button type="submit" className="auth__submit" loading={status === "submitting"}>
-          {status === "submitting" ? t.submitting : t.submit}
+        {/* al entrar no se muestra aviso: el botón sigue cargando hasta que abre la cuenta */}
+        <Button type="submit" className="auth__submit" loading={status !== "idle"}>
+          {status !== "idle" ? t.submitting : t.submit}
         </Button>
 
-        <p className="auth__msg" role="status" data-tone={formError ? "error" : status === "success" ? "ok" : undefined}>
-          {formError ?? (status === "success" ? t.success : "")}
+        <p className="auth__msg" role="status" data-tone={formError ? "error" : undefined}>
+          {formError ?? ""}
         </p>
       </form>
 

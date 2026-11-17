@@ -11,9 +11,12 @@ header.top {
   justify-content: space-between;
   height: var(--nav-h);
 }
+/* logo: el mismo de la barra de la landing (Monument Extended, recto) */
 .logo {
-  font: 800 italic 22px var(--head);
-  letter-spacing: -0.04em;
+  font: 700 20px/1 var(--brand);
+  font-synthesis: none;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
   text-decoration: none;
 }
 /* logo, enlaces, iconos y cuenta: cuatro bloques repartidos con space-between */

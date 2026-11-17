@@ -22,7 +22,7 @@
   const keysText = (n, long) => { const w = I18N.js(long ? 'keyLong' : 'keyShort'); return n + ' ' + w[n === 1 ? 0 : 1]; };
   const planCode = p => (p.id.normalize('NFD').replace(/[^a-z]/gi, '').slice(0, 3) || 'PLN').toUpperCase();
   const api = { setPlans: () => {}, setReviews: () => {}, subscribe: null };
-  const sep = () => (I18N.lang === 'en' ? '.' : ',');
+  const sep = () => '.';
   const money = p => (+p.int).toString() + (p.dec === '00' ? '' : sep() + p.dec);
 
   const $ = (s, r = document) => r.querySelector(s);
@@ -55,6 +55,8 @@
   safe('tema', readTheme);
   $('#themeBtn').addEventListener('click', () => {
     root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+    // el icono gira al cambiar, como en la barra del login
+    const ic = $('#themeBtn .theme-i'); ic.classList.remove('is-swap'); void ic.offsetWidth; ic.classList.add('is-swap');
     try { localStorage.setItem('hyro.theme', root.dataset.theme); } catch (e) {}
     safe('tema', readTheme);
   });
@@ -64,7 +66,20 @@
   const listeners = [];
   const onLang = fn => { listeners.push(fn); };
   document.addEventListener('langchange', () => listeners.forEach(fn => safe('idioma', () => fn(I18N.lang))));
-  $('#langBtn').addEventListener('click', () => I18N.apply(I18N.lang === 'es' ? 'en' : 'es'));
+  // menú de idioma pegado al botón (igual que en el login): dos opciones, la activa lleva el check
+  safe('idioma', () => {
+    const pick = $('#langPick'), btn = $('#langBtn'), pop = $('#langPop');
+    const mark = l => $$('.lp-opt', pop).forEach(o => o.setAttribute('aria-checked', String(o.dataset.lang === l)));
+    const setOpen = open => {
+      btn.setAttribute('aria-expanded', String(open));
+      if (open) { mark(I18N.lang); pop.hidden = false; requestAnimationFrame(() => pop.classList.add('is-open')); }
+      else { pop.classList.remove('is-open'); pop.hidden = true; }
+    };
+    btn.addEventListener('click', () => setOpen(pop.hidden));
+    $$('.lp-opt', pop).forEach(o => o.addEventListener('click', () => { setOpen(false); if (o.dataset.lang !== I18N.lang) I18N.apply(o.dataset.lang); btn.focus(); }));
+    addEventListener('pointerdown', e => { if (!pop.hidden && !pick.contains(e.target)) setOpen(false); });
+    addEventListener('keydown', e => { if (e.key === 'Escape' && !pop.hidden) { setOpen(false); btn.focus(); } });
+  });
   onLang(l => { $('#langLabel').textContent = l.toUpperCase(); });
 
   /* ---------- Bucle de animación ----------
@@ -639,7 +654,7 @@
     function buildCards() {
       cardsEl.innerHTML = steps.map((s, i) => {
         const [title, d] = s[I18N.lang];
-        return `<button class="t-card" type="button" role="tab" aria-selected="false" data-i="${i}" style="--dur:${DUR[s.id]}ms"><span class="t-num">_${String(i).padStart(2, '0')}</span><span class="t-title">${title}</span><span class="t-desc">${d}</span><span class="t-prog"></span></button>`;
+        return `<button class="t-card" type="button" role="tab" aria-selected="false" data-i="${i}" style="--dur:${DUR[s.id]}ms"><span class="t-num">${String(i).padStart(2, '0')}</span><span class="t-title">${title}</span><span class="t-desc">${d}</span><span class="t-prog"></span></button>`;
       }).join('');
       $$('.t-card', cardsEl).forEach(b => b.addEventListener('click', () => go(+b.dataset.i, true)));
       markCards();
@@ -723,7 +738,7 @@
   /* ---------- Compra (factura) ---------- */
   function pricing() {
     const ticket = $('#ticket'), intEl = $('#tkInt'), perf = $('#tkPerf');
-    const compare = $('#planCompare'), choices = $('.tk-plans', ticket);
+    const choices = $('#buyPlans');
     let plan = PLANS[0].id;
 
     // una columna de dígitos por cifra del precio (se rehace si el precio cambia de 2 a 3 cifras)
@@ -733,7 +748,7 @@
       if ($$('.dg-col', intEl).length !== str.length) { buildDigits(str.length); instant = true; }
       $$('.dg-col', intEl).forEach((col, i) => {
         if (instant) col.style.transition = 'none';
-        col.style.transform = `translateY(${-0.86 * +str[i]}em)`;
+        col.style.transform = `translateY(${-1 * +str[i]}em)`;
         if (instant) { void col.offsetWidth; col.style.transition = ''; }
       });
       intEl.setAttribute('aria-label', str);
@@ -751,27 +766,19 @@
     }
     function notch() { ticket.style.setProperty('--notch-y', (perf.offsetTop + .5) + 'px'); }
 
-    // la lista de planes (a la izquierda) y las opciones del ticket salen de PLANS: tantos como haya en el panel
+    // las licencias (tarjetas a la izquierda del ticket) salen de PLANS: una por plan del panel
     function buildPlans() {
-      compare.textContent = '';
       choices.textContent = '';
       PLANS.forEach(p => {
-        const b = document.createElement('button');
-        b.type = 'button'; b.className = 'pc'; b.dataset.plan = p.id;
-        b.innerHTML = '<span class="pc-dot"></span><span class="pc-name"></span><span class="pc-keys"></span><span class="pc-price"></span>';
-        $('.pc-name', b).textContent = planName(p);
-        $('.pc-keys', b).textContent = keysText(p.keys, true);
-        $('.pc-price', b).textContent = '$' + money(p);
-        b.addEventListener('click', () => { plan = p.id; render(); });
-        compare.appendChild(b);
-
         const l = document.createElement('label');
-        l.className = 'tk-plan';
-        l.innerHTML = '<input type="radio" name="plan"><span class="tk-plan-top"><b></b><span class="tk-plan-price"></span></span><small></small>';
+        l.className = 'bp';
+        // check (icono de Hugeicons), nombre, claves y precio
+        l.innerHTML = '<input type="radio" name="plan"><span class="bp-top"><span class="bp-check"><svg data-icon="check"></svg></span><small class="bp-keys"></small></span><b class="bp-name"></b><span class="bp-price display"></span>';
         const r = $('input', l); r.value = p.id;
-        $('b', l).textContent = planName(p);
-        $('.tk-plan-price', l).textContent = '$' + money(p);
-        $('small', l).textContent = keysText(p.keys, false);
+        $('.bp-name', l).textContent = planName(p);
+        $('.bp-keys', l).textContent = keysText(p.keys, false);
+        $('.bp-price', l).textContent = '$' + money(p);
+        icons(l);
         r.addEventListener('change', () => { plan = p.id; render(); });
         choices.appendChild(l);
       });
@@ -783,15 +790,13 @@
       const p = findPlan(plan), yy = String(new Date().getFullYear()).slice(2), code = planCode(p);
       plan = p.id;
       ticket.dataset.plan = plan;
-      $$('input[name="plan"]', ticket).forEach(r => { r.checked = r.value === plan; });
-      $$('.pc', compare).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.plan === plan)));
+      $$('input[name="plan"]', choices).forEach(r => { r.checked = r.value === plan; });
+      $('#tkPlan').textContent = planName(p);
       digits(p.int, instant);
-      $('#tkDec').textContent = sep() + p.dec + ' USD';
-      $('#tkLine').textContent = p.int + sep() + p.dec;
-      $('#tkKeys').textContent = p.keys;
-      $('#tkPlanName').textContent = planName(p);
+      $('#tkDec').textContent = sep() + p.dec;
       $('#tkNo').textContent = `${I18N.js('invoiceNo')} HV-${yy}-${code}-0${p.keys}`;
       $('#tkDate').textContent = dateStr();
+      $('#tkKeysN').textContent = String(p.keys).padStart(2, '0');
       $('#barcodeTxt').textContent = `HV-${code}-${p.keys}K-${new Date().getFullYear()}`;
       barcode(code + p.keys);
       const buy = $('#buyBtn');
@@ -801,6 +806,22 @@
     buildPlans();
     render(true);
     onLang(() => { buildPlans(); render(true); });
+
+    // al comprar: el botón se queda en rojo con «Preparando tu compra…» mientras abre el checkout
+    const buyBtn = $('#buyBtn');
+    buyBtn.addEventListener('click', e => {
+      if (buyBtn.classList.contains('is-loading')) { e.preventDefault(); return; }
+      const label = $('.tk-cta-label', buyBtn);
+      buyBtn.dataset.label = label.textContent;
+      buyBtn.classList.add('is-loading'); buyBtn.setAttribute('aria-busy', 'true');
+      label.textContent = I18N.js('preparing');
+    });
+    // al volver con el botón «atrás» (página guardada en memoria), el botón vuelve a su estado normal
+    addEventListener('pageshow', () => {
+      if (!buyBtn.classList.contains('is-loading')) return;
+      buyBtn.classList.remove('is-loading'); buyBtn.removeAttribute('aria-busy');
+      $('.tk-cta-label', buyBtn).textContent = buyBtn.dataset.label;
+    });
     addEventListener('resize', notch);
     document.fonts && document.fonts.ready.then(notch);
 
@@ -867,8 +888,11 @@
       const stage = $('#stage'), top = stage.getBoundingClientRect().top + scrollY;
       root.style.setProperty('--rails-top', Math.round(top - 140) + 'px');
       root.style.setProperty('--rails-fade', '260px');
+      // y se desvanecen antes de las preguntas (no aparecen ahí ni en la compra), igual que al empezar
+      const buy = $('#preguntas'), end = buy.getBoundingClientRect().top + scrollY - (top - 140);
+      root.style.setProperty('--rails-end', Math.round(end) + 'px');
     };
-    set(); new ResizeObserver(set).observe(hero);
+    set(); new ResizeObserver(set).observe(hero); new ResizeObserver(set).observe($('main'));
   }
 
   /* ---------- Textos con scroll infinito (ticker y cintas) ---------- */
@@ -1015,7 +1039,7 @@
       $$('.bento .cell').forEach(cell => items.push({ t: clean($('h3', cell).textContent), d: clean($('.cell-copy p', cell).textContent), tag: label('funciones'), go: () => goTo(cell) }));
       I18N.STEPS.forEach((st, i) => { const [t, d] = st[I18N.lang]; items.push({ t, d, tag: label('accion'), go: () => { goTo($('#tour')); document.dispatchEvent(new CustomEvent('tour:go', { detail: i })); } }); });
       $$('.faq-item').forEach(it => items.push({ t: clean($('.faq-t', it).textContent), d: clean($('.faq-a p', it).textContent), tag: label('preguntas'), go: () => { goTo(it); const q = $('.faq-q', it); if (q.getAttribute('aria-expanded') !== 'true') q.click(); } }));
-      PLANS.forEach(p => items.push({ t: planName(p), d: keysText(p.keys, true) + ' · $' + money(p), tag: label('comprar'), go: () => { goTo($('#ticket')); const b = $$('#planCompare .pc').find(x => x.dataset.plan === p.id); b && b.click(); } }));
+      PLANS.forEach(p => items.push({ t: planName(p), d: keysText(p.keys, true) + ' · $' + money(p), tag: label('comprar'), go: () => { goTo($('#comprar')); const r = $$('#buyPlans input[name="plan"]').find(x => x.value === p.id); if (r) { r.checked = true; r.dispatchEvent(new Event('change')); } } }));
       I18N.MODULES.forEach(m => items.push({ t: I18N.moduleName(m[0]), d: I18N.js('search.module'), tag: label('funciones'), go: () => { goTo($('.c-spectra')); document.dispatchEvent(new CustomEvent('spec:show', { detail: m[0] })); } }));
       items.forEach(it => { it.nt = norm(it.t); it.n = norm(it.t + ' ' + it.d + ' ' + it.tag); });
     }
@@ -1036,7 +1060,7 @@
       if (!results.length) { list.innerHTML = `<li class="sr-empty">${esc(I18N.js('search.empty'))} “${esc(input.value.trim())}”</li>`; return; }
       list.innerHTML = (terms.length ? '' : `<li class="sr-head" role="presentation">${esc(I18N.js('search.suggest'))}</li>`) + results.map((r, i) => {
         const d = r.it.d.length > 110 ? r.it.d.slice(0, 108) + '…' : r.it.d;
-        return `<li class="sr-item${i === active ? ' is-active' : ''}" role="option" id="sr-${i}" aria-selected="${i === active}" data-i="${i}"><span class="sr-tag">${esc(r.it.tag)}</span><span class="sr-body"><b>${mark(r.it.t, terms)}</b>${d ? `<small>${esc(d)}</small>` : ''}</span><svg data-icon="enter" class="sr-enter"></svg></li>`;
+        return `<li class="sr-item${i === active ? ' is-active' : ''}" role="option" id="sr-${i}" aria-selected="${i === active}" data-i="${i}"><span class="sr-body"><b>${mark(r.it.t, terms)}</b>${d ? `<small>${esc(d)}</small>` : ''}</span><svg data-icon="enter" class="sr-enter"></svg></li>`;
       }).join('');
       icons(list);
       input.setAttribute('aria-activedescendant', 'sr-' + active);

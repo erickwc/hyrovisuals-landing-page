@@ -49,6 +49,15 @@
   font-display: swap;
 }
 
+/* Monument Extended Ultrabold: la misma de los títulos y el logo de la landing */
+@font-face {
+  font-family: "Monument Extended";
+  src: url("/landing/fonts/monument-extended-ultrabold.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @font-face {
   font-family: "Clash Display";
   src: url("/fonts/ClashDisplay-Variable.woff2") format("woff2");
@@ -61,6 +70,7 @@
   --head: "Plus Jakarta Sans", "Arial Black", sans-serif;
   --display: "Clash Display", "Plus Jakarta Sans", "Arial Black", sans-serif;
   --body: "Space Grotesk", system-ui, sans-serif;
+  --brand: "Monument Extended", "Plus Jakarta Sans", "Arial Black", sans-serif;
   --pad: clamp(18px, 3.2vw, 72px);
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --nav-h: 58px;

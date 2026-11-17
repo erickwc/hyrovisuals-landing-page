@@ -208,8 +208,13 @@
 .dash__eyebrow {
   color: var(--muted);
 }
+/* títulos de la cuenta con la tipografía de la landing (Monument Extended) */
 .dash__title {
-  font-size: clamp(22px, 3.4vw, 32px);
+  font-family: var(--brand);
+  font-weight: 700;
+  font-synthesis: none;
+  font-size: clamp(22px, 3.2vw, 30px);
+  letter-spacing: 0.02em;
 }
 .dash__sub {
   max-width: 52ch;
@@ -279,10 +284,15 @@
   align-self: flex-start;
   margin-left: auto;
 }
-.lib-product__photo {
+/* icono del producto junto al nombre (como en el checkout) */
+.lib-product__thumb {
   flex: none;
   width: 48px;
   height: 48px;
+}
+.lib-product__thumb img {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 .lib-product__info {
@@ -359,56 +369,117 @@
   gap: 8px;
 }
 /* clave activada en un equipo */
+/* «En uso» en la lista de claves: texto pequeño que despliega el equipo */
 .key-status {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  color: var(--green);
-  font: 600 11px/1 var(--body);
+  gap: 3px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: 600 11px var(--body);
+  white-space: nowrap;
+}
+.key-status--btn {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.key-status--btn:hover,
+.key-status--btn[aria-expanded="true"] {
+  color: var(--text);
+}
+.key-status--btn:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+.key-status__chev {
+  transition: transform 0.2s;
+}
+.key-status--btn[aria-expanded="true"] .key-status__chev {
+  transform: rotate(180deg);
 }
 /* mini ventana de claves: compacta y sin líneas entre filas */
 .mini-keys__list {
   display: grid;
-  gap: 12px;
+  gap: 18px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .mini-keys__group {
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
 .mini-keys .key-status {
   flex: none;
   margin-left: auto;
 }
-/* equipo donde está activada la clave + liberar */
+/* equipo donde está activada la clave: tarjeta con equipo y sistema en filas + liberar */
 .key-device {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 12px;
-  margin-top: 10px;
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--text) 3%, transparent);
   color: var(--muted);
   font: 500 12px/1.4 var(--body);
 }
-.key-device__name strong {
+.key-device__info {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+.key-device__info > div {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+.key-device__info dt {
+  color: var(--muted);
+  font: 600 10px/1.4 var(--body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.key-device__info dd {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
   color: var(--text);
   font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.key-device__info dd svg {
+  flex: none;
 }
 .key-device__release {
-  padding: 0;
-  border: 0;
+  justify-self: start;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
   background: none;
-  color: var(--muted);
-  font: 600 12px/1.4 var(--body);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--text);
+  font: 600 12px var(--body);
   cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
 }
 .key-device__release:hover,
 .key-device__release[data-confirm="true"] {
   color: var(--red, #e5484d);
+  border-color: var(--red, #e5484d);
+}
+/* en la mini ventana de «En uso» el detalle va sin su propio marco */
+.mini-modal--sm .key-device {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
 }
 .key-device__release:disabled {
   cursor: default;
@@ -419,7 +490,7 @@
   color: var(--red, #e5484d);
 }
 .mini-keys .key-device {
-  margin: 6px 0 0 12px;
+  margin: 0;
 }
 .mini-keys__plan {
   color: var(--muted);
@@ -548,7 +619,10 @@
   animation: dash-pulse 1.4s ease-in-out infinite;
 }
 .lib-product__photo.skel-block {
-  border-radius: 10px;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 11px;
 }
 .skel-line {
   height: 12px;

@@ -12,7 +12,7 @@ import { Check } from "./animate-ui/icons/hugeicons/check";
 import { Star } from "./animate-ui/icons/hugeicons/star";
 import { View } from "./animate-ui/icons/hugeicons/view";
 import { EyeOff } from "./animate-ui/icons/hugeicons/eye-off";
-import { CircleCheckBig } from "./animate-ui/icons/hugeicons/circle-check-big";
+import { ArrowDown01 } from "./animate-ui/icons/hugeicons/arrow-down-01";
 import { Delete02 } from "./animate-ui/icons/hugeicons/delete-02";
 
 type ReviewStatus = "idle" | "submitting" | "error" | "confirmDelete" | "deleting" | "deleteError";
@@ -30,6 +30,9 @@ export function ProductBoard({ product }: { product: Product }) {
   const [shownKeys, setShownKeys] = useState<Set<string>>(() => new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [keysAnchor, setKeysAnchor] = useState<HTMLElement | null>(null);
+  // «En uso»: mini ventana con el equipo donde está activada la clave. `where` dice desde dónde se abrió
+  // (la tarjeta o la ventana de «Ver todas»), para dibujarla dentro de esa ventana y que no la cierre
+  const [device, setDevice] = useState<{ item: License; anchor: HTMLElement; where: "main" | "mini" } | null>(null);
   // liberar un equipo: primer clic pide confirmar, el segundo libera
   const [released, setReleased] = useState<Set<string>>(() => new Set());
   const [confirmRelease, setConfirmRelease] = useState<string | null>(null);
@@ -87,6 +90,9 @@ export function ProductBoard({ product }: { product: Product }) {
     }
   };
 
+  const openDevice = (item: License, where: "main" | "mini", anchor: HTMLElement) =>
+    setDevice((cur) => (cur && cur.item.id === item.id && cur.where === where ? null : { item, anchor, where }));
+
   const toggleShown = (id: string) =>
     setShownKeys((cur) => {
       const next = new Set(cur);
@@ -110,6 +116,7 @@ export function ProductBoard({ product }: { product: Product }) {
       await releaseActivation(item.activation.id);
       setReleased((cur) => new Set(cur).add(item.id));
       setConfirmRelease(null);
+      setDevice(null);
     } catch (err) {
       const limit = err instanceof Error && err.message === "release_limit";
       setReleaseError({ id: item.id, text: limit ? t.releaseLimit : t.releaseError });
@@ -118,24 +125,25 @@ export function ProductBoard({ product }: { product: Product }) {
     }
   };
 
-  // en qué equipo está activada la clave, con el botón para liberarlo
-  const deviceRow = (item: License) =>
+  // en qué equipo está activada la clave (equipo y sistema en filas)
+  const deviceInfo = (item: License) =>
     item.activation && (
       <div className="key-device">
-        <span className="key-device__name">
-          {t.activeOn} <strong>{item.activation.deviceName || t.unknownDevice}</strong>
-          {item.activation.platform && ` · ${platformName(item.activation.platform)}`}
-        </span>
-        <button
-          type="button"
-          className="key-device__release"
-          data-confirm={confirmRelease === item.id}
-          disabled={releasing === item.id}
-          onClick={() => onRelease(item)}
-          onBlur={() => setConfirmRelease((cur) => (cur === item.id && releasing !== item.id ? null : cur))}
-        >
-          {releasing === item.id ? t.releasing : confirmRelease === item.id ? t.releaseConfirm : t.release}
-        </button>
+        <dl className="key-device__info">
+          <div>
+            <dt>{t.device}</dt>
+            <dd>{item.activation.deviceName || t.unknownDevice}</dd>
+          </div>
+          {item.activation.platform && (
+            <div>
+              <dt>{t.system}</dt>
+              <dd>
+                {item.activation.platform === "darwin" ? <AppleIcon width={13} height={13} /> : item.activation.platform === "win32" ? <WindowsIcon width={13} height={13} /> : null}
+                {platformName(item.activation.platform)}
+              </dd>
+            </div>
+          )}
+        </dl>
         {releaseError?.id === item.id && (
           <span className="key-device__error" role="alert">
             {releaseError.text}
@@ -144,13 +152,48 @@ export function ProductBoard({ product }: { product: Product }) {
       </div>
     );
 
-  const inUseTag = (item: License) =>
-    item.inUse && (
-      <span className="key-status">
-        <CircleCheckBig size={12} />
-        {t.inUse}
-      </span>
+  // liberar el equipo: va en la barra de arriba de la mini ventana
+  const releaseButton = (item: License) => (
+    <button
+      type="button"
+      className="key-device__release"
+      data-confirm={confirmRelease === item.id}
+      disabled={releasing === item.id}
+      onClick={() => onRelease(item)}
+      onBlur={() => setConfirmRelease((cur) => (cur === item.id && releasing !== item.id ? null : cur))}
+    >
+      {releasing === item.id ? t.releasing : confirmRelease === item.id ? t.releaseConfirm : t.release}
+    </button>
+  );
+
+  // la mini ventana de «En uso» (la misma para la tarjeta y para la lista de «Ver todas»)
+  const deviceModal = (where: "main" | "mini") =>
+    device?.where === where && (
+      <MiniModal open anchor={device.anchor} onClose={() => setDevice(null)} title={t.inUse} className="mini-modal--sm" action={releaseButton(device.item)}>
+        {deviceInfo(device.item)}
+      </MiniModal>
     );
+
+  // en la lista de «Ver todas»: «En uso» como texto pequeño que abre la misma mini ventana
+  const inUseTag = (item: License) => {
+    if (!item.inUse) return null;
+    if (!item.activation) return <span className="key-status">{t.inUse}</span>;
+    const open = device?.where === "mini" && device.item.id === item.id;
+    return (
+      <button
+        type="button"
+        className="key-status key-status--btn"
+        data-mini-trigger
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        title={t.showDevice}
+        onClick={(e) => openDevice(item, "mini", e.currentTarget)}
+      >
+        {t.inUse}
+        <ArrowDown01 size={12} className="key-status__chev" />
+      </button>
+    );
+  };
 
   // píldora con el ojo, la clave (oculta hasta pedirla), si está en uso y copiar
   const keyField = (item: License, withStatus = false) => {
@@ -219,9 +262,14 @@ export function ProductBoard({ product }: { product: Product }) {
   return (
     <article className="lib-product">
       <header className="lib-product__head">
-        {product.image && !photoFailed && (
-          <img className="lib-product__photo" src={asset(product.image)} alt="" decoding="async" onError={() => setPhotoFailed(true)} />
-        )}
+        <span className="lib-product__thumb">
+          <img
+            src={product.image && !photoFailed ? asset(product.image) : "/landing/img/favicon.png?v=2"}
+            alt=""
+            decoding="async"
+            onError={() => setPhotoFailed(true)}
+          />
+        </span>
         <div className="lib-product__info">
           <h2 className="lib-product__name">
             {product.name}
@@ -262,7 +310,6 @@ export function ProductBoard({ product }: { product: Product }) {
               <h3 className="lib-product__title" id={`key-${product.id}`}>
                 {t.license}
               </h3>
-              {inUseTag(license)}
             </div>
             <div className="lib-product__keys">
               {keyField(license)}
@@ -281,8 +328,19 @@ export function ProductBoard({ product }: { product: Product }) {
                   {t.viewAllKeys}
                 </Button>
               )}
+              {license.inUse && license.activation && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  data-mini-trigger
+                  aria-haspopup="dialog"
+                  aria-expanded={device?.where === "main"}
+                  onClick={(e) => openDevice(license, "main", e.currentTarget)}
+                >
+                  {t.inUse}
+                </Button>
+              )}
             </div>
-            {deviceRow(license)}
           </section>
         )}
       </div>
@@ -322,7 +380,20 @@ export function ProductBoard({ product }: { product: Product }) {
         </section>
       )}
 
-      <MiniModal open={Boolean(keysAnchor)} anchor={keysAnchor} onClose={() => setKeysAnchor(null)} title={t.licenses} bodyClassName="mini-keys">
+      {deviceModal("main")}
+
+      <MiniModal
+        open={Boolean(keysAnchor)}
+        anchor={keysAnchor}
+        onClose={() => {
+          setKeysAnchor(null);
+          setDevice((cur) => (cur?.where === "mini" ? null : cur));
+        }}
+        title={t.licenses}
+        bodyClassName="mini-keys"
+      >
+        {/* dentro de esta ventana, para que un clic en el detalle no la cierre */}
+        {deviceModal("mini")}
         <ul className="mini-keys__list">
           {groups.map((group) => (
             <li key={group.planId} className="mini-keys__group">
@@ -330,7 +401,6 @@ export function ProductBoard({ product }: { product: Product }) {
               {group.items.map((item) => (
                 <div key={item.id} className="mini-keys__item">
                   {keyField(item, true)}
-                  {deviceRow(item)}
                 </div>
               ))}
             </li>

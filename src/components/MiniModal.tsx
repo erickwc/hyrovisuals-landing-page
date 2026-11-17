@@ -25,6 +25,8 @@ export function MiniModal(props: {
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
+  /** Botón en la barra del título, a la derecha (p. ej. «Liberar equipo»). */
+  action?: ReactNode;
   anchor?: HTMLElement | null;
   locked?: boolean;
   wide?: boolean;
@@ -41,6 +43,7 @@ function MiniModalBody({
   onClose,
   children,
   footer,
+  action,
   anchor,
   locked = false,
   wide = false,
@@ -52,6 +55,7 @@ function MiniModalBody({
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
+  action?: ReactNode;
   anchor?: HTMLElement | null;
   locked?: boolean;
   wide?: boolean;
@@ -118,7 +122,14 @@ function MiniModalBody({
   const cls = ["mini-modal", wide && "mini-modal--wide", className, anchor && "mini-modal--fixed", closing && "is-closing"].filter(Boolean).join(" ");
   return (
     <div className={cls} role="dialog" aria-label={title} ref={ref} tabIndex={-1} onKeyDown={onKey} style={anchor ? (pos ?? { visibility: "hidden" }) : undefined}>
-      <p className="mini-modal__title">{title}</p>
+      {action ? (
+        <div className="mini-modal__title mini-modal__title--action">
+          <span>{title}</span>
+          {action}
+        </div>
+      ) : (
+        <p className="mini-modal__title">{title}</p>
+      )}
       <div className={"mini-modal__body" + (bodyClassName ? ` ${bodyClassName}` : "")}>{children}</div>
       {footer && <div className="mini-modal__foot">{footer}</div>}
     </div>

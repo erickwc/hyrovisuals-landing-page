@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /* Botones oficiales de PayPal (SDK de JavaScript, cargado una sola vez): uno para pagar con la cuenta de PayPal y
    otro aparte para tarjeta de crédito o débito sin cuenta. Van separados para que, al abrir el formulario de tarjeta,
@@ -60,8 +60,12 @@ type Props = {
   onError: (message: string | null) => void;
   /** Texto si el SDK de PayPal no carga (bloqueador de anuncios, sin conexión). */
   loadError: string;
-  /** «+más» al final de los logos de tarjetas. */
-  moreLabel: string;
+  /** Título sobre el botón de PayPal («Pago exprés»). */
+  expressLabel: string;
+  /** Lo que va entre PayPal y la tarjeta (separador «O», contacto, título de pago). */
+  between?: ReactNode;
+  /** Título de la caja de la tarjeta. */
+  cardLabel: string;
 };
 
 export function PaypalButtons(props: Props) {
@@ -86,7 +90,8 @@ export function PaypalButtons(props: Props) {
     let cancelled = false;
     let lastError: string | null = null;
     // PayPal en su amarillo de siempre; tarjeta en negro (claro) o blanco (oscuro), que son los colores que admite
-    const cardColor = props.theme === "dark" ? "white" : "black";
+    // PayPal solo admite negro o blanco en el botón de tarjeta: va en negro (gris carbón) y checkout.css lo aclara a gris
+    const cardColor = "black";
 
     loadSdk(props.clientId)
       .then((paypal) => {
@@ -139,18 +144,33 @@ export function PaypalButtons(props: Props) {
     };
   }, [props.clientId, props.theme]);
 
-  if (failed) return <p className="co__error">{props.loadError}</p>;
+  if (failed)
+    return (
+      <>
+        {props.between}
+        <p className="co__error">{props.loadError}</p>
+      </>
+    );
   return (
     <div className="co__paypal">
-      <div ref={paypalSlot} />
-      <div ref={cardSlot} className={cardOpen ? "co__paypal-card is-open" : "co__paypal-card"} />
-      <PaymentMarks more={props.moreLabel} />
+      <section className="co__express" aria-label={props.expressLabel}>
+        <p className="co__express-label">{props.expressLabel}</p>
+        <div ref={paypalSlot} className="co__paypal-btn" />
+      </section>
+      {props.between}
+      <div className="co__cardbox">
+        <div className="co__cardbox-head">
+          <span>{props.cardLabel}</span>
+          <PaymentMarks />
+        </div>
+        <div ref={cardSlot} className={cardOpen ? "co__paypal-card is-open" : "co__paypal-card"} />
+      </div>
     </div>
   );
 }
 
 /* Logos de lo que se acepta (logos de marca: fuera de la regla de iconos). */
-function PaymentMarks({ more }: { more: string }) {
+function PaymentMarks() {
   return (
     <div className="co__marks" aria-label="PayPal, Visa, Mastercard">
       <span className="co__mark co__mark--paypal" aria-hidden="true">
@@ -169,7 +189,6 @@ function PaymentMarks({ more }: { more: string }) {
           <path fill="#ff5f00" d="M12 3.2a6 6 0 0 1 0 9.6 6 6 0 0 1 0-9.6Z" />
         </svg>
       </span>
-      <span className="co__marks-more">{more}</span>
     </div>
   );
 }

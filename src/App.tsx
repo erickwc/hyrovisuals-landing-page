@@ -8,7 +8,10 @@ import { PrefsProvider } from "./lib/prefs";
 function ToLanding() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
-    window.location.replace(pathname === "/" ? `/${hash}` : "/");
+    // Con un #sección y la dirección ya en "/", replace() solo cambiaría el ancla sin cargar la landing
+    // (la página se quedaba en blanco): en ese caso se recarga.
+    if (pathname === "/" && hash && window.location.pathname === "/") window.location.reload();
+    else window.location.replace(pathname === "/" ? `/${hash}` : "/");
   }, [pathname, hash]);
   return null;
 }
