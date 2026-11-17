@@ -1490,7 +1490,7 @@
       box-shadow 0.22s ease;
   }
   .admin__rail:hover .admin__sidebar,
-  .admin__rail:focus-within .admin__sidebar {
+  .admin__rail:has(:focus-visible) .admin__sidebar {
     width: 264px;
     box-shadow: 12px 0 32px rgba(0, 0, 0, 0.28);
     /* un instante antes de abrir: pasar el mouse de camino no lo despliega */
@@ -1508,12 +1508,27 @@
   .admin__rail:hover .admin__nav-label,
   .admin__rail:hover .admin__profile-text,
   .admin__rail:hover .admin__logout,
-  .admin__rail:focus-within .admin__nav-text,
-  .admin__rail:focus-within .admin__nav-label,
-  .admin__rail:focus-within .admin__profile-text,
-  .admin__rail:focus-within .admin__logout {
+  .admin__rail:has(:focus-visible) .admin__nav-text,
+  .admin__rail:has(:focus-visible) .admin__nav-label,
+  .admin__rail:has(:focus-visible) .admin__profile-text,
+  .admin__rail:has(:focus-visible) .admin__logout {
     opacity: 1;
     transition-delay: 0.12s;
+  }
+}
+/* recién elegida una sección: cerrado hasta que el mouse salga y vuelva a entrar */
+@media (min-width: 881px) {
+  .admin__rail.is-closed .admin__sidebar {
+    width: 57px;
+    box-shadow: inset 0 0 0 0 transparent;
+    transition-delay: 0s;
+  }
+  .admin__rail.is-closed .admin__nav-text,
+  .admin__rail.is-closed .admin__nav-label,
+  .admin__rail.is-closed .admin__profile-text,
+  .admin__rail.is-closed .admin__logout {
+    opacity: 0;
+    transition-delay: 0s;
   }
 }
 @media (max-width: 880px) {

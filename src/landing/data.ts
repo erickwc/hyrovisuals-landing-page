@@ -1,14 +1,15 @@
 /* Datos reales de la landing desde Supabase, sin cargar supabase-js (fetch directo a la API REST con la clave
    pública; los permisos los ponen las políticas RLS):
-   - Precios de Personal y Equipos: tabla plans del producto hyro-visuals (lo que cobra el checkout).
+   - Planes: todos los planes activos del producto hyro-visuals en la tabla plans, del más barato al más caro
+     (los mismos que se crean y editan en el panel admin y que cobra el checkout).
    - Reseñas publicadas: función public_reviews (nombre corto, foto, estrellas y comentario).
    - Newsletter: inserta en newsletter_subscribers (migración 0011; la API pública solo puede insertar).
    La landing (public/landing/js/app.js) recibe todo por window.HyroLanding. */
 
-type PlanKey = "personal" | "teams";
+type LandingPlan = { id: string; price: number; keys: number };
 type LandingReview = { name: string | null; avatarUrl: string | null; rating: number; text: string };
 type LandingApi = {
-  setPlans: (plans: Partial<Record<PlanKey, { price: number; keys: number }>>) => void;
+  setPlans: (plans: LandingPlan[]) => void;
   setReviews: (list: LandingReview[] | null) => void;
   subscribe: ((email: string, lang: string) => Promise<void>) | null;
 };
@@ -22,8 +23,6 @@ declare global {
 const SB_URL = import.meta.env.VITE_SUPABASE_URL;
 const SB_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const PRODUCT_SLUG = "hyro-visuals";
-// plan de la landing → id del plan en Supabase (el mismo que usa /checkout?plan=…)
-const PLAN_IDS: Record<PlanKey, string> = { personal: "personal", teams: "equipos" };
 
 class RestError extends Error {
   constructor(readonly status: number) {
@@ -47,14 +46,12 @@ async function loadPlans(api: LandingApi) {
   const product = products?.[0];
   if (!product) return;
   const rows = await rest<{ id: string; price_usd: number | string; license_count: number }[]>(
-    `plans?select=id,price_usd,license_count&active=eq.true&product_id=eq.${product.id}`,
+    `plans?select=id,price_usd,license_count&active=eq.true&product_id=eq.${product.id}&order=price_usd.asc`,
   );
-  const live: Partial<Record<PlanKey, { price: number; keys: number }>> = {};
-  for (const key of Object.keys(PLAN_IDS) as PlanKey[]) {
-    const row = rows?.find((r) => r.id === PLAN_IDS[key]);
-    if (row) live[key] = { price: Number(row.price_usd), keys: Number(row.license_count) };
-  }
-  api.setPlans(live);
+  const plans = (rows ?? [])
+    .map((r) => ({ id: r.id, price: Number(r.price_usd), keys: Number(r.license_count) }))
+    .filter((p) => p.price > 0);
+  if (plans.length) api.setPlans(plans);
 }
 
 async function loadReviews(api: LandingApi) {

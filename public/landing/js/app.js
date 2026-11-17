@@ -4,16 +4,23 @@
 
   /* ===== Configuración: enlaces a la app (React) que vive en las mismas rutas del sitio ===== */
   const CONFIG = {
-    // checkout propio: pide la sesión si falta. "equipos" es el id del plan Equipos en Supabase.
-    checkout: { personal: '/checkout?plan=personal', teams: '/checkout?plan=equipos' },
+    // checkout propio (pide la sesión si falta): cada plan va con su id de Supabase
+    checkout: id => '/checkout?plan=' + encodeURIComponent(id),
     auth: { login: '/login', signup: '/register' } // Iniciar sesión y Crear cuenta
   };
 
   /* ===== Datos reales =====
      src/landing/data.ts (Supabase) los entrega por window.HyroLanding cuando la web arranca:
-     setPlans (precios de la tabla plans), setReviews (reseñas publicadas) y subscribe (newsletter).
-     Estos precios son el respaldo mientras llegan (o si no hay conexión): mantenerlos iguales a Supabase. */
-  const PLANS = { personal: { int: '20', dec: '00', keys: 1, code: 'PER' }, teams: { int: '50', dec: '00', keys: 3, code: 'TEA' } };
+     setPlans (todos los planes activos de la tabla plans, los que se crean en el panel admin), setReviews (reseñas
+     publicadas) y subscribe (newsletter). Estos dos planes son el respaldo mientras llegan (o si no hay conexión):
+     mantenerlos iguales a Supabase. El ticket y la lista de planes se arman solos con los que haya. */
+  const toPlan = (id, price, keys) => { const [int, dec] = Number(price).toFixed(2).split('.'); return { id, int, dec, keys }; };
+  let PLANS = [toPlan('personal', 20, 1), toPlan('equipos', 50, 3)];
+  const findPlan = id => PLANS.find(p => p.id === id) || PLANS[0];
+  // nombre del plan: los conocidos traducidos; los nuevos del panel, con su nombre tal cual
+  const planName = p => (I18N.js('plan') || {})[p.id] || p.id.charAt(0).toUpperCase() + p.id.slice(1);
+  const keysText = (n, long) => { const w = I18N.js(long ? 'keyLong' : 'keyShort'); return n + ' ' + w[n === 1 ? 0 : 1]; };
+  const planCode = p => (p.id.normalize('NFD').replace(/[^a-z]/gi, '').slice(0, 3) || 'PLN').toUpperCase();
   const api = { setPlans: () => {}, setReviews: () => {}, subscribe: null };
   const sep = () => (I18N.lang === 'en' ? '.' : ',');
   const money = p => (+p.int).toString() + (p.dec === '00' ? '' : sep() + p.dec);
@@ -716,11 +723,12 @@
   /* ---------- Compra (factura) ---------- */
   function pricing() {
     const ticket = $('#ticket'), intEl = $('#tkInt'), perf = $('#tkPerf');
-    let plan = 'personal';
+    const compare = $('#planCompare'), choices = $('.tk-plans', ticket);
+    let plan = PLANS[0].id;
 
     // una columna de dígitos por cifra del precio (se rehace si el precio cambia de 2 a 3 cifras)
     const buildDigits = n => { intEl.innerHTML = Array.from({ length: n }, () => `<span class="dg"><span class="dg-col">${'0123456789'.split('').map(d => `<span>${d}</span>`).join('')}</span></span>`).join(''); };
-    buildDigits(PLANS.personal.int.length);
+    buildDigits(PLANS[0].int.length);
     function digits(str, instant) {
       if ($$('.dg-col', intEl).length !== str.length) { buildDigits(str.length); instant = true; }
       $$('.dg-col', intEl).forEach((col, i) => {
@@ -742,42 +750,66 @@
       return String(d.getDate()).padStart(2, '0') + ' ' + m + ' ' + d.getFullYear();
     }
     function notch() { ticket.style.setProperty('--notch-y', (perf.offsetTop + .5) + 'px'); }
+
+    // la lista de planes (a la izquierda) y las opciones del ticket salen de PLANS: tantos como haya en el panel
+    function buildPlans() {
+      compare.textContent = '';
+      choices.textContent = '';
+      PLANS.forEach(p => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'pc'; b.dataset.plan = p.id;
+        b.innerHTML = '<span class="pc-dot"></span><span class="pc-name"></span><span class="pc-keys"></span><span class="pc-price"></span>';
+        $('.pc-name', b).textContent = planName(p);
+        $('.pc-keys', b).textContent = keysText(p.keys, true);
+        $('.pc-price', b).textContent = '$' + money(p);
+        b.addEventListener('click', () => { plan = p.id; render(); });
+        compare.appendChild(b);
+
+        const l = document.createElement('label');
+        l.className = 'tk-plan';
+        l.innerHTML = '<input type="radio" name="plan"><span class="tk-plan-top"><b></b><span class="tk-plan-price"></span></span><small></small>';
+        const r = $('input', l); r.value = p.id;
+        $('b', l).textContent = planName(p);
+        $('.tk-plan-price', l).textContent = '$' + money(p);
+        $('small', l).textContent = keysText(p.keys, false);
+        r.addEventListener('change', () => { plan = p.id; render(); });
+        choices.appendChild(l);
+      });
+      ticket.dataset.plans = PLANS.length;
+      if (!PLANS.some(p => p.id === plan)) plan = PLANS[0].id;
+    }
+
     function render(instant) {
-      const p = PLANS[plan], yy = String(new Date().getFullYear()).slice(2);
+      const p = findPlan(plan), yy = String(new Date().getFullYear()).slice(2), code = planCode(p);
+      plan = p.id;
       ticket.dataset.plan = plan;
       $$('input[name="plan"]', ticket).forEach(r => { r.checked = r.value === plan; });
-      $$('#planCompare .pc').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.plan === plan)));
+      $$('.pc', compare).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.plan === plan)));
       digits(p.int, instant);
       $('#tkDec').textContent = sep() + p.dec + ' USD';
       $('#tkLine').textContent = p.int + sep() + p.dec;
       $('#tkKeys').textContent = p.keys;
-      $('#tkPlanName').textContent = I18N.js('plan')[plan];
-      $('#tkNo').textContent = `${I18N.js('invoiceNo')} HV-${yy}-${p.code}-0${p.keys}`;
+      $('#tkPlanName').textContent = planName(p);
+      $('#tkNo').textContent = `${I18N.js('invoiceNo')} HV-${yy}-${code}-0${p.keys}`;
       $('#tkDate').textContent = dateStr();
-      $('#barcodeTxt').textContent = `HV-${p.code}-${p.keys}K-${new Date().getFullYear()}`;
-      barcode(p.code + p.keys);
-      $$('.pc-price').forEach((el, i) => { el.textContent = '$' + money(PLANS[i ? 'teams' : 'personal']); });
-      $$('.tk-plan-price').forEach((el, i) => { el.textContent = '$' + money(PLANS[i ? 'teams' : 'personal']); });
-      const buy = $('#buyBtn'), url = CONFIG.checkout[plan];
-      buy.href = url || '#comprar'; buy.dataset.plan = plan;
+      $('#barcodeTxt').textContent = `HV-${code}-${p.keys}K-${new Date().getFullYear()}`;
+      barcode(code + p.keys);
+      const buy = $('#buyBtn');
+      buy.href = CONFIG.checkout(plan); buy.dataset.plan = plan;
       notch();
     }
-    $$('input[name="plan"]', ticket).forEach(r => r.addEventListener('change', () => { plan = r.value; render(); }));
-    $$('#planCompare .pc').forEach(b => b.addEventListener('click', () => { plan = b.dataset.plan; render(); }));
-    $('#buyBtn').addEventListener('click', e => { if (!CONFIG.checkout[plan]) { e.preventDefault(); console.info('[Hyro] Configura CONFIG.checkout.' + plan + ' en assets/js/app.js'); } });
+    buildPlans();
     render(true);
-    onLang(() => render(true));
+    onLang(() => { buildPlans(); render(true); });
     addEventListener('resize', notch);
     document.fonts && document.fonts.ready.then(notch);
 
-    // precios reales: { personal: { price, keys }, teams: { price, keys } } (solo los planes que lleguen)
-    api.setPlans = live => {
-      for (const id of Object.keys(PLANS)) {
-        const p = live && live[id];
-        if (!p || !(p.price > 0)) continue;
-        const [int, dec] = Number(p.price).toFixed(2).split('.');
-        Object.assign(PLANS[id], { int, dec, keys: p.keys || PLANS[id].keys });
-      }
+    // planes reales del panel: [{ id, price, keys }, ...] del más barato al más caro
+    api.setPlans = list => {
+      const next = (list || []).filter(p => p && p.id && p.price > 0).map(p => toPlan(p.id, p.price, p.keys || 1));
+      if (!next.length) return;
+      PLANS = next;
+      buildPlans();
       render(true);
     };
   }
@@ -983,7 +1015,7 @@
       $$('.bento .cell').forEach(cell => items.push({ t: clean($('h3', cell).textContent), d: clean($('.cell-copy p', cell).textContent), tag: label('funciones'), go: () => goTo(cell) }));
       I18N.STEPS.forEach((st, i) => { const [t, d] = st[I18N.lang]; items.push({ t, d, tag: label('accion'), go: () => { goTo($('#tour')); document.dispatchEvent(new CustomEvent('tour:go', { detail: i })); } }); });
       $$('.faq-item').forEach(it => items.push({ t: clean($('.faq-t', it).textContent), d: clean($('.faq-a p', it).textContent), tag: label('preguntas'), go: () => { goTo(it); const q = $('.faq-q', it); if (q.getAttribute('aria-expanded') !== 'true') q.click(); } }));
-      [['personal', 'search.plan1'], ['teams', 'search.plan3']].forEach(([p, k]) => items.push({ t: I18N.js('plan')[p], d: I18N.js(k).replace('{p}', '$' + money(PLANS[p])), tag: label('comprar'), go: () => { goTo($('#ticket')); const b = $(`#planCompare .pc[data-plan="${p}"]`); b && b.click(); } }));
+      PLANS.forEach(p => items.push({ t: planName(p), d: keysText(p.keys, true) + ' · $' + money(p), tag: label('comprar'), go: () => { goTo($('#ticket')); const b = $$('#planCompare .pc').find(x => x.dataset.plan === p.id); b && b.click(); } }));
       I18N.MODULES.forEach(m => items.push({ t: I18N.moduleName(m[0]), d: I18N.js('search.module'), tag: label('funciones'), go: () => { goTo($('.c-spectra')); document.dispatchEvent(new CustomEvent('spec:show', { detail: m[0] })); } }));
       items.forEach(it => { it.nt = norm(it.t); it.n = norm(it.t + ' ' + it.d + ' ' + it.tag); });
     }

@@ -1,5 +1,6 @@
 // Aviso por correo de cada venta, con Resend (https://resend.com), en el mismo estilo que el correo de recuperar
-// contraseña (fondo negro, HYRO arriba, tarjeta oscura). Dice quién compró, qué licencia y lleva el botón al panel.
+// contraseña (fondo negro, HYRO arriba, tarjeta oscura). Dice cuánto se cobró (y lo que queda tras la comisión),
+// quién compró, qué licencia y lleva el botón al panel.
 // Secretos de Edge Functions: RESEND_API_KEY y SALE_EMAIL_FROM (opcional, p. ej. "Hyro <auth@byhyro.com>").
 // A quién se envía se edita en el panel admin (sale_notifications).
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
@@ -69,6 +70,7 @@ async function recipients(admin: SupabaseClient): Promise<{ enabled: boolean; em
 }
 
 const capitalize = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
+const money = (n: number, currency = "USD") => new Intl.NumberFormat("en-US", { style: "currency", currency }).format(n);
 
 /** Avisa de una venta pagada. Sale una sola vez por compra (purchases.notified_at). */
 export async function notifySale(admin: SupabaseClient, purchaseId: string): Promise<"sent" | "skipped"> {
@@ -82,7 +84,7 @@ export async function notifySale(admin: SupabaseClient, purchaseId: string): Pro
     .eq("id", purchaseId)
     .eq("status", "paid")
     .is("notified_at", null)
-    .select("id, user_id, product_id, plan_id, provider")
+    .select("id, user_id, product_id, plan_id, provider, amount, currency, discount_amount, fee_amount, net_amount")
     .maybeSingle();
   if (!claimed) return "skipped";
 
@@ -96,8 +98,19 @@ export async function notifySale(admin: SupabaseClient, purchaseId: string): Pro
     const planName = capitalize(String(claimed.plan_id));
     const keys = Number(plan?.license_count ?? 1);
     const isTest = claimed.provider === "paypal_sandbox";
+    const currency = claimed.currency || "USD";
+    const amount = Number(claimed.amount);
+    const fee = Number(claimed.fee_amount);
+    const discount = Number(claimed.discount_amount);
+    const saleDetail = [
+      fee > 0 ? `Te quedan ${money(Number(claimed.net_amount), currency)} después de la comisión de PayPal (${money(fee, currency)})` : null,
+      discount > 0 ? `Incluye un descuento de ${money(discount, currency)}` : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
 
     const blocks: Block[] = [
+      { label: "Valor de la venta", title: money(amount, currency), detail: saleDetail || undefined },
       {
         label: "Usuario que compró",
         title: buyer?.name || buyer?.email || "Cliente",
@@ -116,7 +129,7 @@ export async function notifySale(admin: SupabaseClient, purchaseId: string): Pro
 
     await sendEmail(
       emails,
-      `${isTest ? "[PRUEBA] " : ""}Nueva venta: ${productName} ${planName}`,
+      `${isTest ? "[PRUEBA] " : ""}Nueva venta de ${money(amount, currency)}: ${productName} ${planName}`,
       layout({ eyebrow: "Ventas", heading, intro, blocks, button: { label: "Ver en el panel", href: PANEL_URL } }),
       plainText(heading, intro, blocks, PANEL_URL),
     );
@@ -134,6 +147,7 @@ export async function sendTestEmail(admin: SupabaseClient): Promise<string[]> {
   if (!emailConfigured()) throw new Error("Falta el secreto RESEND_API_KEY en Supabase.");
   if (emails.length === 0) throw new Error("No hay correos para avisar.");
   const blocks: Block[] = [
+    { label: "Valor de la venta", title: "$20.00", detail: "Te quedan $18.62 después de la comisión de PayPal ($1.38)" },
     { label: "Usuario que compró", title: "Nombre del cliente", detail: "cliente@correo.com" },
     { label: "Licencia que compró", title: "Hyro Visuals · Personal", detail: "1 clave de activación" },
   ];

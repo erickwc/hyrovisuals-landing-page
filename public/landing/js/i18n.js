@@ -42,7 +42,7 @@
     'faq.q8': 'Can I save and share my settings?', 'faq.a8': 'Yes. Save your combinations as presets and export or import them as a file to share them with other producers.',
     'faq.q9': 'Is it a subscription?', 'faq.a9': 'No. You pay once and the license is yours for life.',
     'faq.q10': 'What’s the difference between Personal and Teams?', 'faq.a10': 'Only the number of activation keys. Personal includes 1 key and Teams includes 3 independent keys, managed from your account. The features are exactly the same.',
-    'buy.eyebrow': 'License', 'buy.t1': 'Buy', 'buy.lead': 'One-time payment, lifetime license. Both plans include everything: only the number of keys changes.',
+    'buy.eyebrow': 'License', 'buy.t1': 'Buy', 'buy.lead': 'One-time payment, lifetime license. Every plan includes everything: only the number of keys changes.',
     'buy.personal': 'Personal', 'buy.teams': 'Teams', 'buy.keys1': '1 activation key', 'buy.keys3': '3 activation keys',
     'buy.i1': 'Over 30 spectrums and visuals', 'buy.i2': 'Styles, palettes and presets', 'buy.i3': 'Installers for Windows and macOS', 'buy.i4': '100% local processing', 'buy.i5': 'No subscriptions',
     'buy.lifetime': 'Lifetime', 'buy.software': 'Software license', 'buy.invoice': 'Invoice', 'buy.choose': 'Choose your license',
@@ -67,8 +67,10 @@
       ticker: ['Pago único', 'Desde 20 US$', 'Acceso de por vida', 'Windows y Mac', 'Para productores, DJs y creadores', '30+ espectros de audio'],
       ribbonA: ['Para productores', 'DJs', 'Creadores'], ribbonB: ['Un solo pago', 'Acceso de por vida'],
       months: ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'],
-      plan: { personal: 'Personal', teams: 'Equipos' }, invoiceNo: 'N.º',
-      'search.empty': 'Sin resultados para', 'search.suggest': 'Sugerencias', 'search.module': 'Espectro disponible en Hyro Visuals', 'search.step': 'Paso del recorrido', 'search.plan1': '1 clave de activación · {p}', 'search.plan3': '3 claves de activación · {p}'
+      // nombres de los planes conocidos (por su id en Supabase); los que se creen en el panel salen con su nombre
+      plan: { personal: 'Personal', equipos: 'Equipos' }, invoiceNo: 'N.º',
+      keyShort: ['clave', 'claves'], keyLong: ['clave de activación', 'claves de activación'],
+      'search.empty': 'Sin resultados para', 'search.suggest': 'Sugerencias', 'search.module': 'Espectro disponible en Hyro Visuals', 'search.step': 'Paso del recorrido'
     },
     en: {
       'stage.d.strip': 'The strip lives at the top and your apps fit below it.',
@@ -80,8 +82,9 @@
       ticker: ['One-time payment', 'From 20 US$', 'Lifetime access', 'Mac and Windows', 'For producers, DJs and creators', '30+ audio spectrums'],
       ribbonA: ['For producers', 'DJs', 'Creators'], ribbonB: ['One purchase', 'Lifetime access'],
       months: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
-      plan: { personal: 'Personal', teams: 'Teams' }, invoiceNo: 'No.',
-      'search.empty': 'No results for', 'search.suggest': 'Suggestions', 'search.module': 'Spectrum available in Hyro Visuals', 'search.step': 'Tour step', 'search.plan1': '1 activation key · {p}', 'search.plan3': '3 activation keys · {p}'
+      plan: { personal: 'Personal', equipos: 'Teams' }, invoiceNo: 'No.',
+      keyShort: ['key', 'keys'], keyLong: ['activation key', 'activation keys'],
+      'search.empty': 'No results for', 'search.suggest': 'Suggestions', 'search.module': 'Spectrum available in Hyro Visuals', 'search.step': 'Tour step'
     }
   };
 

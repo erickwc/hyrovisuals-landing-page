@@ -62,13 +62,41 @@ function Avatar({ url }: { url: string | null }) {
   );
 }
 
+/* Todas las secciones del panel se bajan apenas abre el panel (en segundo plano): al hacer clic en el menú la página
+   ya está lista y aparece al instante, en vez de esperar a descargarla. */
+function preloadSections() {
+  void Promise.allSettled([
+    import("./Overview"),
+    import("./Sales"),
+    import("./Finances"),
+    import("./Products"),
+    import("./ProductAdmin"),
+    import("./Clients"),
+    import("./ClientDetail"),
+    import("./Reviews"),
+    import("./Announcements"),
+    import("./Coupons"),
+    import("./Settings"),
+    import("./ActivityLog"),
+    import("./ClientView"),
+  ]);
+}
+
 export function AdminLayout() {
   const navigate = useNavigate();
   const { info, checked } = useRequireAdmin();
   const { theme, toggleTheme } = usePrefs();
   // en teléfono el sidebar es un menú lateral que se abre con la hamburguesa de la barra de arriba
   const [menuOpen, setMenuOpen] = useState(false);
+  // en computadora: después de elegir una sección el menú se cierra aunque el mouse siga encima;
+  // vuelve a abrirse la próxima vez que el mouse entre
+  const [railClosed, setRailClosed] = useState(false);
   const { pathname } = useLocation();
+
+  useEffect(() => {
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 300));
+    idle(preloadSections);
+  }, []);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -86,6 +114,12 @@ export function AdminLayout() {
   }, [menuOpen]);
 
   if (!checked || !info) return null;
+
+  // al elegir una sección: se cierra el menú (y se suelta el foco, que también lo mantendría abierto)
+  const onPick = (e: { currentTarget: HTMLElement }) => {
+    e.currentTarget.blur();
+    setRailClosed(true);
+  };
 
   const onLogout = async () => {
     await supabase?.auth.signOut();
@@ -106,7 +140,7 @@ export function AdminLayout() {
       {menuOpen && <div className="admin__backdrop" onClick={() => setMenuOpen(false)} aria-hidden="true" />}
 
       {/* en computadora: riel angosto de iconos que se despliega encima del contenido al pasar el mouse */}
-      <div className="admin__rail">
+      <div className={"admin__rail" + (railClosed ? " is-closed" : "")} onMouseLeave={() => setRailClosed(false)}>
       <aside className="admin__sidebar" id="admin-menu" data-open={menuOpen}>
         <AnimateIcon animateOnHover asChild>
           <button type="button" className="admin__burger admin__menu-close" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú">
@@ -136,6 +170,7 @@ export function AdminLayout() {
                   to={item.to}
                   end={item.end}
                   aria-label={item.label}
+                  onClick={onPick}
                   className={({ isActive }) => "admin__nav-link" + (isActive ? " active" : "")}
                 >
                   <item.icon size={15} />
@@ -153,7 +188,7 @@ export function AdminLayout() {
               <span className="admin__nav-text">{theme === "dark" ? "Modo claro" : "Modo oscuro"}</span>
             </button>
           </AnimateIcon>
-          <NavLink to="/admin/vista-cliente" aria-label="Ver como cliente" className={({ isActive }) => "admin__nav-link" + (isActive ? " active" : "")}>
+          <NavLink to="/admin/vista-cliente" aria-label="Ver como cliente" onClick={onPick} className={({ isActive }) => "admin__nav-link" + (isActive ? " active" : "")}>
             <UserRound size={15} />
             <span className="admin__nav-text">Ver como cliente</span>
           </NavLink>
