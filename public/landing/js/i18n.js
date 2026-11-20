@@ -17,7 +17,7 @@
     'hf.live': 'Live', 'hf.theme': 'Style', 'hf.brutal': 'Brutalism', 'hf.palettes': '12 palettes',
     'stage.strip': 'Strip', 'stage.grid': 'Grid', 'stage.float': 'Separate', 'stage.meta': 'Live demo · 124 BPM',
     'stage.d.strip': 'The strip lives at the top and your apps fit below it.',
-    'feat.eyebrow': 'Features', 'feat.t1': 'Built for', 'feat.t2': 'producers', 'feat.lead': 'The essentials of Hyro Visuals in four points. Everything you see here is running live.',
+    'feat.eyebrow': 'Features', 'feat.t1': 'Built for', 'feat.t2': 'producers', 'feat.lead': 'The essentials of Hyro Visuals in four points.',
     'feat.next': 'Show the next spectrum', 'feat.hint': 'Click to switch',
     'feat.1.t': '30+ audio spectrums', 'feat.1.d': 'More than 30 unique spectrums to choose from.',
     'feat.2.tag': 'Readjust windows', 'feat.2.t': 'Fits your screen completely', 'feat.2.d': 'Automatically arranges the apps you have open, on one or several monitors.',

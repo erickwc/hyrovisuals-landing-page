@@ -261,6 +261,13 @@
 .co__card-btn[data-locked] {
   opacity: 0.4;
 }
+/* capa transparente encima de los botones sin la casilla marcada: el clic no llega al marco de PayPal */
+.co__pp-block {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  cursor: pointer;
+}
 /* formulario de tarjeta abierto: PayPal lo dibuja en claro (fondo transparente y textos oscuros). En tema claro
    queda como viene; en oscuro se invierten sus colores (y se rota el tono para que los logos no cambien de color),
    así los campos quedan oscuros con texto claro como el resto de la página. */

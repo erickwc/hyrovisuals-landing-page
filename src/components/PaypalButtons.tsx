@@ -189,8 +189,17 @@ export function PaypalButtons(props: Props) {
   }, [props.clientId, props.theme, props.funding, props.resetKey, round]);
 
   if (failed) return <p className="co__error">{props.loadError}</p>;
+  // sin la casilla marcada, una capa encima recibe el clic: así PayPal no llega a abrir su ventana
+  const blocker = !props.canPay && phase !== "open" && (
+    <span className="co__pp-block" aria-hidden="true" onClick={() => props.onBlocked()} />
+  );
   if (props.funding !== "card")
-    return <div ref={slot} className="co__pp co__pp--paypal" data-locked={!props.canPay || undefined} />;
+    return (
+      <div className="co__pp co__pp--paypal" data-locked={!props.canPay || undefined}>
+        <div ref={slot} className="co__pp-clip" />
+        {blocker}
+      </div>
+    );
   return (
     <div className={`co__pp co__pp--card is-${phase}`} data-locked={!props.canPay || undefined} aria-busy={phase === "opening"}>
       {/* arriba del formulario quedan el botón de PayPal y su X: abierto, se recortan y solo se ve el formulario */}
@@ -216,6 +225,7 @@ export function PaypalButtons(props: Props) {
           )}
         </span>
       )}
+      {blocker}
     </div>
   );
 }

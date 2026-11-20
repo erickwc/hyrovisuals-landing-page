@@ -894,8 +894,17 @@
       // y se desvanecen antes de las preguntas (no aparecen ahí ni en la compra), igual que al empezar
       const buy = $('#preguntas'), end = buy.getBoundingClientRect().top + scrollY - (top - 140);
       root.style.setProperty('--rails-end', Math.round(end) + 'px');
+      // columnas iguales que calzan con los cuadros: 1/3 del contenido (1/2 en el celular), desde su borde.
+      // Se mide el contenedor (.wrap), que no tiene animación de entrada como la demo
+      const box = ($('#inicio .wrap') || stage).getBoundingClientRect(), cols = innerWidth <= 640 ? 2 : 3, tile = box.width / cols;
+      root.style.setProperty('--rails-tile', tile + 'px');
+      root.style.setProperty('--rails-x', (((box.left % tile) + tile) % tile) + 'px');
     };
     set(); new ResizeObserver(set).observe(hero); new ResizeObserver(set).observe($('main'));
+    // también cuando aparece la barra de desplazamiento (al terminar la intro) y cambia el ancho de la página
+    let lastW = document.documentElement.clientWidth;
+    new ResizeObserver(() => { const w = document.documentElement.clientWidth; if (w !== lastW) { lastW = w; set(); } }).observe(document.documentElement);
+    addEventListener('load', set);
   }
 
   /* ---------- Textos con scroll infinito (ticker y cintas) ---------- */
