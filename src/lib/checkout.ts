@@ -15,6 +15,9 @@ export type CheckoutPlan = {
 
 export type CouponPreview = { code: string; discount: number; amount: number };
 
+/** Idioma que tiene la página (lo pone prefs.tsx en <html lang>): el del correo de confirmación. */
+const pageLang = (): "es" | "en" => (document.documentElement.lang === "en" ? "en" : "es");
+
 function db() {
   if (!supabase) throw new Error("Falta configurar Supabase.");
   return supabase;
@@ -63,7 +66,7 @@ export async function claimFreeOrder(planId: string, couponCode: string): Promis
   if (error || !result?.purchaseId) throw new Error(result?.error && result.error !== "payment_required" ? result.error : "");
   // aviso por correo al equipo (si falla, el pedido ya quedó hecho)
   db()
-    .functions.invoke("sale-notify", { body: { purchaseId: result.purchaseId } })
+    .functions.invoke("sale-notify", { body: { purchaseId: result.purchaseId, lang: pageLang() } })
     .catch(() => undefined);
   return result.purchaseId;
 }
@@ -104,6 +107,7 @@ export async function createPaypalOrder(planId: string, coupon: string | null): 
 }
 
 export async function capturePaypalOrder(orderId: string): Promise<string> {
-  const { purchaseId } = await callFunction<{ purchaseId: string }>("paypal", { action: "capture", orderId });
+  // el idioma de la página: en ese idioma sale el correo de confirmación de la compra
+  const { purchaseId } = await callFunction<{ purchaseId: string }>("paypal", { action: "capture", orderId, lang: pageLang() });
   return purchaseId;
 }

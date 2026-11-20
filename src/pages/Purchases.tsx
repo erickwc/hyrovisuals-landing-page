@@ -11,6 +11,9 @@ import { downloadInvoicePdf } from "../lib/invoice-pdf";
 import { AnimateIcon } from "../components/animate-ui/icons/icon";
 import { ArrowDown01 } from "../components/animate-ui/icons/hugeicons/arrow-down-01";
 import { Download01 } from "../components/animate-ui/icons/hugeicons/download-01";
+import { UserRound } from "../components/animate-ui/icons/hugeicons/user-round";
+import { CreditCard } from "../components/animate-ui/icons/hugeicons/credit-card";
+import { ClipboardList } from "../components/animate-ui/icons/hugeicons/clipboard-list";
 
 type Status = "loading" | "ready" | "empty" | "error";
 
@@ -179,14 +182,20 @@ export function Purchases() {
                     >
                       <div className="purch__grid">
                         <section className="purch__block">
-                          <h3 className="lib-product__title purch__title">{t.customer}</h3>
+                          <h3 className="lib-product__title purch__title acct-label">
+                            <UserRound size={15} aria-hidden="true" />
+                            {t.customer}
+                          </h3>
                           <dl className="purch-dl">
                             {row(t.nameLabel, account.name || "—")}
                             {row(t.emailLabel, account.email)}
                           </dl>
                         </section>
                         <section className="purch__block">
-                          <h3 className="lib-product__title purch__title">{t.payment}</h3>
+                          <h3 className="lib-product__title purch__title acct-label">
+                            <CreditCard size={15} aria-hidden="true" />
+                            {t.payment}
+                          </h3>
                           <dl className="purch-dl">
                             {row(t.order, `#${orderNumber(purchase)}`)}
                             {row(t.methodLabel, methodName(purchase))}
@@ -196,7 +205,10 @@ export function Purchases() {
                           </dl>
                         </section>
                         <section className="purch__block">
-                          <h3 className="lib-product__title purch__title">{t.summary}</h3>
+                          <h3 className="lib-product__title purch__title acct-label">
+                            <ClipboardList size={15} aria-hidden="true" />
+                            {t.summary}
+                          </h3>
                           <dl className="purch-dl">
                             {row(t.planLabel(planName(purchase.planId)), formatAmount(purchase.amount + purchase.discount, purchase.currency))}
                             {purchase.discount > 0 &&

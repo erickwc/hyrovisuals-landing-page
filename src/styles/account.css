@@ -369,25 +369,21 @@
   gap: 8px;
 }
 /* clave activada en un equipo */
-/* «En uso» en la lista de claves: texto pequeño que despliega el equipo */
+/* «En uso» en la lista de claves: texto blanco que despliega el equipo donde está activada */
 .key-status {
   display: inline-flex;
   align-items: center;
   gap: 3px;
+  flex: none;
   padding: 0;
   border: 0;
   background: none;
-  color: var(--muted);
+  color: var(--text);
   font: 600 11px var(--body);
   white-space: nowrap;
 }
 .key-status--btn {
   cursor: pointer;
-  transition: color 0.15s;
-}
-.key-status--btn:hover,
-.key-status--btn[aria-expanded="true"] {
-  color: var(--text);
 }
 .key-status--btn:focus-visible {
   outline: 2px solid var(--green);
@@ -1067,4 +1063,140 @@
     border-left: 0;
     border-top: 1px solid var(--line);
   }
+}
+
+/* enlace dentro de un texto de ayuda (p. ej. «Política de privacidad»), sin subrayado */
+.acct-board__link {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+.acct-board__link:hover {
+  color: var(--red);
+}
+
+/* eliminar la cuenta: qué se borra, qué se guarda por ley y la confirmación escribiendo ELIMINAR */
+.acct-delete {
+  gap: 12px;
+}
+.acct-delete__label {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+.acct-delete__list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 13px;
+  list-style: disc;
+}
+.acct-delete__list li::marker {
+  color: var(--red);
+}
+.acct-delete__kept {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.acct-delete__confirm {
+  margin-top: 4px;
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.acct-delete__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* eliminar cuenta: título y botón en rojo, relleno rojo al pasar el cursor */
+.acct-danger__title {
+  color: var(--red);
+}
+.btn.ghost.acct-danger {
+  border-color: color-mix(in srgb, var(--red) 55%, transparent);
+  color: var(--red);
+}
+.btn.ghost.acct-danger:hover:not(:disabled) {
+  border-color: var(--red);
+  background: var(--red);
+  color: #fff;
+}
+.acct-delete__go:not(:disabled) .btn__fill,
+.acct-delete__go:not(:disabled) .btn__bg {
+  background: var(--red);
+}
+.acct-delete__go:not(:disabled) {
+  color: #fff;
+}
+
+/* icono de cada fila de ajustes (contraseña, tus datos, novedades, eliminar cuenta), suelto a la izquierda */
+.acct-row__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  /* la misma separación a los dos lados: 16 px del borde (el relleno) y 16 px hasta el texto */
+  margin-right: 4px;
+  color: var(--text);
+}
+.acct-row__icon + div {
+  flex: 1;
+  min-width: 0;
+}
+.acct-row__icon--danger {
+  color: var(--red);
+}
+
+/* títulos con su icono delante: «Correo electrónico» y «Nombre», y Cliente / Pago / Resumen en Mis compras */
+.acct-board label.acct-label,
+.purch__title.acct-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* foto de perfil clicable: al pasar el cursor (o con el teclado) se oscurece y aparece el icono de subir */
+.avatar-edit {
+  position: relative;
+  flex: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.avatar-edit__overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.avatar-edit:hover .avatar-edit__overlay,
+.avatar-edit:focus-within .avatar-edit__overlay,
+.avatar-edit[aria-busy] .avatar-edit__overlay {
+  opacity: 1;
+}
+.avatar-edit:focus-within {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+/* «Quitar foto» como texto pequeño junto a la fecha */
+.acct-textbtn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.acct-textbtn:hover {
+  color: var(--text);
 }

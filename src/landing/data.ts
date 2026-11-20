@@ -3,7 +3,7 @@
    - Planes: todos los planes activos del producto hyro-visuals en la tabla plans, del más barato al más caro
      (los mismos que se crean y editan en el panel admin y que cobra el checkout).
    - Reseñas publicadas: función public_reviews (nombre corto, foto, estrellas y comentario).
-   - Newsletter: inserta en newsletter_subscribers (migración 0011; la API pública solo puede insertar).
+   - Newsletter: función newsletter_subscribe (migración 0019): autorización, suscripción y límite por IP.
    La landing (public/landing/js/app.js) recibe todo por window.HyroLanding. */
 
 type LandingPlan = { id: string; price: number; keys: number };
@@ -77,18 +77,16 @@ async function loadReviews(api: LandingApi) {
   }
 }
 
+// versión de los documentos legales que se aceptan (la misma de la app)
+import { LEGAL_VERSION } from "../data/legal-version";
+
+// newsletter_subscribe (migración 0019) valida el correo, guarda la autorización (IP, navegador y hora los pone
+// el servidor), limita a 5 suscripciones por hora y por IP, y si el correo ya estaba no hace nada
 async function subscribe(email: string, lang: string) {
-  try {
-    await rest("newsletter_subscribers", {
-      method: "POST",
-      headers: { Prefer: "return=minimal" },
-      body: JSON.stringify({ email: email.trim().toLowerCase(), lang: lang === "en" ? "en" : "es", source: "landing" }),
-    });
-  } catch (err) {
-    // 409: el correo ya estaba en la lista; para quien se suscribe es lo mismo que «listo»
-    if (err instanceof RestError && err.status === 409) return;
-    throw err;
-  }
+  await rest("rpc/newsletter_subscribe", {
+    method: "POST",
+    body: JSON.stringify({ p_email: email.trim().toLowerCase(), p_lang: lang === "en" ? "en" : "es", p_source: "landing", p_version: LEGAL_VERSION }),
+  });
 }
 
 function connect(api: LandingApi) {

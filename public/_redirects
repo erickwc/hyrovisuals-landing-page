@@ -14,3 +14,6 @@
 /cuenta/* /app 200
 /admin /app 200
 /admin/* /app 200
+/legal /app 200
+/legal/* /app 200
+/baja /app 200

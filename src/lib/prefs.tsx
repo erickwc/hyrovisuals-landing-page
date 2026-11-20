@@ -38,7 +38,6 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.lang = lang;
-    document.title = content[lang].meta.title;
   }, [lang]);
 
   useEffect(() => {

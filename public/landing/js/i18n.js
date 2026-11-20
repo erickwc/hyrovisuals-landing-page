@@ -50,7 +50,7 @@
     'buy.concept': 'Item', 'buy.amount': 'Amount', 'buy.keysrow': 'Activation keys', 'buy.incl': 'Included', 'buy.osrow': 'Windows + macOS', 'buy.lifetime2': 'Lifetime license',
     'buy.total': 'Total', 'buy.once': 'One-time payment', 'buy.coupon': 'Have a coupon? Apply it at checkout.', 'buy.cta': 'Buy now', 'buy.secure': 'Secure payment',
     'foot.t1': 'Ready to see', 'foot.t2': 'your sound?', 'foot.desc': 'Modular audio visualizer for Windows and macOS.',
-    'foot.map': 'Sitemap', 'foot.home': 'Home', 'foot.buy': 'Buy', 'foot.privacy': 'Privacy', 'foot.terms': 'Terms', 'foot.license': 'License', 'foot.social': 'Social',
+    'foot.map': 'Sitemap', 'foot.home': 'Home', 'foot.buy': 'Buy', 'foot.privacy': 'Privacy', 'foot.terms': 'Terms', 'foot.license': 'License', 'foot.cookies': 'Cookies', 'foot.refunds': 'Refunds', 'foot.company': 'Company details', 'foot.consent': 'I agree to receive news by email and to the', 'foot.consentLink': 'privacy policy', 'foot.social': 'Social',
     'foot.news': 'Subscribe', 'foot.newsd': 'New spectrums, presets and news. No spam.', 'foot.email': 'Email address', 'foot.ph': 'you@email.com', 'foot.sub': 'Subscribe',
     'foot.rights': 'All rights reserved.', 'foot.made': 'Made for producers', 'foot.top': 'Back to top'
   };
@@ -61,7 +61,7 @@
       'stage.d.strip': 'La franja vive arriba y tus apps se acomodan debajo.',
       'stage.d.grid': 'Cuadrícula autoadaptable: los módulos se reparten solos, sin scroll.',
       'stage.d.float': 'Separa cada visual como un cuadro independiente.',
-      'news.ok': '¡Listo! Te avisaremos de las novedades.', 'news.err': 'Escribe un correo válido.', 'news.fail': 'No se pudo enviar. Inténtalo de nuevo.',
+      'news.ok': '¡Listo! Te avisaremos de las novedades.', 'news.err': 'Escribe un correo válido.', 'news.consent': 'Marca la casilla para autorizar los correos.', 'news.fail': 'No se pudo enviar. Inténtalo de nuevo.',
       'rv.verified': 'Cliente verificado', 'rv.anon': 'Cliente de Hyro', 'rv.empty': 'Todavía no hay reseñas. Los clientes pueden dejar la suya desde su biblioteca.', 'rv.error': 'No pudimos cargar las reseñas.',
       'mk.nosrc': 'Sin fuente', 'mk.src1': 'Audio del sistema',
       ticker: ['Pago único', 'Desde 20 US$', 'Acceso de por vida', 'Windows y Mac', 'Para productores, DJs y creadores', '30+ espectros de audio'],
@@ -76,7 +76,7 @@
       'stage.d.strip': 'The strip lives at the top and your apps fit below it.',
       'stage.d.grid': 'Self-adapting grid: modules spread out on their own, no scrolling.',
       'stage.d.float': 'Pull each visual apart as an independent square.',
-      'news.ok': 'Done! We’ll keep you posted.', 'news.err': 'Enter a valid email.', 'news.fail': 'Couldn’t send it. Please try again.',
+      'news.ok': 'Done! We’ll keep you posted.', 'news.err': 'Enter a valid email.', 'news.consent': 'Check the box to allow the emails.', 'news.fail': 'Couldn’t send it. Please try again.',
       'rv.verified': 'Verified customer', 'rv.anon': 'Hyro customer', 'rv.empty': 'No reviews yet. Customers can leave theirs from their library.', 'rv.error': 'We couldn’t load the reviews.',
       'mk.nosrc': 'No source', 'mk.src1': 'System audio',
       ticker: ['One-time payment', 'From 20 US$', 'Lifetime access', 'Mac and Windows', 'For producers, DJs and creators', '30+ audio spectrums'],

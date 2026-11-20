@@ -28,7 +28,9 @@ type RawPurchase = {
   provider: string | null;
   plan_id: string;
   settlement_id: string | null;
-  user_id: string;
+  /** null si el cliente eliminó su cuenta (la compra se conserva con buyer_email, migración 0018) */
+  user_id: string | null;
+  buyer_email: string | null;
   profiles: { email: string } | null;
   settlements: { status: string } | null;
   coupon_id: string | null;
@@ -40,14 +42,20 @@ type RawPurchase = {
 // incrustar profiles(email) automáticamente (no hay llave foránea entre esas dos tablas).
 // Se consulta profiles aparte y se mezcla en el cliente.
 const PURCHASE_SELECT =
-  "id, created_at, paid_at, amount, fee_amount, net_amount, status, provider, plan_id, settlement_id, user_id, coupon_id, discount_amount, settlements(status), coupons(code)";
+  "id, created_at, paid_at, amount, fee_amount, net_amount, status, provider, plan_id, settlement_id, user_id, buyer_email, coupon_id, discount_amount, settlements(status), coupons(code)";
 
-async function attachEmails<T extends { user_id: string }>(rows: T[]): Promise<(T & { profiles: { email: string } | null })[]> {
-  const ids = Array.from(new Set(rows.map((r) => r.user_id)));
-  if (ids.length === 0) return rows.map((r) => ({ ...r, profiles: null }));
-  const { data } = await db().from("profiles").select("id, email").in("id", ids);
+// Si el cliente eliminó su cuenta, la compra no tiene usuario: se muestra el correo guardado en la compra.
+async function attachEmails<T extends { user_id: string | null; buyer_email?: string | null }>(
+  rows: T[],
+): Promise<(T & { profiles: { email: string } | null })[]> {
+  const ids = Array.from(new Set(rows.map((r) => r.user_id).filter((id): id is string => Boolean(id))));
+  const { data } = ids.length ? await db().from("profiles").select("id, email").in("id", ids) : { data: [] };
   const byId = new Map((data ?? []).map((p) => [p.id, p.email]));
-  return rows.map((r) => ({ ...r, profiles: byId.has(r.user_id) ? { email: byId.get(r.user_id)! } : null }));
+  return rows.map((r) => {
+    const email = r.user_id ? byId.get(r.user_id) : undefined;
+    if (email) return { ...r, profiles: { email } };
+    return { ...r, profiles: r.buyer_email ? { email: `${r.buyer_email} (cuenta eliminada)` } : null };
+  });
 }
 
 export type OverviewData = {

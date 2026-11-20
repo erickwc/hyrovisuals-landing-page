@@ -5,6 +5,8 @@ import { supabase } from "../lib/supabase";
 import { Button } from "../components/Button";
 import { ViewIcon, ViewOffIcon } from "../components/HugeIcons";
 import { AuthLayout } from "./AuthLayout";
+import { SignupNotice } from "../components/LegalConsent";
+import { signupConsent } from "../lib/legal";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PASSWORD_RE = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
@@ -58,7 +60,7 @@ export function Register() {
 
     setStatus("submitting");
     try {
-      const { error } = await supabase.auth.signUp({ email: trimmedEmail, password, options: { data: { name: trimmedName } } });
+      const { error } = await supabase.auth.signUp({ email: trimmedEmail, password, options: { data: { name: trimmedName, consent: signupConsent() } } });
       // Un correo ya registrado y confirmado no da error (Supabase devuelve identities: [])
       // para no revelar si existe; solo tratamos como error los fallos reales (contraseña, límite, red).
       if (error && !/already registered/i.test(error.message)) {
@@ -237,6 +239,9 @@ export function Register() {
         <Button type="submit" className="auth__submit" loading={status === "submitting"}>
           {status === "submitting" ? t.submitting : t.submit}
         </Button>
+
+        {/* sin casillas: crear la cuenta es aceptar (queda registrado con la versión de los documentos) */}
+        <SignupNotice />
 
         {formError && (
           <p className="auth__msg" role="status" data-tone="error">

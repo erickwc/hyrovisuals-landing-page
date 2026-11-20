@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from "react";
 import { MotionConfig } from "motion/react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { PrefsProvider } from "./lib/prefs";
+import { PrefsProvider, usePrefs } from "./lib/prefs";
 
 /* La landing es index.html (HTML estático, fuera de React; ver vite.config.ts). Ir a "/" desde la app, o a una
    ruta que no existe, carga la página completa de la landing (conservando el #sección si lo hay). */
@@ -16,6 +16,30 @@ function ToLanding() {
   return null;
 }
 
+/* Título de la pestaña: solo el nombre de la página («Iniciar sesión», «Biblioteca»…). Las páginas legales ponen
+   el título de su documento (Legal.tsx), por eso aquí se saltan. */
+function TabTitle() {
+  const { pathname } = useLocation();
+  const { c } = usePrefs();
+  useEffect(() => {
+    const tabs = c.meta.tabs;
+    const [, first = "", second = ""] = pathname.split("/");
+    if (first === "legal") return;
+    const byRoute: Record<string, string> = {
+      login: tabs.login,
+      register: tabs.register,
+      "recuperar-contrasena": tabs.recover,
+      checkout: tabs.checkout,
+      baja: tabs.unsubscribe,
+    };
+    let title = byRoute[first] ?? c.meta.title;
+    if (first === "cuenta") title = second === "biblioteca" ? tabs.library : second === "compras" ? tabs.purchases : tabs.account;
+    if (first === "admin") title = tabs.adminSections[second] ?? tabs.admin;
+    document.title = title;
+  }, [pathname, c]);
+  return null;
+}
+
 // Cada página carga aparte: quien entra al login no descarga el panel admin.
 const Login = lazy(() => import("./pages/Login").then((m) => ({ default: m.Login })));
 const Register = lazy(() => import("./pages/Register").then((m) => ({ default: m.Register })));
@@ -25,6 +49,8 @@ const AccountSettings = lazy(() => import("./pages/AccountSettings").then((m) =>
 const Library = lazy(() => import("./pages/Library").then((m) => ({ default: m.Library })));
 const Purchases = lazy(() => import("./pages/Purchases").then((m) => ({ default: m.Purchases })));
 const Checkout = lazy(() => import("./pages/Checkout").then((m) => ({ default: m.Checkout })));
+const Legal = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Legal })));
+const Unsubscribe = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Unsubscribe })));
 
 // Panel administrativo: carpeta aparte, acceso restringido a socios.
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout").then((m) => ({ default: m.AdminLayout })));
@@ -45,6 +71,7 @@ const ClientView = lazy(() => import("./pages/admin/ClientView").then((m) => ({ 
 export function App() {
   return (
     <PrefsProvider>
+      <TabTitle />
       <MotionConfig reducedMotion="user">
         <Suspense fallback={null}>
           <Routes>
@@ -53,6 +80,9 @@ export function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/recuperar-contrasena" element={<RecoverPassword />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/legal" element={<Navigate to="/legal/terminos" replace />} />
+            <Route path="/legal/:doc" element={<Legal />} />
+            <Route path="/baja" element={<Unsubscribe />} />
             <Route path="/cuenta" element={<AccountLayout />}>
               <Route index element={<AccountSettings />} />
               <Route path="biblioteca" element={<Library />} />

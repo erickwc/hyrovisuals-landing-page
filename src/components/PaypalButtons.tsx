@@ -1,16 +1,20 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import { CreditCard } from "./animate-ui/icons/hugeicons/credit-card";
 
-/* Botones oficiales de PayPal (SDK de JavaScript, cargado una sola vez): uno para pagar con la cuenta de PayPal y
-   otro aparte para tarjeta de crédito o débito sin cuenta. Van separados para que, al abrir el formulario de tarjeta,
-   el de PayPal siga a la vista. El pedido lo crea y lo cobra el servidor: aquí solo se pide. */
+/* Un botón oficial de PayPal (SDK de JavaScript, cargado una sola vez para toda la página): `funding="paypal"`
+   para pagar con la cuenta de PayPal, `funding="card"` para tarjeta de crédito o débito sin cuenta. El de tarjeta va
+   dentro del modal del checkout: al tocarlo, PayPal despliega ahí su formulario. Mientras falten las casillas de
+   términos y privacidad, el botón no abre nada (onClick → reject). El pedido lo crea y lo cobra el servidor. */
 
 type PaypalActions = { restart: () => Promise<void> };
+type PaypalClickActions = { resolve: () => Promise<void>; reject: () => Promise<void> };
 type PaypalButtonsInstance = { isEligible: () => boolean; render: (el: HTMLElement) => Promise<void>; close: () => Promise<void> };
 type PaypalSdk = {
   FUNDING: { PAYPAL: string; CARD: string };
   Buttons: (options: {
     fundingSource: string;
     style: Record<string, unknown>;
+    onClick: (data: unknown, actions: PaypalClickActions) => Promise<void> | void;
     createOrder: () => Promise<string>;
     onApprove: (data: { orderID: string }, actions: PaypalActions) => Promise<void>;
     onCancel?: () => void;
@@ -51,7 +55,9 @@ function loadSdk(clientId: string): Promise<PaypalSdk> {
 
 type Props = {
   clientId: string;
-  /** Tema de la página: los botones van en negro sobre claro y en blanco sobre oscuro. */
+  /** Qué botón dibujar: la cuenta de PayPal o la tarjeta. */
+  funding: "paypal" | "card";
+  /** Tema de la página: PayPal va en blanco sobre oscuro y en negro sobre claro. */
   theme: "light" | "dark";
   createOrder: () => Promise<string>;
   /** Cobra el pedido aprobado. Si lanza un error con code INSTRUMENT_DECLINED, PayPal deja elegir otra forma de pago. */
@@ -60,119 +66,164 @@ type Props = {
   onError: (message: string | null) => void;
   /** Texto si el SDK de PayPal no carga (bloqueador de anuncios, sin conexión). */
   loadError: string;
-  /** Título sobre el botón de PayPal («Pago exprés»). */
-  expressLabel: string;
-  /** Lo que va entre PayPal y la tarjeta (separador «O», contacto, título de pago). */
-  between?: ReactNode;
-  /** Título de la caja de la tarjeta. */
-  cardLabel: string;
+  /** false mientras falten las casillas obligatorias: el botón se ve apagado y no abre el pago. */
+  canPay: boolean;
+  /** Se llama al tocar el botón apagado (para mostrar qué falta). */
+  onBlocked: () => void;
+  /** Tarjeta: texto del botón propio que va encima del de PayPal, y del botón para cerrar el formulario. */
+  cardLabel?: string;
+  cancelLabel?: string;
+  /** Cuando cambia (otra licencia u otro cupón), los botones se vuelven a dibujar y se cierra el formulario
+   *  abierto: PayPal crea el pedido al tocar el botón, así el siguiente clic usa el monto nuevo. */
+  resetKey?: string;
 };
 
 export function PaypalButtons(props: Props) {
-  const paypalSlot = useRef<HTMLDivElement>(null);
-  const cardSlot = useRef<HTMLDivElement>(null);
+  const slot = useRef<HTMLDivElement>(null);
   const latest = useRef(props);
   latest.current = props;
   const [failed, setFailed] = useState(false);
-  // el formulario de tarjeta viene con textos oscuros: abierto, se le pone un panel blanco (se nota en tema oscuro)
-  const [cardOpen, setCardOpen] = useState(false);
+  // tarjeta: encima del botón de PayPal va uno con el diseño de la web que deja pasar el clic (pointer-events: none),
+  // así el clic lo recibe PayPal y abre su formulario. «opening» muestra el loader desde el clic hasta que el
+  // formulario aparece (tarda unos segundos); «open» oculta el botón propio y deja solo el formulario de PayPal,
+  // que trae su propia X para cerrarse (al cerrarlo, el alto baja y se vuelve a «idle»).
+  const [phase, setPhase] = useState<"idle" | "opening" | "open">("idle");
+  // PayPal primero muestra su propio spinner (unos 250 px) y luego los campos (más de 500 px): «Cancelar» espera a
+  // que aparezcan los campos para no quedar flotando debajo del spinner
+  const [formReady, setFormReady] = useState(false);
+  // al cambiar, el botón se vuelve a dibujar cerrado (Cancelar)
+  const [round, setRound] = useState(0);
+  const closeCard = () => {
+    setPhase("idle");
+    setRound((n) => n + 1);
+  };
 
   useEffect(() => {
-    const slot = cardSlot.current;
-    if (!slot || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(() => setCardOpen(slot.getBoundingClientRect().height > 90));
-    observer.observe(slot);
+    const el = slot.current;
+    if (!el || props.funding !== "card" || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => {
+      const height = el.getBoundingClientRect().height;
+      const open = height > 90;
+      setPhase((p) => (open ? "open" : p === "open" ? "idle" : p));
+      setFormReady(height > 420);
+    });
+    observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [props.funding]);
+
+  // si PayPal no llega a abrir el formulario (sin conexión, ventana bloqueada), el loader no se queda para siempre
+  useEffect(() => {
+    if (phase !== "opening") return;
+    const t = window.setTimeout(() => setPhase((p) => (p === "opening" ? "idle" : p)), 15000);
+    return () => window.clearTimeout(t);
+  }, [phase]);
+
+  // el clic dentro del marco de PayPal no llega a la página, pero la ventana pierde el foco y el marco queda activo:
+  // así se sabe que tocaron el botón de tarjeta y se muestra el loader al instante
+  useEffect(() => {
+    if (props.funding !== "card") return;
+    const onBlur = () =>
+      window.setTimeout(() => {
+        const active = document.activeElement;
+        if (active && slot.current?.contains(active) && latest.current.canPay) setPhase((p) => (p === "idle" ? "opening" : p));
+      }, 0);
+    window.addEventListener("blur", onBlur);
+    return () => window.removeEventListener("blur", onBlur);
+  }, [props.funding]);
 
   useEffect(() => {
-    const rendered: PaypalButtonsInstance[] = [];
+    let rendered: PaypalButtonsInstance | null = null;
     let cancelled = false;
     let lastError: string | null = null;
-    // PayPal en su amarillo de siempre; tarjeta en negro (claro) o blanco (oscuro), que son los colores que admite
-    // PayPal solo admite negro o blanco en el botón de tarjeta: va en negro (gris carbón) y checkout.css lo aclara a gris
-    const cardColor = "black";
+    // PayPal en su amarillo de siempre; el de tarjeta (tapado por el botón propio) en blanco u oscuro según el tema
+    const cardColor = props.theme === "dark" ? "white" : "black";
 
     loadSdk(props.clientId)
       .then((paypal) => {
-        if (cancelled) return;
-        const slots: [string, HTMLDivElement | null][] = [
-          [paypal.FUNDING.PAYPAL, paypalSlot.current],
-          [paypal.FUNDING.CARD, cardSlot.current],
-        ];
-        for (const [fundingSource, slot] of slots) {
-          if (!slot) continue;
-          const buttons = paypal.Buttons({
-            fundingSource,
-            style:
-              fundingSource === paypal.FUNDING.PAYPAL
-                ? { shape: "rect", color: "gold", height: 46, label: "paypal" }
-                : { shape: "rect", color: cardColor, height: 46 },
-            createOrder: async () => {
-              lastError = null;
-              latest.current.onError(null);
-              try {
-                return await latest.current.createOrder();
-              } catch (err) {
-                lastError = err instanceof Error ? err.message : null;
-                throw err;
-              }
-            },
-            onApprove: async (data, actions) => {
-              try {
-                await latest.current.onApprove(data.orderID);
-              } catch (err) {
-                if ((err as { code?: string }).code === "INSTRUMENT_DECLINED") return actions.restart();
-                latest.current.onError(err instanceof Error ? err.message : "");
-              }
-            },
-            onError: () => latest.current.onError(lastError ?? ""),
-          });
-          if (!buttons.isEligible()) continue;
-          rendered.push(buttons);
-          buttons.render(slot).catch(() => undefined);
-        }
+        if (cancelled || !slot.current) return;
+        const card = props.funding === "card";
+        const buttons = paypal.Buttons({
+          fundingSource: card ? paypal.FUNDING.CARD : paypal.FUNDING.PAYPAL,
+          style: card ? { shape: "rect", color: cardColor, height: 46 } : { shape: "rect", color: "gold", height: 46, label: "paypal" },
+          onClick: (_data, actions) => {
+            if (latest.current.canPay) {
+              if (card) setPhase("opening");
+              return actions.resolve();
+            }
+            latest.current.onBlocked();
+            return actions.reject();
+          },
+          createOrder: async () => {
+            lastError = null;
+            latest.current.onError(null);
+            try {
+              return await latest.current.createOrder();
+            } catch (err) {
+              lastError = err instanceof Error ? err.message : null;
+              throw err;
+            }
+          },
+          onApprove: async (data, actions) => {
+            try {
+              await latest.current.onApprove(data.orderID);
+            } catch (err) {
+              if ((err as { code?: string }).code === "INSTRUMENT_DECLINED") return actions.restart();
+              latest.current.onError(err instanceof Error ? err.message : "");
+            }
+          },
+          onError: () => latest.current.onError(lastError ?? ""),
+        });
+        if (!buttons.isEligible()) return;
+        rendered = buttons;
+        buttons.render(slot.current).catch(() => undefined);
       })
       .catch(() => !cancelled && setFailed(true));
 
+    const el = slot.current;
     return () => {
       cancelled = true;
-      rendered.forEach((b) => b.close().catch(() => undefined));
-      // el SDK deja su iframe al cerrar: se vacían los huecos para no duplicar botones al cambiar de tema
-      paypalSlot.current?.replaceChildren();
-      cardSlot.current?.replaceChildren();
+      rendered?.close().catch(() => undefined);
+      // el SDK deja su iframe al cerrar: se vacía el hueco para no duplicar botones al cambiar de tema
+      el?.replaceChildren();
     };
-  }, [props.clientId, props.theme]);
+  }, [props.clientId, props.theme, props.funding, props.resetKey, round]);
 
-  if (failed)
-    return (
-      <>
-        {props.between}
-        <p className="co__error">{props.loadError}</p>
-      </>
-    );
+  if (failed) return <p className="co__error">{props.loadError}</p>;
+  if (props.funding !== "card")
+    return <div ref={slot} className="co__pp co__pp--paypal" data-locked={!props.canPay || undefined} />;
   return (
-    <div className="co__paypal">
-      <section className="co__express" aria-label={props.expressLabel}>
-        <p className="co__express-label">{props.expressLabel}</p>
-        <div ref={paypalSlot} className="co__paypal-btn" />
-      </section>
-      {props.between}
-      <div className="co__cardbox">
-        <div className="co__cardbox-head">
-          <span>{props.cardLabel}</span>
-          <PaymentMarks />
-        </div>
-        <div ref={cardSlot} className={cardOpen ? "co__paypal-card is-open" : "co__paypal-card"} />
+    <div className={`co__pp co__pp--card is-${phase}`} data-locked={!props.canPay || undefined} aria-busy={phase === "opening"}>
+      {/* arriba del formulario quedan el botón de PayPal y su X: abierto, se recortan y solo se ve el formulario */}
+      <div className="co__pp-clip">
+        <div ref={slot} className="co__pp-slot" />
       </div>
+      {/* en lugar de la X de PayPal, «Cancelar» debajo de «Pagar», con el mismo aspecto del formulario */}
+      {phase === "open" && formReady && (
+        <button type="button" className="co__pp-cancel" onClick={closeCard}>
+          {props.cancelLabel}
+        </button>
+      )}
+      {/* botón propio encima del de PayPal: solo se ve, el clic pasa al de PayPal que está debajo */}
+      {phase !== "open" && (
+        <span className="co__pp-face" aria-hidden="true">
+          {phase === "opening" ? (
+            <span className="co__pp-spinner" />
+          ) : (
+            <>
+              <CreditCard size={18} />
+              {props.cardLabel}
+            </>
+          )}
+        </span>
+      )}
     </div>
   );
 }
 
 /* Logos de lo que se acepta (logos de marca: fuera de la regla de iconos). */
-function PaymentMarks() {
+export function PaymentMarks() {
   return (
-    <div className="co__marks" aria-label="PayPal, Visa, Mastercard">
+    <div className="co__marks" role="img" aria-label="PayPal, Visa, Mastercard">
       <span className="co__mark co__mark--paypal" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="14" height="14">
           <path fill="#003087" d="M7.1 21.4H3.6a.5.5 0 0 1-.5-.6L6 2.6a.7.7 0 0 1 .7-.6h7c3.3 0 5.4 1.6 4.9 4.9-.6 3.9-3.1 5.7-6.6 5.7H9.8a.7.7 0 0 0-.7.6Z" />

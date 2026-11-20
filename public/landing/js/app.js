@@ -843,6 +843,9 @@
       const email = input.value.trim().toLowerCase();
       msg.classList.remove('err');
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { msg.textContent = t('news.err'); msg.classList.add('err'); input.focus(); return; }
+      // autorización expresa para los correos (casilla aparte, sin marcar); queda registrada en legal_consents
+      const consent = $('#newsConsent');
+      if (!consent.checked) { msg.textContent = t('news.consent'); msg.classList.add('err'); consent.focus(); return; }
       if (btn.disabled) return;
       btn.disabled = true;
       try {

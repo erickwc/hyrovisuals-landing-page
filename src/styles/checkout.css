@@ -1,51 +1,50 @@
-/* checkout al estilo de las tiendas: a la izquierda PayPal exprés, contacto y tarjeta; a la derecha, en un panel
-   gris de borde a borde, el producto, el cupón y el total. Sigue el tema de quien compra (en claro, blanco puro). */
+/* Checkout de HYRO: el mismo fondo de la web en toda la página (sin panel gris de tienda), títulos en Monument
+   Extended y, a la derecha, el ticket de compra de la landing como resumen del pedido. La tarjeta se paga en un
+   modal propio con el formulario de PayPal adentro. */
 .co {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--bg);
-  --co-side: #0b0b0b;
-  --co-field: var(--bg);
+  --co-side: 56px;
 }
-:root[data-theme="light"] .co {
-  --bg: #ffffff;
-  --panel: #ffffff;
-  --co-side: #f5f5f5;
+.co__wrap {
+  width: min(1040px, 100% - 2 * clamp(16px, 4vw, 40px));
+  margin-inline: auto;
 }
 
 /* barra: logo y volver */
-.co__top {
-  border-bottom: 1px solid var(--line);
-}
-/* mismas dos mitades que el contenido: el logo alineado con el pago y «Volver» con el final del resumen */
 .co__top-in {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   height: 72px;
 }
-.co__top-in .logo {
-  justify-self: end;
-  width: min(500px, 100% - 2 * clamp(24px, 4vw, 56px));
-  margin-right: clamp(24px, 4vw, 56px);
-}
-.co__top-in .co__back {
-  justify-self: start;
-  justify-content: flex-end;
-  width: min(400px, 100% - 2 * clamp(24px, 4vw, 56px));
-  margin-left: clamp(24px, 4vw, 56px);
-}
-.co__back {
+.co__home {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 12px;
+  color: var(--text);
+  text-decoration: none;
+}
+/* «Volver» no se ve: aparece junto al logo al pasar el cursor (o con el teclado) */
+.co__home-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   color: var(--muted);
   font-size: 12px;
-  text-decoration: none;
-  transition: color 0.15s;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.18s, transform 0.18s;
+  pointer-events: none;
 }
-.co__back:hover {
+.co__home:hover .co__home-back,
+.co__home:focus-visible .co__home-back {
+  opacity: 1;
+  transform: none;
+}
+.co__home:hover .logo {
   color: var(--text);
 }
 .co__state {
@@ -55,106 +54,74 @@
   text-align: center;
 }
 
-/* dos mitades: la de la derecha en gris hasta el borde de la ventana */
-.co__split {
+/* dos columnas sobre el mismo fondo: el pago y el ticket */
+.co__grid {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* la columna de pago mide lo mismo que el formulario de tarjeta de PayPal (400 px), así todo queda alineado */
+  grid-template-columns: minmax(0, 400px) minmax(0, 500px);
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--co-side);
+  padding: clamp(24px, 4vw, 48px) 0 96px;
 }
-.co__left {
-  display: flex;
-  justify-content: flex-end;
-  padding: 36px clamp(24px, 4vw, 56px) 72px;
-}
-.co__summary {
-  display: flex;
-  justify-content: flex-start;
-  padding: 36px clamp(24px, 4vw, 56px) 72px;
-  background: var(--co-side);
-  border-left: 1px solid var(--line);
-}
-.co__left .co__col {
-  width: min(500px, 100%);
-}
-.co__summary .co__col {
-  position: sticky;
-  top: 36px;
-  align-self: flex-start;
-  width: min(400px, 100%);
-}
-.co__col {
+.co__main {
+  position: relative;
   display: grid;
-  gap: 18px;
+  gap: 32px;
   align-content: start;
 }
+.co__aside {
+  position: sticky;
+  top: 32px;
+}
 
-/* títulos de bloque (Contacto, Pago) */
-.co__block {
+/* bloques (Contacto, Pago) con su título en Monument Extended */
+.co__block,
+.co__block + .co__block {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   padding: 0;
+  border: 0;
 }
 .co__h {
-  font: 600 18px/1.3 var(--body);
+  font: 600 15px/1.3 var(--body);
   letter-spacing: 0;
   text-transform: none;
 }
-.co__pay-head {
-  display: grid;
-  gap: 2px;
-  margin-top: 10px;
-}
-.co__pay-head p,
+
 .co__note {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.5;
 }
 
-/* pago exprés: PayPal arriba, con su título centrado */
-.co__express {
-  display: grid;
-  gap: 10px;
-  padding: 0;
-}
-.co__express-label {
-  color: var(--muted);
-  font-size: 13px;
-  text-align: center;
-}
-/* separador «O» */
-.co__or {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin: 6px 0;
-  color: var(--muted);
-  font-size: 12px;
-}
-.co__or::before,
-.co__or::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-}
-
+/* correo con el icono de información dentro; el aviso sale en un globo al pasar el cursor o enfocar */
 .co__field {
   display: grid;
   gap: 6px;
 }
-/* correo con el icono de información dentro; el aviso sale en un globo al pasar el cursor o enfocar */
 .co__email {
   position: relative;
 }
-.co__email input {
+.co__field input {
   width: 100%;
-  padding-right: 44px !important;
+  height: 48px;
+  padding: 0 44px 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  font: 500 14px var(--body);
+}
+.co__field input:focus {
+  outline: none;
+  border-color: var(--muted);
 }
 .co__tip {
   position: absolute;
   top: 50%;
-  right: 8px;
+  right: 10px;
   transform: translateY(-50%);
 }
 .co__tip-btn {
@@ -163,7 +130,7 @@
   width: 30px;
   height: 30px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 50%;
   background: none;
   color: var(--muted);
   cursor: help;
@@ -202,7 +169,8 @@
   opacity: 1;
   transform: none;
 }
-/* check de avisos por correo */
+
+/* check de avisos por correo (mismo dibujo que las casillas legales) */
 .co__check {
   display: flex;
   align-items: center;
@@ -243,55 +211,202 @@
   outline: 2px solid var(--red);
   outline-offset: 2px;
 }
-.co__check:hover {
-  color: var(--text);
-}
-.co__field input {
-  height: 46px;
-  padding: 0 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--co-field);
-  color: var(--text);
-  font: 500 14px var(--body);
-}
-.co__field input:focus {
-  outline: none;
-  border-color: var(--muted);
-}
-.co__field p {
-  color: var(--muted);
-  font-size: 12px;
-}
 
-/* caja de la tarjeta: encabezado con los logos y el botón/formulario de PayPal dentro */
-.co__cardbox {
-  margin-top: 4px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.co__cardbox-head {
+/* logos de PayPal, Visa y Mastercard junto al título «Pago» */
+.co__marks {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--line);
-  background: color-mix(in srgb, var(--text) 3%, transparent);
-  font-size: 14px;
-  font-weight: 600;
+  gap: 6px;
 }
-.co__cardbox .co__paypal-card {
-  padding: 14px 16px;
+.co__mark {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 22px;
+  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid var(--line);
 }
-/* botón de tarjeta en gris: el negro de PayPal aclarado (solo cerrado; el formulario abierto queda como viene) */
-.co__cardbox .co__paypal-card:not(.is-open) iframe {
-  filter: brightness(1.55);
+.co__mark--paypal {
+  background: #eef3fb;
+}
+.co__mark--visa {
+  background: #1a1f71;
+  border-color: #1a1f71;
+  color: #ffffff;
+  font: italic 800 10px/1 Arial, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* botón oficial de PayPal (blanco en oscuro, negro en claro) */
+.co__pp {
+  position: relative;
+  z-index: 0;
+  min-height: 46px;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: opacity 0.2s;
+}
+/* con el mismo esquema de color que su contenido, el navegador deja el marco transparente */
+.co__pp iframe {
+  color-scheme: light;
+}
+/* el formulario de PayPal trae su propio foco: sin el contorno rojo de la web alrededor */
+.co__pp :focus,
+.co__pp :focus-visible {
+  outline: none;
+}
+/* sin las casillas de términos y privacidad: apagados (al tocarlos se marca lo que falta) */
+.co__pp[data-locked],
+.co__card-btn[data-locked] {
+  opacity: 0.4;
+}
+/* formulario de tarjeta abierto: PayPal lo dibuja en claro (fondo transparente y textos oscuros). En tema claro
+   queda como viene; en oscuro se invierten sus colores (y se rota el tono para que los logos no cambien de color),
+   así los campos quedan oscuros con texto claro como el resto de la página. */
+.co__pp--card.is-open {
+  border-radius: 0;
+  overflow: visible;
+}
+:root:not([data-theme="light"]) .co__pp--card.is-open iframe {
+  filter: invert(1) hue-rotate(180deg);
+}
+.co__pp-clip {
+  position: relative;
+  z-index: 0; /* encierra el marco de PayPal: el botón propio queda encima */
+  border-radius: inherit;
+  overflow: hidden;
+}
+/* arriba del formulario van el botón de PayPal (46 px) y la fila de su X: se recortan subiendo el contenido */
+.co__pp--card.is-open .co__pp-slot {
+  margin-top: -88px;
+}
+/* PayPal y tarjeta más juntos; abierto el formulario, más aire para que no quede pegado al botón de PayPal */
+/* el marco de PayPal deja unos píxeles vacíos debajo del botón: cerrados, los dos miden justo 46 px */
+.co__pp--paypal,
+.co__pp--card:not(.is-open) {
+  height: 46px;
+  min-height: 0;
+}
+.co__pp--paypal + .co__pp--card {
+  margin-top: -4px;
+}
+.co__pp--paypal + .co__pp--card.is-open {
+  margin-top: 14px;
+}
+/* «Cancelar» con el aspecto del formulario de PayPal: mismo ancho que sus campos y su botón «Pagar» */
+.co__pp-cancel {
+  position: relative;
+  z-index: 1; /* sube sobre el margen vacío del marco de PayPal: si no, el marco taparía su parte de arriba */
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  height: 48px;
+  margin: -14px auto 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  font: 600 14px var(--body);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+/* aparece un instante después de los campos, cuando PayPal ya los pintó */
+.co__pp-cancel {
+  animation: co-fade 0.25s ease-out 0.35s both;
+}
+@keyframes co-fade {
+  from {
+    opacity: 0;
+  }
+}
+.co__pp-cancel:hover {
+  border-color: var(--muted);
+}
+.co__pp-cancel:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+/* botón propio encima del de PayPal (el clic lo atraviesa): píldora con borde, como el resto de la web.
+   El hover se toma del contenedor, porque el puntero está sobre el marco de PayPal. */
+.co__pp-face {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: 600 14px var(--body);
+  pointer-events: none;
+  transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+}
+.co__pp--card.is-idle:not([data-locked]):hover .co__pp-face {
+  border-color: var(--red);
+  background: var(--red);
+  color: #fff;
+}
+.co__pp--card:focus-within .co__pp-face {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+.co__pp-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--text);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: co-spin 0.7s linear infinite;
+}
+@keyframes co-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* «Pagar con tarjeta»: píldora de la web que abre el modal */
+.co__card-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  font: 600 14px var(--body);
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s, color 0.15s, opacity 0.2s;
+}
+.co__card-btn:hover:not(:disabled) {
+  border-color: var(--red);
+  background: var(--red);
+  color: #fff;
+}
+.co__card-btn:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+.co__card-btn:disabled {
+  color: var(--muted);
+  cursor: default;
 }
 .co__method {
   width: 100%;
   height: 48px;
+}
+
+/* quien ya aceptó los documentos: una línea en vez de las casillas */
+.co__accepted {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
 }
 .co__error {
   color: var(--red);
@@ -300,68 +415,184 @@
 }
 .co__terms {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+.co__order-id {
+  font: 600 12px var(--body) !important;
+  letter-spacing: 0.08em;
+  color: var(--text) !important;
 }
 
-/* resumen: producto con su miniatura y la cantidad en una burbuja */
-.co__item {
+/* mientras se confirma el cobro, la columna queda tapada con el aviso */
+.co__capturing {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 14px;
+  place-items: center;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  color: var(--text);
+  font-weight: 600;
 }
-.co__thumb {
-  position: relative;
-  width: 64px;
-  height: 64px;
-  padding: 6px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #0a0a0a;
-}
-.co__thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-.co__item-txt {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
-.co__product {
-  font: 600 14px/1.3 var(--body);
-}
-.co__item-txt small {
-  color: var(--muted);
+
+/* PayPal en modo pruebas: aviso visible para no confundirlo con un cobro real */
+.co__sandbox {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--red-soft);
+  color: var(--text);
   font-size: 12px;
-}
-.co__item-price {
-  font-size: 14px;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
+  font-weight: 600;
 }
 
-/* licencia: el texto del producto abre una lista sencilla para cambiarla */
+/* pedido confirmado */
+.co__result {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+.co__result svg {
+  color: var(--green, #3ecf8e);
+}
+.co__result p {
+  max-width: 380px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ---------- ticket (el de la landing): papel claro sobre la página oscura, papel negro en tema claro ---------- */
+.tk {
+  --paper: #efece6;
+  --ink: #0b0b0b;
+  --ink-2: color-mix(in srgb, var(--ink) 70%, transparent);
+  --ink-3: color-mix(in srgb, var(--ink) 50%, transparent);
+  --ink-line: color-mix(in srgb, var(--ink) 22%, transparent);
+  --ny: var(--notch-y, 40%);
+  position: relative;
+  padding: 42px 30px 38px;
+  color: var(--ink);
+  background:
+    radial-gradient(circle 6px at 50% 0, #0000 97%, var(--paper)) 0 0 / 18px 10px repeat-x,
+    radial-gradient(circle 6px at 50% 100%, #0000 97%, var(--paper)) 0 100% / 18px 10px repeat-x,
+    linear-gradient(var(--paper), var(--paper)) 0 10px / 100% calc(100% - 20px) no-repeat;
+  -webkit-mask:
+    radial-gradient(circle 15px at 0 var(--ny), #0000 96%, #000) 0 0 / 51% 100% no-repeat,
+    radial-gradient(circle 15px at 100% var(--ny), #0000 96%, #000) 100% 0 / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle 15px at 0 var(--ny), #0000 96%, #000) 0 0 / 51% 100% no-repeat,
+    radial-gradient(circle 15px at 100% var(--ny), #0000 96%, #000) 100% 0 / 51% 100% no-repeat;
+}
+:root[data-theme="light"] .tk {
+  --paper: #0d0d0d;
+  --ink: #f3f1ec;
+}
+.tk__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--ink-3);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.tk__row b {
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.tk__title {
+  margin: 20px 0 0;
+  font: 400 clamp(36px, 3.6vw, 48px) / 0.95 var(--brand);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.tk__title span {
+  display: block;
+}
+.tk__feats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tk__feats li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.tk__feats li::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+}
+.tk__perf {
+  height: 2px;
+  margin: 32px -10px;
+  background: linear-gradient(90deg, var(--ink-line) 60%, #0000 0) 0 0 / 12px 2px repeat-x;
+}
+.tk__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px 12px;
+  margin: 0;
+}
+.tk__lic {
+  grid-column: 1 / -1;
+}
+.tk__grid dt {
+  color: var(--ink-3);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.tk__grid dd {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tk__lic dd {
+  font: 400 22px/1.1 var(--brand);
+  letter-spacing: 0.03em;
+}
+
+/* licencia: el nombre abre una lista sencilla para cambiarla */
 .co__lic {
   position: relative;
-  justify-self: start;
+  display: inline-block;
 }
 .co__lic-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   padding: 0;
   border: 0;
   background: none;
-  color: var(--muted);
-  font: 400 12px var(--body);
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
   cursor: pointer;
   transition: color 0.15s;
 }
 .co__lic-btn:hover,
 .co__lic-btn[aria-expanded="true"] {
-  color: var(--text);
+  color: var(--red);
 }
 .co__lic-btn svg {
   transition: transform 0.2s;
@@ -374,11 +605,11 @@
   z-index: 20;
   top: calc(100% + 8px);
   left: 0;
-  min-width: 250px;
+  min-width: 260px;
   padding: 4px;
   display: grid;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--bg);
   box-shadow: 0 16px 40px -16px rgba(0, 0, 0, 0.5);
   animation: co-pop 0.14s ease-out;
@@ -394,14 +625,16 @@
   grid-template-columns: 16px auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
-  height: 36px;
+  height: 38px;
   padding: 0 10px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 8px;
   background: none;
   color: var(--muted);
   font: 500 13px var(--body);
+  letter-spacing: 0;
   text-align: left;
+  text-transform: none;
   cursor: pointer;
 }
 .co__lic-opt:hover,
@@ -429,26 +662,127 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* cupón: «Aplicar» va dentro del campo, a la derecha */
-.co__coupon {
+/* precio y descuento (solo con cupón), antes del total */
+.tk__lines {
+  display: grid;
+  gap: 6px;
+  margin: 22px 0 0;
+}
+.tk__lines div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.tk__lines dt {
+  color: var(--ink-3);
+}
+.tk__lines dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.tk__lines div + div dd {
+  color: var(--red);
+}
+
+/* total grande, como en la landing */
+.tk__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1.5px solid var(--ink);
+}
+.tk__label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ink-3);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.tk__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-3);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.tk__meta i {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--ink-line);
+}
+.tk__meta em {
+  font-style: normal;
+  color: var(--red);
+}
+.tk__price {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  font-family: var(--brand);
+  line-height: 1;
+}
+.tk__cur,
+.tk__dec {
+  margin-top: 4px;
+  font-size: 20px;
+}
+.tk__dec {
+  color: var(--ink-2);
+}
+.tk__int {
+  font-size: clamp(44px, 4vw, 56px);
+  letter-spacing: -0.01em;
+}
+.tk__foot {
   display: grid;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 30px;
+}
+.tk__barcode {
+  width: 100%;
+  height: 38px;
+  color: var(--ink);
+}
+.tk__foot span {
+  color: var(--ink-3);
+  font-size: 9.5px;
+  letter-spacing: 0.28em;
+}
+
+/* cupón: debajo del ticket, con su título, en una píldora como el correo */
+.co__coupon {
+  display: grid;
+  gap: 12px;
+}
+.co__coupon-label {
+  font: 600 15px/1.3 var(--body);
 }
 .co__coupon-field {
   display: flex;
   align-items: center;
-  height: 44px;
-  padding: 0 5px 0 14px;
+  gap: 8px;
+  height: 48px;
+  padding: 0 6px 0 18px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--bg);
+  border-radius: 999px;
   transition: border-color 0.15s;
 }
 .co__coupon-field:focus-within {
   border-color: var(--muted);
 }
-.co__coupon-field[aria-invalid="true"] {
+.co__coupon-field[data-invalid] {
   border-color: var(--red);
 }
 .co__coupon-field input {
@@ -459,234 +793,59 @@
   border: 0;
   background: none;
   color: var(--text);
-  font: 500 14px var(--body);
+  font: 600 14px var(--body);
+  letter-spacing: 0.06em;
+}
+.co__coupon-field input::placeholder {
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0;
 }
 .co__coupon-field input:focus {
   outline: none;
 }
-.co__coupon-field input::placeholder {
-  color: var(--muted);
+.co__coupon-field--on {
+  justify-content: space-between;
+  border-style: dashed;
 }
-.co__coupon-apply {
+.co__coupon-field--on span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.co__coupon-field--on svg {
+  color: var(--red);
+}
+.co__coupon-btn {
   flex: none;
-  height: 32px;
-  padding: 0 12px;
+  height: 36px;
+  padding: 0 16px;
   border: 0;
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  color: var(--text);
-  font: 600 12px var(--body);
-  cursor: pointer;
-  transition: background-color 0.15s, color 0.15s;
-}
-.co__coupon-apply:hover:not(:disabled) {
+  border-radius: 999px;
   background: var(--text);
   color: var(--bg);
-}
-.co__coupon-apply:disabled {
-  color: var(--muted);
-  cursor: default;
-}
-.co__applied {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 6px;
-  padding: 12px 14px;
-  border: 1px dashed var(--line);
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-}
-/* botón pequeño sin subrayado (p. ej. «Quitar» el cupón) */
-.co__chip {
-  height: 28px;
-  padding: 0 12px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: none;
-  color: var(--muted);
   font: 600 12px var(--body);
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: background-color 0.15s, color 0.15s, opacity 0.15s;
 }
-.co__chip:hover {
-  color: var(--text);
-  border-color: var(--muted);
+.co__coupon-btn:hover:not(:disabled) {
+  background: var(--red);
+  color: #fff;
 }
-
-/* totales */
-.co__totals {
-  display: grid;
-  gap: 10px;
-  margin-top: 8px;
-}
-.co__totals > div {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 16px;
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-}
-.co__totals > div > span:first-child {
-  color: var(--muted);
-}
-.co__totals > .co__total {
-  margin-top: 6px;
-  font: 600 18px var(--body);
-}
-.co__totals > .co__total > span:first-child {
-  color: var(--text);
-}
-.co__total small {
-  margin-right: 8px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 500;
-}
-.co__order-id {
-  font: 600 12px var(--body) !important;
-  letter-spacing: 0.08em;
-  color: var(--text) !important;
+.co__coupon-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 
-/* pedido confirmado */
-.co__result {
-  display: grid;
-  justify-items: center;
-  gap: 12px;
-  padding: 16px 8px;
-  text-align: center;
+/* casilla de términos y aviso de privacidad: debajo del ticket en escritorio, debajo de los botones en móvil
+   (las dos son la misma casilla; solo se muestra una) */
+.co__consent--main {
+  display: none;
 }
-.co__result svg {
-  color: var(--green, #3ecf8e);
-}
-.co__result h1,
-.co__result h2 {
-  font: 700 18px/1.3 var(--body);
-  letter-spacing: 0;
-  text-transform: none;
-}
-.co__result p {
-  max-width: 340px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-/* móvil: primero el resumen (arriba, en gris) y después el pago */
-@media (max-width: 860px) {
-  .co__top-in {
-    display: flex;
-    justify-content: space-between;
-    padding-inline: clamp(16px, 5vw, 24px);
-  }
-  .co__top-in .logo,
-  .co__top-in .co__back {
-    width: auto;
-    margin: 0;
-  }
-  .co__left,
-  .co__summary {
-    padding-inline: clamp(16px, 5vw, 24px);
-  }
-  .co__split {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .co__summary {
-    order: -1;
-    justify-content: center;
-    padding-block: 24px;
-    border-left: 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .co__left {
-    justify-content: center;
-    padding-top: 28px;
-  }
-  .co__summary .co__col {
-    position: static;
-    width: min(500px, 100%);
-  }
-}
-
-/* botones de PayPal: mientras se confirma el cobro quedan tapados con el aviso */
-.co__paypal-wrap {
-  position: relative;
-  min-height: 46px;
-}
-.co__paypal {
-  position: relative;
-  z-index: 0;
-  display: grid;
-  gap: 18px;
-}
-/* en oscuro, el marco de PayPal pinta un fondo blanco: se recorta a la forma de píldora (y el formulario de
-   tarjeta, que viene en blanco, queda como una tarjeta redondeada) */
-.co__paypal-btn {
-  border-radius: 4px;
-  overflow: hidden;
-}
-/* logos de PayPal, Visa, Mastercard… en el encabezado de la caja de la tarjeta */
-.co__marks {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.co__mark {
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 22px;
-  border-radius: 4px;
-  background: #ffffff;
-  border: 1px solid var(--line);
-}
-.co__mark--paypal {
-  background: #eef3fb;
-}
-.co__mark--visa {
-  background: #1a1f71;
-  border-color: #1a1f71;
-  color: #ffffff;
-  font: italic 800 10px/1 Arial, sans-serif;
-  letter-spacing: 0.02em;
-}
-/* con el mismo esquema de color que su contenido, el navegador deja el marco transparente */
-.co__paypal iframe {
-  color-scheme: light;
-}
-/* formulario de tarjeta abierto: en un panel blanco, porque sus textos vienen en oscuro */
-.co__cardbox .co__paypal-card.is-open {
-  background: #ffffff;
-}
-/* el formulario de PayPal trae su propio foco: sin el contorno rojo de la web alrededor */
-.co__paypal :focus,
-.co__paypal :focus-visible {
-  outline: none;
-}
-.co__capturing {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  color: var(--text) !important;
-  font-weight: 600;
-}
-
-/* PayPal en modo pruebas: aviso visible para no confundirlo con un cobro real */
-.co__sandbox {
-  margin-bottom: 14px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  background: var(--red-soft);
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 600;
+.co__consent--aside {
+  margin-top: 28px;
 }
 
 /* compra lista: modal centrado, con el ícono arriba del título y la X en la esquina */
@@ -721,4 +880,39 @@
 }
 .co__done .co__order-id {
   margin-bottom: 6px;
+}
+
+/* móvil: primero el ticket y después el pago */
+@media (max-width: 900px) {
+  .co__grid {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 32px;
+    padding-top: 16px;
+  }
+  .co__main {
+    width: min(400px, 100%);
+  }
+  .co__aside {
+    width: min(420px, 100%);
+  }
+  /* móvil: la casilla va debajo de los botones de pago y el ticket al final, con aire */
+  .co__aside {
+    position: static;
+    margin-top: 24px;
+  }
+  .co__consent--main {
+    display: block;
+  }
+  .co__consent--aside {
+    display: none;
+  }
+}
+@media (max-width: 420px) {
+  .tk {
+    padding: 30px 18px 26px;
+  }
+  .tk__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

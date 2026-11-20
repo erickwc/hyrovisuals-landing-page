@@ -1,0 +1,77 @@
+/* Casillas de aceptación (registro y checkout): sin marcar por defecto, en rojo al marcarlas. */
+.consent {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+.consent__row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: left;
+  cursor: pointer;
+}
+.consent__row input {
+  position: absolute;
+  opacity: 0;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  pointer-events: none;
+}
+.consent__box {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--line);
+  border-radius: 5px;
+  color: #fff;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.consent__box svg {
+  transform: scale(0);
+  transition: transform 0.15s;
+}
+.consent__row input:checked + .consent__box {
+  background: var(--red);
+  border-color: var(--red);
+}
+.consent__row input:checked + .consent__box svg {
+  transform: scale(1);
+}
+.consent__row input:focus-visible + .consent__box {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+.consent__row[data-invalid] .consent__box {
+  border-color: var(--red);
+}
+.consent__txt {
+  padding-top: 1px;
+}
+.consent__link {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+.consent__link:hover {
+  color: var(--red);
+}
+.consent__error {
+  color: var(--red);
+  font-size: 12px;
+}
+
+/* línea del registro: qué se acepta al crear la cuenta */
+.consent__notice {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+  text-align: center;
+}

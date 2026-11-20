@@ -206,7 +206,7 @@ export function ProductBoard({ product }: { product: Product }) {
             {shown ? <EyeOff size={16} /> : <View size={16} />}
           </button>
         </AnimateIcon>
-        <code className="key-field__key">{shown ? item.key : item.key.replace(/[^-]/g, "•")}</code>
+        <code className="key-field__key">{shown ? item.key : "•".repeat(item.key.replace(/-/g, "").length)}</code>
         {withStatus && inUseTag(item)}
         <AnimateIcon animateOnHover asChild>
           <button type="button" className="key-field__copy" onClick={() => onCopy(item)} data-copied={copied}>

@@ -256,9 +256,14 @@ export function Sales() {
                       {paged.map((row) => (
                         <tr key={row.id}>
                           <td>
-                            <Link className="table-link" to={`/admin/clientes/${row.user_id}`}>
-                              {row.profiles?.email ?? row.user_id.slice(0, 8)}
-                            </Link>
+                            {/* cuenta eliminada: sin enlace, con el correo guardado en la compra */}
+                            {row.user_id ? (
+                              <Link className="table-link" to={`/admin/clientes/${row.user_id}`}>
+                                {row.profiles?.email ?? row.user_id.slice(0, 8)}
+                              </Link>
+                            ) : (
+                              <span className="is-muted">{row.profiles?.email ?? "Cuenta eliminada"}</span>
+                            )}
                           </td>
                           <td>
                             <PlanCell planId={row.plan_id} />

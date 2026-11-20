@@ -13,6 +13,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { firstKeyFrom } from "../_shared/keys.ts";
 import { accessToken, asMode, paypalClientId, paypalConfigured, paypalIssue, paypalRequest, type PaypalMode } from "../_shared/paypal.ts";
 import { emailConfigured, emailFrom, notifySale } from "../_shared/sale-email.ts";
+import { sendPurchaseReceipt } from "../_shared/receipt-email.ts";
 
 const CORS_HEADERS = {
   "access-control-allow-origin": "*",
@@ -201,6 +202,12 @@ Deno.serve(async (req) => {
         await notifySale(admin, purchaseId);
       } catch (err) {
         console.error("aviso de venta", String(err));
+      }
+      // confirmación de la compra al cliente, en su idioma
+      try {
+        await sendPurchaseReceipt(admin, purchaseId, body.lang === "en" ? "en" : "es");
+      } catch (err) {
+        console.error("correo de compra", String(err));
       }
       return json({ purchaseId });
     }

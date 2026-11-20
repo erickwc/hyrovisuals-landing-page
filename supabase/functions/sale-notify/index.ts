@@ -1,10 +1,11 @@
-// Aviso por correo de una venta que no pasó por PayPal (pedido gratis con cupón del 100 %),
-// y el correo de prueba del panel admin.
+// Aviso por correo de una venta que no pasó por PayPal (pedido gratis con cupón del 100 %) y confirmación de esa
+// compra al cliente, y el correo de prueba del panel admin.
 //   { purchaseId }  el dueño de la compra (o un admin) pide el aviso; sale una sola vez por compra
 //   { test: true }  solo admins: envía un correo de prueba a los destinatarios configurados
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { firstKeyFrom } from "../_shared/keys.ts";
 import { notifySale, sendTestEmail } from "../_shared/sale-email.ts";
+import { sendPurchaseReceipt } from "../_shared/receipt-email.ts";
 
 const CORS_HEADERS = {
   "access-control-allow-origin": "*",
@@ -50,7 +51,16 @@ Deno.serve(async (req) => {
     const { data: visible } = await asUser.from("purchases").select("id").eq("id", purchaseId).maybeSingle();
     if (!visible) return json({ error: "Compra no encontrada" }, 404);
 
-    return json({ result: await notifySale(admin, purchaseId) });
+    const result = await notifySale(admin, purchaseId).catch((err) => {
+      console.error("aviso de venta", String(err));
+      return "error";
+    });
+    // confirmación de la compra al cliente, en su idioma (una sola vez por compra)
+    const receipt = await sendPurchaseReceipt(admin, purchaseId, body.lang === "en" ? "en" : "es").catch((err) => {
+      console.error("correo de compra", String(err));
+      return "error";
+    });
+    return json({ result, receipt });
   } catch (err) {
     console.error("sale-notify", String(err));
     return json({ error: "No se pudo enviar el aviso" }, 500);

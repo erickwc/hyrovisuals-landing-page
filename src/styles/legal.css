@@ -1,0 +1,221 @@
+/* Páginas legales con la misma voz de la web: migas pequeñas, título grande en Monument Extended (la segunda línea
+   solo con el contorno), el resumen y las pestañas de documentos, y debajo el índice fijo a la izquierda con el
+   texto a la derecha. */
+
+/* barra: enlaces a la landing en el centro (solo en escritorio) */
+.lg-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+.lg-top .authtop__icons {
+  justify-self: end;
+}
+.lg-top__links {
+  display: flex;
+  gap: 26px;
+}
+.lg-top__links a {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.lg-top__links a:hover {
+  color: var(--text);
+}
+
+.lg {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 120px;
+}
+
+/* cabecera, como los encabezados de sección de la landing (.sec-head): la etiqueta con su número en rojo arriba,
+   el título en dos líneas a la izquierda y el resumen a la derecha, abajo las pestañas de documentos */
+.lg__hero {
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+  padding: clamp(40px, 7vw, 88px) 0 clamp(32px, 5vw, 52px);
+}
+.lg__title {
+  display: grid;
+  font: 400 clamp(26px, 3.3vw, 54px) / 0.95 var(--brand);
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+}
+.lg__intro {
+  max-width: 560px;
+}
+.lg__summary {
+  color: var(--muted);
+  font-size: clamp(14px, 1vw, 16px);
+  line-height: 1.55;
+}
+.lg__meta {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  opacity: 0.8;
+}
+.lg__note {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+/* pestañas de documentos: píldoras, la actual en rojo */
+.lg__docs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.lg__doc-pill {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+.lg__doc-pill:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+.lg__doc-pill.active {
+  border-color: var(--red);
+  background: var(--red);
+  color: #fff;
+}
+
+/* cuerpo: índice + documento */
+.lg__body {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 680px);
+  justify-content: space-between;
+  gap: 48px;
+  padding-top: clamp(36px, 5vw, 56px);
+}
+.lg__index {
+  position: sticky;
+  top: calc(var(--nav-h) + 28px);
+  align-self: start;
+}
+.lg__index p {
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.lg__index ol {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lg__index a {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.lg__index a span {
+  min-width: 18px;
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.lg__index a:hover,
+.lg__index a.is-active {
+  color: var(--text);
+}
+
+.lg__sec,
+.lg__sec + .lg__sec {
+  padding: 0;
+  border: 0;
+  scroll-margin-top: calc(var(--nav-h) + 24px);
+}
+.lg__sec + .lg__sec {
+  margin-top: 48px;
+}
+.lg__sec h2 {
+  margin-bottom: 16px;
+  font: 400 clamp(17px, 2vw, 21px) / 1.2 var(--brand);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.lg__sec p,
+.lg__sec li {
+  color: color-mix(in srgb, var(--text) 78%, var(--bg));
+  font-size: 15px;
+  line-height: 1.75;
+}
+.lg__sec p + p,
+.lg__sec ul + p,
+.lg__sec p + ul {
+  margin-top: 12px;
+}
+.lg__sec b {
+  color: var(--text);
+  font-weight: 700;
+}
+.lg__sec ul {
+  display: grid;
+  gap: 6px;
+  padding-left: 20px;
+  list-style: disc;
+}
+.lg__sec li::marker {
+  color: var(--red);
+}
+.lg__contact {
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13.5px;
+}
+.lg__contact a {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+.lg__contact a:hover {
+  color: var(--red);
+}
+
+@media (max-width: 960px) {
+  .lg-top {
+    display: flex;
+    justify-content: space-between;
+  }
+  .lg-top__links {
+    display: none;
+  }
+  .lg__body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  /* en móvil el índice va arriba, sin quedarse fijo */
+  .lg__index {
+    position: static;
+  }
+
+}

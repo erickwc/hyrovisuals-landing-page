@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { defineConfig, type Connect, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
@@ -6,7 +7,7 @@ import react from "@vitejs/plugin-react";
    La app de React (login, registro, checkout, cuenta y panel admin) vive en app.html y atiende estas rutas.
    En producción las reescribe public/_redirects (Cloudflare Pages); aquí el plugin hace lo mismo en
    `npm run dev` y `npm run preview`. Si se agrega una ruta nueva en App.tsx, va en los dos lugares. */
-const APP_ROUTES = ["/login", "/register", "/recuperar-contrasena", "/checkout", "/cuenta", "/admin"];
+const APP_ROUTES = ["/login", "/register", "/recuperar-contrasena", "/checkout", "/cuenta", "/admin", "/legal", "/baja"];
 
 const isAppRoute = (path: string) => APP_ROUTES.some((r) => path === r || path.startsWith(`${r}/`));
 
@@ -23,9 +24,34 @@ function appRoutes(): Plugin {
   };
 }
 
+/* Los encabezados de seguridad de public/_headers (los que pone Cloudflare Pages) también en `npm run preview`,
+   para probar la política de seguridad en local con la web compilada. En `npm run dev` no se aplican: Vite
+   inyecta scripts propios que esa política bloquearía. */
+function securityHeaders(): Plugin {
+  const headers: [string, string][] = [];
+  let inRoot = false;
+  for (const line of readFileSync(resolve(import.meta.dirname, "public/_headers"), "utf8").split(/\r?\n/)) {
+    if (!line.trim() || line.trimStart().startsWith("#")) continue;
+    if (!/^\s/.test(line)) {
+      inRoot = line.trim() === "/*";
+      continue;
+    }
+    const i = line.indexOf(":");
+    if (inRoot && i > 0) headers.push([line.slice(0, i).trim(), line.slice(i + 1).trim()]);
+  }
+  return {
+    name: "hyro-security-headers",
+    configurePreviewServer: (server) =>
+      void server.middlewares.use((_req, res, next) => {
+        for (const [name, value] of headers) res.setHeader(name, value);
+        next();
+      }),
+  };
+}
+
 // Se sirve en la raíz de byhyro.com (Cloudflare Pages compila la rama main con `npm run build`).
 export default defineConfig({
-  plugins: [react(), appRoutes()],
+  plugins: [react(), appRoutes(), securityHeaders()],
   server: { port: 5173 },
   build: {
     rolldownOptions: {
