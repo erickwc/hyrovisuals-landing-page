@@ -23,7 +23,7 @@
   const planCode = p => (p.id.normalize('NFD').replace(/[^a-z]/gi, '').slice(0, 3) || 'PLN').toUpperCase();
   const api = { setPlans: () => {}, setReviews: () => {}, subscribe: null };
   const sep = () => '.';
-  const money = p => (+p.int).toString() + (p.dec === '00' ? '' : sep() + p.dec);
+  const money = p => (+p.int).toString() + sep() + p.dec;
 
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));

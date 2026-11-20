@@ -418,15 +418,16 @@ main, .footer, .nav { position: relative; z-index: 1; }
 .monitor { display: flex; flex-direction: column; align-items: center; }
 .mon-screen { position: relative; width: 100%; aspect-ratio: 16 / 10; border: 1.5px solid var(--line-3); border-radius: 7px; background: var(--bg-2); overflow: hidden; }
 .mon-foot { width: 28%; height: 12px; border: 1.5px solid var(--line-3); border-top: 0; border-radius: 0 0 6px 6px; }
+/* franja de arriba: una onda de audio roja que corre (como la curva del espectro de la app) */
 .a-strip {
-  position: absolute; left: 0; right: 0; top: 0; height: 21%; display: flex; align-items: flex-end; gap: 2px; padding: 3px 4px;
+  position: absolute; left: 0; right: 0; top: 0; height: 21%; overflow: hidden;
   background: var(--panel); border-bottom: 1px solid var(--red); transform: translateY(-102%); transition: transform .7s var(--ease);
 }
-.a-strip i { flex: 1; background: var(--red); height: 40%; animation: eq .484s ease-in-out infinite alternate; border-radius: 1px; }
-.a-strip i:nth-child(2n) { animation-duration: .36s; background: var(--ink); opacity: .8; }
-.a-strip i:nth-child(3n) { animation-duration: .6s; }
-.a-strip i:nth-child(4n+1) { animation-delay: -.2s; }
-@keyframes eq { from { height: 18%; } to { height: 92%; } }
+.a-wave { position: absolute; inset: 3px 0 0; width: 100%; height: calc(100% - 3px); color: var(--red); overflow: visible; }
+.a-wave-run { animation: a-wave 3.2s linear infinite; }
+.monitor + .monitor .a-wave-run { animation-delay: -1.4s; }
+@keyframes a-wave { from { transform: translateX(0); } to { transform: translateX(-100px); } }
+@media (prefers-reduced-motion: reduce) { .a-wave-run { animation: none; } }
 .a-win {
   position: absolute; border: 1px solid var(--line-3); border-radius: 4px; background: var(--bg-3); overflow: hidden;
   transition: left .8s var(--ease), top .8s var(--ease), width .8s var(--ease), height .8s var(--ease);
@@ -659,7 +660,7 @@ main, .footer, .nav { position: relative; z-index: 1; }
 .buy .sec-head { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; margin-bottom: 0; }
 .buy .sec-lead { justify-self: start; }
 /* licencias: una tarjeta por plan, en fila; la elegida en rojo con su check */
-.buy-plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 32px 0 0; margin-left: clamp(0px, 1.5vw, 20px); max-width: 560px; }
+.buy-plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 32px 0 0; max-width: 560px; }
 .bp {
   position: relative; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px 16px; border: 1px solid var(--line-2); border-radius: 14px;
   cursor: pointer; transition: border-color .2s, background-color .2s;
@@ -678,7 +679,7 @@ main, .footer, .nav { position: relative; z-index: 1; }
 .bp-price { font-size: 22px; letter-spacing: .02em; color: var(--ink-2); transition: color .2s; }
 .bp:hover .bp-name, .bp:has(input:checked) .bp-name, .bp:has(input:checked) .bp-price { color: var(--ink); }
 /* lo que incluye la compra: checks en una columna */
-.incl { list-style: none; margin: 34px 0 0; padding: 0; margin-left: clamp(0px, 1.5vw, 20px); display: grid; gap: 14px; }
+.incl { list-style: none; margin: 34px 0 0; padding: 0; display: grid; gap: 14px; }
 .incl li { display: flex; align-items: flex-start; gap: 10px; color: var(--ink-2); font-size: 14.5px; line-height: 1.4; }
 .incl svg { flex: none; width: 18px; height: 18px; margin-top: 1px; color: var(--red); }
 
