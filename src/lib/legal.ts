@@ -26,8 +26,3 @@ export async function hasCurrentConsent(): Promise<boolean> {
   const docs = new Set(data.map((r) => r.document));
   return docs.has("terms") && docs.has("privacy");
 }
-
-/** Metadatos de signUp: el disparador de auth.users los pasa a legal_consents al crear la cuenta. */
-export function signupConsent() {
-  return { version: LEGAL_VERSION, terms: true, privacy: true, user_agent: navigator.userAgent.slice(0, 400) };
-}

@@ -53,15 +53,3 @@ export function LegalConsent({ checked, onChange, showErrors }: { checked: boole
     </div>
   );
 }
-
-/* Registro: sin casillas, una línea que avisa qué se acepta al crear la cuenta. */
-export function SignupNotice() {
-  const { c } = usePrefs();
-  const t = c.legal;
-  return (
-    <p className="consent__notice">
-      {t.signupA} <DocLink to="/legal/terminos">{t.termsLink}</DocLink> {t.acceptAnd}{" "}
-      <DocLink to="/legal/privacidad">{t.privacyLink}</DocLink>.
-    </p>
-  );
-}

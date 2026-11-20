@@ -67,11 +67,3 @@
   color: var(--red);
   font-size: 12px;
 }
-
-/* línea del registro: qué se acepta al crear la cuenta */
-.consent__notice {
-  color: var(--muted);
-  font-size: 12.5px;
-  line-height: 1.5;
-  text-align: center;
-}
