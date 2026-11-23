@@ -614,6 +614,12 @@ main, .footer, .nav { position: relative; z-index: 1; }
 .mk-cursor.is-click .mk-click { animation: ripple .55s var(--ease-out); }
 @keyframes ripple { 0% { opacity: 1; transform: scale(.2); } 100% { opacity: 0; transform: scale(1.4); } }
 
+/* Video real de la app sobre el mock: el recuadro toma la forma de la app y oculta las franjas negras de la grabación */
+.tour-view.has-video { aspect-ratio: var(--vid-ar, 16 / 9); max-height: none; }
+.tour-video { position: absolute; inset: 0; z-index: 2; overflow: hidden; background: #000; opacity: 0; visibility: hidden; transition: opacity .35s, visibility .35s; }
+.tour-video.is-on { opacity: 1; visibility: visible; }
+.tour-video video { position: absolute; left: 0; top: var(--vid-top, 0); display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+
 .tour-nav { display: flex; align-items: stretch; }
 .tour-cards { flex: 1; min-width: 0; display: flex; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; }
 .tour-cards::-webkit-scrollbar { display: none; }

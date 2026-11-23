@@ -647,7 +647,12 @@
         toast.classList.add('is-show'); await wait(1600);
       }
     };
-    const DUR = { overview: 6200, strip: 6000, reorder: 5600, source: 7200, themes: 8000, palette: 8000, modules: 6600, sliders: 7000, presets: 6400 };
+    const DUR = { overview: 6200, strip: 6000, reorder: 5600, source: 7200, themes: 14310, palette: 8000, modules: 6600, sliders: 7000, presets: 6400 };
+    // Pasos con video real: reemplazan a su animación. Para agregar otro, súmalo aquí y pon su duración en DUR.
+    // y y h: dónde empieza la app dentro de la grabación de 1920×1080 y cuánto mide de alto (lo demás no se muestra).
+    const VIDEOS = {
+      themes: { src: '/landing/video/tematica-dm.mp4', poster: '/landing/video/tematica-dm.webp', y: 202, h: 678 }
+    };
 
     /* Tarjetas y puntos numerados */
     const steps = I18N.STEPS;
@@ -683,15 +688,65 @@
       const card = $(`.t-card[data-i="${current}"]`, cardsEl); if (!card) return;
       setTimeout(() => { cardsEl.scrollTo({ left: Math.max(0, card.offsetLeft - cardsEl.offsetLeft - 60), behavior: reduce ? 'auto' : 'smooth' }); }, 60);
     }
+
+    /* Video del paso actual: va sin sonido, se pausa fuera de vista y la barra sigue su tiempo real */
+    const vidWrap = $('#tourVideoWrap'), vid = $('#tourVideo');
+    let vidAllowed = !reduce, vidRaf = 0;
+    const videoOf = id => (VIDEOS[id] && !VIDEOS[id].failed ? VIDEOS[id] : null);
+    const vidOn = () => vidWrap.classList.contains('is-on');
+    function clearProg() { cancelAnimationFrame(vidRaf); $$('.t-prog', cardsEl).forEach(p => p.removeAttribute('style')); }
+    function tickProg() {
+      if (!vidOn()) return;
+      const p = $('.t-card.is-active .t-prog', cardsEl);
+      if (p) { p.style.animation = 'none'; p.style.transform = `scaleX(${vid.currentTime / (vid.duration || 1)})`; }
+      vidRaf = requestAnimationFrame(tickProg);
+    }
+    function syncVideo() {
+      if (!vidOn()) return;
+      if (!visible || document.hidden || !vidAllowed) { vid.pause(); return; }
+      const myRun = run, playing = vid.play();
+      if (playing) playing.catch(e => {
+        // Sin permiso de reproducción (p. ej. ahorro de batería en iPhone): queda la imagen fija y el recorrido sigue.
+        if (e.name !== 'NotAllowedError' || myRun !== run || !auto) return;
+        clearTimeout(advanceTimer);
+        advanceTimer = setTimeout(() => { if (myRun === run && auto && visible && !document.hidden) go(current + 1); }, DUR[steps[current].id]);
+      });
+    }
+    function showVideo(v) {
+      if (vid.getAttribute('src') !== v.src) { vid.poster = v.poster; vid.src = v.src; }
+      else if (vid.readyState > 0) vid.currentTime = 0;
+      view.style.setProperty('--vid-ar', `1920 / ${v.h}`);
+      view.style.setProperty('--vid-top', `${-v.y / v.h * 100}%`);
+      view.classList.add('has-video');
+      vidWrap.classList.add('is-on'); tickProg(); syncVideo();
+    }
+    function hideVideo() { vidWrap.classList.remove('is-on'); view.classList.remove('has-video'); vid.pause(); }
+    vid.addEventListener('ended', () => {
+      if (auto && visible && !document.hidden) { go(current + 1); return; }
+      vid.currentTime = 0; syncVideo();
+    });
+    vid.addEventListener('error', () => {
+      // Si el video no carga, el paso vuelve a su animación.
+      const id = steps[current].id;
+      if (!VIDEOS[id] || vid.getAttribute('src') !== VIDEOS[id].src) return;
+      VIDEOS[id].failed = true; vid.removeAttribute('src'); go(current);
+    });
+    document.addEventListener('visibilitychange', syncVideo);
+
     function go(i, user) {
-      if (user) { auto = false; tourEl.classList.remove('is-auto'); }
-      clearTimeout(advanceTimer);
+      if (user) { auto = false; vidAllowed = true; tourEl.classList.remove('is-auto'); }
+      // Un cambio de tamaño o volver a la sección no reinicia el video: solo lo reanuda.
+      else if (i === current && vidOn() && videoOf(steps[current].id)) { syncVideo(); return; }
+      clearTimeout(advanceTimer); clearProg();
       current = (i + steps.length) % steps.length; run++;
       const card = $(`.t-card[data-i="${current}"]`, cardsEl);
       if (card) { card.classList.remove('is-active'); void card.offsetWidth; }
       markCards(); scrollCard();
       const id = steps[current].id, myRun = run, t0 = performance.now();
       resetMock();
+      const video = videoOf(id);
+      if (video) { showVideo(video); return; }
+      hideVideo();
       SCRIPTS[id]().catch(e => { if (e !== ABORT) console.error(e); }).then(() => {
         if (myRun !== run || !auto) return;
         const rest = Math.max(700, DUR[id] - (performance.now() - t0));
@@ -708,6 +763,7 @@
       visible = es[0].isIntersecting;
       if (visible && !started) { started = true; if (auto) tourEl.classList.add('is-auto'); go(0); }
       else if (visible && auto && current >= 0) go(current);
+      syncVideo();
     }, { threshold: .35 }).observe(view);
     new ResizeObserver(() => { if (current >= 0) { mk.style.transition = 'none'; go(current); requestAnimationFrame(() => { mk.style.transition = ''; }); } else cam(FULL); }).observe(view);
     buildCards(); placeHots(); cam(FULL); place(820, 620, 0);
