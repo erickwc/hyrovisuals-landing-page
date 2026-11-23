@@ -3,9 +3,12 @@
    está ahí, la barra muestra su foto al instante con lo último guardado; luego se confirma con Supabase (cargado
    aparte) y se actualizan el nombre y la foto. */
 
-export type LandingUser = { name: string | null; avatarUrl: string | null };
+export type LandingProfile = { name: string | null; avatarUrl: string | null };
+export type LandingUser = LandingProfile & { isAdmin: boolean };
 
 const PROFILE_KEY = "hyro.profile";
+// id del usuario si es administrador: la foto de la landing lo lleva al panel sin esperar la consulta
+const ADMIN_KEY = "hyro.admin";
 
 function sessionKey() {
   const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
@@ -30,18 +33,36 @@ function storedSession(): { userId: string } | null {
   }
 }
 
-function cachedProfile(userId: string): LandingUser {
+function cachedAdmin(userId: string) {
   try {
-    const cached = JSON.parse(localStorage.getItem(PROFILE_KEY) ?? "null") as ({ id: string } & LandingUser) | null;
-    if (cached?.id === userId) return { name: cached.name, avatarUrl: cached.avatarUrl };
+    return localStorage.getItem(ADMIN_KEY) === userId;
+  } catch {
+    return false;
+  }
+}
+
+function rememberAdmin(userId: string, isAdmin: boolean) {
+  try {
+    if (isAdmin) localStorage.setItem(ADMIN_KEY, userId);
+    else localStorage.removeItem(ADMIN_KEY);
+  } catch {
+    /* sin almacenamiento: se confirma con Supabase en cada visita */
+  }
+}
+
+function cachedProfile(userId: string): LandingUser {
+  const isAdmin = cachedAdmin(userId);
+  try {
+    const cached = JSON.parse(localStorage.getItem(PROFILE_KEY) ?? "null") as ({ id: string } & LandingProfile) | null;
+    if (cached?.id === userId) return { name: cached.name, avatarUrl: cached.avatarUrl, isAdmin };
   } catch {
     /* sin caché: se muestra el icono genérico */
   }
-  return { name: null, avatarUrl: null };
+  return { name: null, avatarUrl: null, isAdmin };
 }
 
 /** Lo llaman las páginas de cuenta al leer o cambiar el perfil, para que la landing lo muestre sin consultar. */
-export function rememberProfile(id: string, profile: LandingUser) {
+export function rememberProfile(id: string, profile: LandingProfile) {
   try {
     localStorage.setItem(PROFILE_KEY, JSON.stringify({ id, ...profile }));
   } catch {
@@ -52,6 +73,7 @@ export function rememberProfile(id: string, profile: LandingUser) {
 export function forgetProfile() {
   try {
     localStorage.removeItem(PROFILE_KEY);
+    localStorage.removeItem(ADMIN_KEY);
   } catch {
     /* nada que borrar */
   }
@@ -86,16 +108,22 @@ export function watchLandingSession(onChange: (user: LandingUser | null) => void
         set(null);
         return;
       }
-      const { data: profile, error } = await supabase.from("profiles").select("name, avatar_url").eq("id", session.user.id).maybeSingle();
+      const [{ data: profile, error }, { data: adminRow, error: adminError }] = await Promise.all([
+        supabase.from("profiles").select("name, avatar_url").eq("id", session.user.id).maybeSingle(),
+        supabase.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle(),
+      ]);
       if (!active) return;
+      // si la consulta falla, no se le quita el acceso al panel a quien ya se sabía que es admin
+      const isAdmin = adminError ? cachedAdmin(session.user.id) : Boolean(adminRow);
+      if (!adminError) rememberAdmin(session.user.id, isAdmin);
       // si el perfil no se pudo leer, la sesión sigue siendo válida: se queda la foto guardada
       if (error) {
-        set(user ?? cachedProfile(session.user.id));
+        set({ ...(user ?? cachedProfile(session.user.id)), isAdmin });
         return;
       }
       const next = { name: profile?.name ?? null, avatarUrl: profile?.avatar_url ?? null };
       rememberProfile(session.user.id, next);
-      set(next);
+      set({ ...next, isAdmin });
     } catch {
       /* sin conexión: se queda lo guardado */
     }

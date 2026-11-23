@@ -25,4 +25,6 @@ photo?.addEventListener("error", () => showPhoto(null));
 watchLandingSession((user) => {
   root.classList.toggle("has-session", Boolean(user));
   showPhoto(user?.avatarUrl ?? null);
+  // los administradores van a su panel, no a la cuenta de cliente
+  account?.setAttribute("href", user?.isAdmin ? "/admin" : "/cuenta/biblioteca");
 });

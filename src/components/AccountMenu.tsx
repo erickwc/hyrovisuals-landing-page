@@ -10,11 +10,12 @@ import { EASE } from "./ui";
 import { AnimateIcon } from "./animate-ui/icons/icon";
 import { UserRound } from "./animate-ui/icons/hugeicons/user-round";
 import { Settings02 } from "./animate-ui/icons/hugeicons/settings-02";
+import { LayoutDashboard } from "./animate-ui/icons/hugeicons/layout-dashboard";
 import { Logout01 } from "./animate-ui/icons/hugeicons/logout-01";
 import "../styles/language.css";
 
 /* Foto del cliente en la barra: abre un mini menú con Configuración y Cerrar sesión (que pide confirmación). */
-export function AccountMenu({ name, email, avatarUrl }: { name: string | null; email: string; avatarUrl: string | null }) {
+export function AccountMenu({ name, email, avatarUrl, isAdmin }: { name: string | null; email: string; avatarUrl: string | null; isAdmin: boolean }) {
   const { c } = usePrefs();
   const t = c.dashboard.nav;
   const navigate = useNavigate();
@@ -69,9 +70,9 @@ export function AccountMenu({ name, email, avatarUrl }: { name: string | null; e
               <span>{email}</span>
             </div>
             <AnimateIcon animateOnHover asChild>
-              <Link to="/cuenta" role="menuitem" className="lp__opt acct-menu__opt" onClick={() => setOpen(false)}>
-                <Settings02 size={16} />
-                {t.settings}
+              <Link to={isAdmin ? "/admin" : "/cuenta"} role="menuitem" className="lp__opt acct-menu__opt" onClick={() => setOpen(false)}>
+                {isAdmin ? <LayoutDashboard size={16} /> : <Settings02 size={16} />}
+                {isAdmin ? t.adminPanel : t.settings}
               </Link>
             </AnimateIcon>
             <AnimateIcon animateOnHover asChild>

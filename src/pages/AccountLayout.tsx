@@ -59,7 +59,7 @@ export function AccountLayout() {
           <div className="authtop__icons dash-top__icons">
             <ThemeButton />
             <LanguagePicker />
-            <AccountMenu name={info.name} email={info.email} avatarUrl={info.avatarUrl} />
+            <AccountMenu name={info.name} email={info.email} avatarUrl={info.avatarUrl} isAdmin={info.isAdmin} />
           </div>
         </div>
       </header>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabase";
 import { rememberProfile } from "./landingSession";
 
-export type SessionInfo = { userId: string; email: string; createdAt: string; name: string | null; avatarUrl: string | null };
+export type SessionInfo = { userId: string; email: string; createdAt: string; name: string | null; avatarUrl: string | null; isAdmin: boolean };
 /* Lo que el panel de cliente pasa a sus páginas: la sesión y cómo avisar que cambió el perfil. */
 export type AccountContext = SessionInfo & { updateProfile: (patch: Partial<Pick<SessionInfo, "name" | "avatarUrl">>) => void };
 
@@ -25,7 +25,10 @@ export function useRequireSession() {
         navigate("/login", { replace: true });
         return;
       }
-      const { data: profile } = await supabase!.from("profiles").select("name, avatar_url").eq("id", session.user.id).maybeSingle();
+      const [{ data: profile }, { data: adminRow }] = await Promise.all([
+        supabase!.from("profiles").select("name, avatar_url").eq("id", session.user.id).maybeSingle(),
+        supabase!.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle(),
+      ]);
       if (!active) return;
       rememberProfile(session.user.id, { name: profile?.name ?? null, avatarUrl: profile?.avatar_url ?? null });
       setInfo({
@@ -34,6 +37,7 @@ export function useRequireSession() {
         createdAt: session.user.created_at,
         name: profile?.name ?? null,
         avatarUrl: profile?.avatar_url ?? null,
+        isAdmin: Boolean(adminRow),
       });
       setChecked(true);
     });
