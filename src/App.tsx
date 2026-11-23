@@ -66,7 +66,6 @@ const Reviews = lazy(() => import("./pages/admin/Reviews").then((m) => ({ defaul
 const Announcements = lazy(() => import("./pages/admin/Announcements").then((m) => ({ default: m.Announcements })));
 const Settings = lazy(() => import("./pages/admin/Settings").then((m) => ({ default: m.Settings })));
 const ActivityLog = lazy(() => import("./pages/admin/ActivityLog").then((m) => ({ default: m.ActivityLog })));
-const ClientView = lazy(() => import("./pages/admin/ClientView").then((m) => ({ default: m.ClientView })));
 
 export function App() {
   return (
@@ -104,7 +103,8 @@ export function App() {
               <Route path="cupones" element={<Coupons />} />
               <Route path="configuracion" element={<Settings />} />
               <Route path="actividad" element={<ActivityLog />} />
-              <Route path="vista-cliente" element={<ClientView />} />
+              {/* La web no se puede meter en un marco (seguridad): la vista de cliente es la cuenta real. */}
+              <Route path="vista-cliente" element={<Navigate to="/cuenta/biblioteca" replace />} />
             </Route>
             <Route path="*" element={<ToLanding />} />
           </Routes>

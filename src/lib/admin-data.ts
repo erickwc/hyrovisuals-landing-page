@@ -743,6 +743,7 @@ export type Coupon = {
   discount_type: "percent" | "fixed";
   discount_value: number;
   product_id: string | null;
+  plan_id: string | null;
   max_uses: number | null;
   uses_count: number;
   active: boolean;
@@ -761,6 +762,7 @@ export type CouponInput = {
   discountType: "percent" | "fixed";
   discountValue: number;
   productId: string | null;
+  planId: string | null;
   maxUses: number | null;
   expiresAt: string | null;
 };
@@ -775,6 +777,7 @@ export async function createCoupon(input: CouponInput): Promise<Coupon> {
       discount_type: input.discountType,
       discount_value: input.discountValue,
       product_id: input.productId,
+      plan_id: input.productId ? input.planId : null,
       max_uses: input.maxUses,
       expires_at: input.expiresAt,
       created_by: userData.user?.id ?? null,

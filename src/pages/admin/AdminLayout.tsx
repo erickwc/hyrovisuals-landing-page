@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useRequireAdmin } from "../../lib/useSession";
 import { supabase } from "../../lib/supabase";
 import { LayoutDashboard } from "../../components/animate-ui/icons/hugeicons/layout-dashboard";
@@ -78,7 +78,6 @@ function preloadSections() {
     import("./Coupons"),
     import("./Settings"),
     import("./ActivityLog"),
-    import("./ClientView"),
   ]);
 }
 
@@ -188,10 +187,11 @@ export function AdminLayout() {
               <span className="admin__nav-text">{theme === "dark" ? "Modo claro" : "Modo oscuro"}</span>
             </button>
           </AnimateIcon>
-          <NavLink to="/admin/vista-cliente" aria-label="Ver como cliente" onClick={onPick} className={({ isActive }) => "admin__nav-link" + (isActive ? " active" : "")}>
+          {/* la cuenta real del cliente; se vuelve con «Panel de administrador» en el menú de la foto */}
+          <Link to="/cuenta/biblioteca" className="admin__nav-link" aria-label="Ver como cliente">
             <UserRound size={15} />
             <span className="admin__nav-text">Ver como cliente</span>
-          </NavLink>
+          </Link>
           <a className="admin__nav-link" href="/" aria-label="Volver al sitio">
             <ArrowLeft02 size={15} />
             <span className="admin__nav-text">Volver al sitio</span>

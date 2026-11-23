@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createCoupon, fetchCoupons, fetchProductOptions, setCouponActive, type Coupon, type CouponInput, type ProductOption } from "../../lib/admin-data";
+import { createCoupon, fetchCoupons, fetchPlans, fetchProductOptions, setCouponActive, type AdminPlan, type Coupon, type CouponInput, type ProductOption } from "../../lib/admin-data";
 import { SelectField } from "./SelectField";
 import { formatMoney } from "./periods";
-import { FormModal, Pager, TableSearch, formatDay } from "./shared";
+import { Pager, TableSearch, formatDay } from "./shared";
 import { Button } from "../../components/Button";
+import { MiniModal } from "../../components/MiniModal";
+import { PlusSign } from "../../components/animate-ui/icons/hugeicons/plus-sign";
 import { Tag } from "../../components/animate-ui/icons/hugeicons/tag";
 import { ShoppingCart } from "../../components/animate-ui/icons/hugeicons/shopping-cart";
 import { Trophy } from "../../components/animate-ui/icons/hugeicons/trophy";
@@ -12,7 +14,9 @@ import { Hourglass } from "../../components/animate-ui/icons/hugeicons/hourglass
 type Status = "loading" | "ready" | "error";
 const PAGE_SIZE = 12;
 
-const EMPTY_FORM: CouponInput = { code: "", discountType: "percent", discountValue: 10, productId: null, maxUses: null, expiresAt: null };
+const EMPTY_FORM: CouponInput = { code: "", discountType: "percent", discountValue: 10, productId: null, planId: null, maxUses: null, expiresAt: null };
+
+const planName = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
 
 // Un cupón activo puede seguir sin servir si ya venció o se acabaron sus usos.
 function couponState(c: Coupon): { label: string; tone: string } {
@@ -25,6 +29,8 @@ function couponState(c: Coupon): { label: string; tone: string } {
 export function Coupons() {
   const [rows, setRows] = useState<Coupon[]>([]);
   const [products, setProducts] = useState<ProductOption[]>([]);
+  // licencias activas del producto elegido en el formulario
+  const [plans, setPlans] = useState<AdminPlan[]>([]);
   const [status, setStatus] = useState<Status>("loading");
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<CouponInput>(EMPTY_FORM);
@@ -47,6 +53,18 @@ export function Coupons() {
     load();
     fetchProductOptions().then(setProducts);
   }, [load]);
+
+  useEffect(() => {
+    setPlans([]);
+    if (!form.productId) return;
+    let active = true;
+    fetchPlans(form.productId)
+      .then((list) => active && setPlans(list.filter((p) => p.active)))
+      .catch(() => active && setFormError("No se pudieron cargar las licencias de este producto."));
+    return () => {
+      active = false;
+    };
+  }, [form.productId]);
 
   const productName = (id: string | null) => (id ? (products.find((p) => p.id === id)?.name ?? "—") : "Todos");
 
@@ -133,84 +151,121 @@ export function Coupons() {
           </div>
         </div>
 
-        {showForm && (
-          <FormModal
-            onClose={() => setShowForm(false)}
-            title="Nuevo cupón"
-            error={formError}
-            actions={
-              <>
-                <Button variant="ghost" size="sm" onClick={() => setShowForm(false)}>
-                  Cancelar
-                </Button>
-                <Button size="sm" loading={saving} disabled={!form.code.trim()} onClick={onCreate}>
-                  {saving ? "Guardando…" : "Crear cupón"}
-                </Button>
-              </>
-            }
-          >
-            <div className="form-grid">
-              <div className="admin-field">
-                <label>Código</label>
-                <input placeholder="PRODUCTOR20" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} />
-              </div>
-              <div className="admin-field">
-                <label>Tipo</label>
-                <SelectField
-                  value={form.discountType}
-                  onChange={(v) => setForm({ ...form, discountType: v as CouponInput["discountType"] })}
-                  options={[
-                    { value: "percent", label: "Porcentaje" },
-                    { value: "fixed", label: "Monto fijo (USD)" },
-                  ]}
-                />
-              </div>
-              <div className="admin-field">
-                <label>Valor</label>
-                <input type="number" min={0} value={form.discountValue} onChange={(e) => setForm({ ...form, discountValue: Number(e.target.value) })} />
-              </div>
-              <div className="admin-field">
-                <label>Producto</label>
-                <SelectField
-                  value={form.productId ?? ""}
-                  onChange={(v) => setForm({ ...form, productId: v || null })}
-                  options={[{ value: "", label: "Todos" }, ...products.map((p) => ({ value: p.id, label: p.name }))]}
-                />
-              </div>
-              <div className="admin-field">
-                <label>Usos máximos</label>
-                <input
-                  type="number"
-                  min={1}
-                  placeholder="Ilimitado"
-                  value={form.maxUses ?? ""}
-                  onChange={(e) => setForm({ ...form, maxUses: e.target.value ? Number(e.target.value) : null })}
-                />
-              </div>
-              <div className="admin-field">
-                <label>Vence</label>
-                <input type="date" value={form.expiresAt ?? ""} onChange={(e) => setForm({ ...form, expiresAt: e.target.value || null })} />
-              </div>
-            </div>
-          </FormModal>
-        )}
-
         <div className="board">
           <div className="board__toolbar">
             <p className="board__title">
               Todos los cupones <span className="board__count">{filtered.length}</span>
             </p>
             <div className="board__tools">
-              <Button
-                size="sm"
-                onClick={() => {
-                  setForm(EMPTY_FORM);
-                  setFormError(null);
-                  setShowForm(true);
-                }}
-              >
-                Nuevo cupón
-              </Button>
+              <div className="mini-anchor">
+                <Button
+                  size="sm"
+                  data-mini-trigger
+                  aria-expanded={showForm}
+                  onClick={() => {
+                    if (saving) return;
+                    if (!showForm) {
+                      setForm(EMPTY_FORM);
+                      setFormError(null);
+                    }
+                    setShowForm(!showForm);
+                  }}
+                >
+                  <PlusSign size={14} />
+                  Nuevo cupón
+                </Button>
+                <MiniModal
+                  open={showForm}
+                  wide
+                  title="Nuevo cupón"
+                  onClose={() => setShowForm(false)}
+                  locked={saving}
+                  footer={
+                    <>
+                      <Button variant="ghost" size="sm" onClick={() => setShowForm(false)} disabled={saving}>
+                        Cancelar
+                      </Button>
+                      <Button size="sm" loading={saving} disabled={!form.code.trim() || form.discountValue <= 0} onClick={onCreate}>
+                        {saving ? "Guardando…" : "Crear cupón"}
+                      </Button>
+                    </>
+                  }
+                >
+                  <div className="sp-field">
+                    <label htmlFor="cp-code">Código</label>
+                    <div className="sp-field__control admin-field">
+                      <input id="cp-code" placeholder="PRODUCTOR20" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} />
+                    </div>
+                  </div>
+                  <div className="sp-field">
+                    <label>Tipo</label>
+                    <div className="sp-field__control admin-field">
+                      <SelectField
+                        value={form.discountType}
+                        onChange={(v) => setForm({ ...form, discountType: v as CouponInput["discountType"] })}
+                        options={[
+                          { value: "percent", label: "Porcentaje" },
+                          { value: "fixed", label: "Monto fijo (USD)" },
+                        ]}
+                      />
+                    </div>
+                  </div>
+                  <div className="sp-field">
+                    <label htmlFor="cp-value">Valor</label>
+                    <div className="sp-field__control admin-field">
+                      <input id="cp-value" className="no-spin" type="number" min={0} value={form.discountValue} onChange={(e) => setForm({ ...form, discountValue: Number(e.target.value) })} />
+                    </div>
+                  </div>
+                  <div className="sp-field">
+                    <label>Producto</label>
+                    <div className="sp-field__control admin-field">
+                      <SelectField
+                        value={form.productId ?? ""}
+                        onChange={(v) => setForm({ ...form, productId: v || null, planId: null })}
+                        options={[{ value: "", label: "Todos" }, ...products.map((p) => ({ value: p.id, label: p.name }))]}
+                      />
+                    </div>
+                  </div>
+                  <div className="sp-field">
+                    <label>Licencia</label>
+                    <div className="sp-field__control admin-field">
+                      <SelectField
+                        value={form.planId ?? ""}
+                        onChange={(v) => setForm({ ...form, planId: v || null })}
+                        options={[
+                          { value: "", label: "Todas" },
+                          ...plans.map((p) => ({ value: p.id, label: `${planName(p.id)} · ${p.license_count} clave${p.license_count === 1 ? "" : "s"}` })),
+                        ]}
+                      />
+                    </div>
+                  </div>
+                  <div className="sp-field">
+                    <label htmlFor="cp-max">Usos máximos</label>
+                    <div className="sp-field__control admin-field">
+                      <input
+                        id="cp-max"
+                        className="no-spin"
+                        type="number"
+                        min={1}
+                        placeholder="Ilimitado"
+                        value={form.maxUses ?? ""}
+                        onChange={(e) => setForm({ ...form, maxUses: e.target.value ? Number(e.target.value) : null })}
+                      />
+                    </div>
+                  </div>
+                  <div className="sp-field">
+                    <label htmlFor="cp-exp">Vence</label>
+                    <div className="sp-field__control admin-field">
+                      <input id="cp-exp" type="date" value={form.expiresAt ?? ""} onChange={(e) => setForm({ ...form, expiresAt: e.target.value || null })} />
+                    </div>
+                  </div>
+                  {formError && (
+                    <p className="mini-modal__error" role="alert">
+                      {formError}
+                    </p>
+                  )}
+                </MiniModal>
+              </div>
             </div>
           </div>
           <div className="board__filterbar">
@@ -230,6 +285,7 @@ export function Coupons() {
                     <th>Código</th>
                     <th>Descuento</th>
                     <th>Producto</th>
+                    <th>Licencia</th>
                     <th className="is-num">Usos</th>
                     <th>Vence</th>
                     <th>Estado</th>
@@ -248,6 +304,7 @@ export function Coupons() {
                         </td>
                         <td>{c.discount_type === "percent" ? `${c.discount_value}%` : formatMoney(Number(c.discount_value))}</td>
                         <td>{productName(c.product_id)}</td>
+                        <td className={c.plan_id ? undefined : "is-muted"}>{c.plan_id ? planName(c.plan_id) : "Todas"}</td>
                         <td className="is-num">
                           {c.uses_count}
                           {c.max_uses ? <span className="is-muted"> / {c.max_uses}</span> : null}

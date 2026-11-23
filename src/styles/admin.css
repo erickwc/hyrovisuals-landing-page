@@ -883,6 +883,16 @@
 .admin-field input[type="file"]:hover::file-selector-button {
   background: color-mix(in srgb, var(--text) 8%, var(--bg));
 }
+/* campo numérico sin las flechas del navegador */
+.admin-field input.no-spin {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.admin-field input.no-spin::-webkit-outer-spin-button,
+.admin-field input.no-spin::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
 .admin-field__hint {
   font-size: 12px;
   color: var(--muted);
@@ -954,6 +964,8 @@
 }
 .sp-field__control.admin-field {
   max-width: none;
+  /* un contenido largo (nombre de archivo) se recorta en vez de ensanchar la ventana */
+  grid-template-columns: minmax(0, 1fr);
 }
 /* botón de solo icono (agregar, editar, quitar) */
 .icon-btn {
@@ -1304,68 +1316,6 @@
 }
 :root[data-theme="light"] .modal {
   box-shadow: 0 2px 6px rgba(110, 80, 50, 0.05), 0 16px 40px rgba(110, 80, 50, 0.08);
-}
-
-/* vista de cliente: el sitio del cliente en un marco que llena el resto de la pantalla */
-.client-view {
-  padding-bottom: 0;
-  height: 100vh;
-  grid-template-rows: auto minmax(0, 1fr);
-}
-.client-view__tools {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.client-view__seg {
-  display: inline-flex;
-  padding: 2px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-.client-view__seg button {
-  padding: 5px 10px;
-  border: 0;
-  border-radius: 6px;
-  background: none;
-  color: var(--muted);
-  font: 500 12px/16px var(--body);
-  cursor: pointer;
-  transition: color 0.15s, background-color 0.15s;
-}
-.client-view__seg button:hover {
-  color: var(--text);
-}
-.client-view__seg button[aria-pressed="true"] {
-  background: var(--selected);
-  color: var(--text);
-}
-.client-view__seg button:focus-visible {
-  outline: 2px solid var(--text);
-  outline-offset: -2px;
-}
-.client-view__stage {
-  display: grid;
-  min-height: 0;
-  background: var(--surface);
-}
-.client-view__stage iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
-  background: var(--bg);
-}
-/* en móvil, un teléfono de 390 px centrado con su borde */
-.client-view__stage[data-device="mobile"] {
-  justify-items: center;
-  padding: 12px;
-}
-.client-view__stage[data-device="mobile"] iframe {
-  width: 390px;
-  max-width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 12px;
 }
 
 /* selector de archivo: un solo control de ancho completo; muestra el nombre del archivo al elegirlo */

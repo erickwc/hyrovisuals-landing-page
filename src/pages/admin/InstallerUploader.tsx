@@ -10,6 +10,7 @@ import {
 } from "../../lib/admin-data";
 import { MiniModal } from "../../components/MiniModal";
 import { Button } from "../../components/Button";
+import { Upload01 } from "../../components/animate-ui/icons/hugeicons/upload-01";
 
 const PLATFORMS: { platform: InstallerPlatform; label: string; accept: string }[] = [
   { platform: "windows", label: "Windows", accept: ".exe,.msi" },
@@ -102,7 +103,11 @@ export function InstallerUploader({
         <div className="sp-field" key={platform}>
           <label>{label}</label>
           <div className="sp-field__control admin-field">
-            <input type="file" accept={accept} disabled={uploading} onChange={(e) => setFiles((f) => ({ ...f, [platform]: e.target.files?.[0] }))} />
+            <label className="file-pick" data-has-file={Boolean(files[platform])} aria-disabled={uploading || undefined}>
+              <Upload01 size={14} />
+              <span>{files[platform]?.name ?? "Seleccionar archivo"}</span>
+              <input type="file" accept={accept} disabled={uploading} onChange={(e) => setFiles((f) => ({ ...f, [platform]: e.target.files?.[0] }))} />
+            </label>
             {progress[platform] !== undefined && <span className="admin-field__hint">Subiendo {progress[platform]}%</span>}
           </div>
         </div>

@@ -69,10 +69,18 @@ export function AccountMenu({ name, email, avatarUrl, isAdmin }: { name: string 
               {name && <b>{name}</b>}
               <span>{email}</span>
             </div>
+            {isAdmin && (
+              <AnimateIcon animateOnHover asChild>
+                <Link to="/admin" role="menuitem" className="lp__opt acct-menu__opt" onClick={() => setOpen(false)}>
+                  <LayoutDashboard size={16} />
+                  {t.adminPanel}
+                </Link>
+              </AnimateIcon>
+            )}
             <AnimateIcon animateOnHover asChild>
-              <Link to={isAdmin ? "/admin" : "/cuenta"} role="menuitem" className="lp__opt acct-menu__opt" onClick={() => setOpen(false)}>
-                {isAdmin ? <LayoutDashboard size={16} /> : <Settings02 size={16} />}
-                {isAdmin ? t.adminPanel : t.settings}
+              <Link to="/cuenta" role="menuitem" className="lp__opt acct-menu__opt" onClick={() => setOpen(false)}>
+                <Settings02 size={16} />
+                {t.settings}
               </Link>
             </AnimateIcon>
             <AnimateIcon animateOnHover asChild>
