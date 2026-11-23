@@ -478,6 +478,7 @@ export function Checkout() {
                 <section className="co__block">
                   <h2 className="co__h">{t.freeReadyTitle}</h2>
                   <p className="co__note">{t.freeReadyBody}</p>
+                  {legalChecks}
                   <Button
                     className="co__method"
                     onClick={onClaimFree}
@@ -486,7 +487,6 @@ export function Checkout() {
                   >
                     {claiming ? t.preparing : t.payFree}
                   </Button>
-                  {legalChecks}
                 </section>
               </>
             ) : paypalProps ? (
@@ -495,6 +495,8 @@ export function Checkout() {
                 {couponBox}
                 <section className="co__block" aria-labelledby="co-pay-title">
                   {payHead}
+                  {/* términos antes de los botones: sin la casilla quedan bloqueados */}
+                  {legalChecks}
                   {/* el pedido se vuelve a crear con el cupón actual: los botones solo piden, el servidor pone el monto */}
                   <PaypalButtons funding="paypal" {...paypalProps} />
                   {/* tarjeta: PayPal despliega su formulario aquí mismo, debajo del botón */}
@@ -504,9 +506,6 @@ export function Checkout() {
                     cardLabel={t.cardLabel}
                     cancelLabel={t.cardCancel}
                   />
-                  <div className="co__consent co__consent--main">
-                    {legalChecks}
-                  </div>
                 </section>
                 {capturing && <p className="co__capturing">{t.capturing}</p>}
               </>
@@ -666,13 +665,6 @@ export function Checkout() {
                 <span>{`HV-${code}-${plan.keys}K-${year}`}</span>
               </div>
             </div>
-
-            {/* la casilla de términos y aviso de privacidad va debajo del ticket (en móvil, debajo de los botones) */}
-            {paypalProps && !done && !(total === 0 && coupon) && (
-              <div className="co__consent co__consent--aside">
-                {legalChecks}
-              </div>
-            )}
           </aside>
         </div>
       )}

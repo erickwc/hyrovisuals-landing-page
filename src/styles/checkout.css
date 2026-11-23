@@ -409,6 +409,11 @@
   height: 48px;
 }
 
+/* la casilla de términos usa la misma separación que el resto del bloque de pago */
+.co__block .consent {
+  margin-top: 0;
+}
+
 /* quien ya aceptó los documentos: una línea en vez de las casillas */
 .co__accepted {
   color: var(--muted);
@@ -846,15 +851,6 @@
   cursor: default;
 }
 
-/* casilla de términos y aviso de privacidad: debajo del ticket en escritorio, debajo de los botones en móvil
-   (las dos son la misma casilla; solo se muestra una) */
-.co__consent--main {
-  display: none;
-}
-.co__consent--aside {
-  margin-top: 28px;
-}
-
 /* compra lista: modal centrado, con el ícono arriba del título y la X en la esquina */
 .dlg.co__done {
   position: relative;
@@ -903,16 +899,10 @@
   .co__aside {
     width: min(420px, 100%);
   }
-  /* móvil: la casilla va debajo de los botones de pago y el ticket al final, con aire */
+  /* móvil: el ticket va al final, con aire */
   .co__aside {
     position: static;
     margin-top: 24px;
-  }
-  .co__consent--main {
-    display: block;
-  }
-  .co__consent--aside {
-    display: none;
   }
 }
 @media (max-width: 420px) {
