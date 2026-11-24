@@ -74,7 +74,7 @@ export const LEGAL_DOCS: Record<LegalDocId, LegalDoc> = {
           { lead: "Pago único.", text: "No es una suscripción: no se renueva sola y no hay cobros recurrentes." },
           { lead: "Una clave, un equipo.", text: "Cada clave funciona en un equipo a la vez. Personal incluye 1 clave y Equipos 3. Puedes desvincular un equipo desde tu cuenta para activar otro." },
           { lead: "Actualizaciones.", text: "Incluye las actualizaciones de Hyro Visuals que publiquemos mientras el producto siga en desarrollo. Una versión mayor que se venda como producto aparte no está incluida, salvo que lo anunciemos." },
-          { lead: "Requisitos.", text: "Windows 10 u 11 de 64 bits, o macOS 13 o posterior (la captura del audio del sistema en Mac pide macOS 14.2 o posterior). Revísalos antes de comprar." },
+          { lead: "Requisitos.", text: "Windows 10 u 11 de 64 bits, o macOS Sonoma 14.2 o posterior. Revísalos antes de comprar." },
         ],
       },
       {
