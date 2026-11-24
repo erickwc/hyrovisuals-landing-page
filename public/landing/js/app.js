@@ -647,11 +647,11 @@
         toast.classList.add('is-show'); await wait(1600);
       }
     };
-    const DUR = { overview: 6200, strip: 6000, reorder: 5600, source: 7200, themes: 14310, palette: 8000, modules: 6600, sliders: 7000, presets: 6400 };
+    const DUR = { overview: 6200, strip: 6000, reorder: 5600, source: 7200, themes: 14250, palette: 8000, modules: 6600, sliders: 7000, presets: 6400 };
     // Pasos con video real: reemplazan a su animación. Para agregar otro, súmalo aquí y pon su duración en DUR.
-    // y y h: dónde empieza la app dentro de la grabación de 1920×1080 y cuánto mide de alto (lo demás no se muestra).
+    // src: 4K para pantallas grandes (máx. 25 MB por archivo en Cloudflare Pages); small: 1080p para celular y tablet.
     const VIDEOS = {
-      themes: { src: '/landing/video/tematica-dm.mp4', poster: '/landing/video/tematica-dm.webp', y: 202, h: 678 }
+      themes: { src: '/landing/video/tematica-dm-4k.mp4', small: '/landing/video/tematica-dm-1080.mp4', poster: '/landing/video/tematica-dm-4k.webp', ratio: '3840 / 1356' }
     };
 
     /* Tarjetas y puntos numerados */
@@ -713,10 +713,11 @@
       });
     }
     function showVideo(v) {
-      if (vid.getAttribute('src') !== v.src) { vid.poster = v.poster; vid.src = v.src; }
+      const saveData = navigator.connection && navigator.connection.saveData;
+      const src = matchMedia('(min-width: 1024px)').matches && !saveData ? v.src : v.small;
+      if (vid.getAttribute('src') !== src) { vid.poster = v.poster; vid.src = src; }
       else if (vid.readyState > 0) vid.currentTime = 0;
-      view.style.setProperty('--vid-ar', `1920 / ${v.h}`);
-      view.style.setProperty('--vid-top', `${-v.y / v.h * 100}%`);
+      view.style.setProperty('--vid-ar', v.ratio);
       view.classList.add('has-video');
       vidWrap.classList.add('is-on'); tickProg(); syncVideo();
     }
@@ -728,7 +729,7 @@
     vid.addEventListener('error', () => {
       // Si el video no carga, el paso vuelve a su animación.
       const id = steps[current].id;
-      if (!VIDEOS[id] || vid.getAttribute('src') !== VIDEOS[id].src) return;
+      if (!VIDEOS[id] || ![VIDEOS[id].src, VIDEOS[id].small].includes(vid.getAttribute('src'))) return;
       VIDEOS[id].failed = true; vid.removeAttribute('src'); go(current);
     });
     document.addEventListener('visibilitychange', syncVideo);

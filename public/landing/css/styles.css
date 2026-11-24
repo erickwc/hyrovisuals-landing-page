@@ -614,11 +614,11 @@ main, .footer, .nav { position: relative; z-index: 1; }
 .mk-cursor.is-click .mk-click { animation: ripple .55s var(--ease-out); }
 @keyframes ripple { 0% { opacity: 1; transform: scale(.2); } 100% { opacity: 0; transform: scale(1.4); } }
 
-/* Video real de la app sobre el mock: el recuadro toma la forma de la app y oculta las franjas negras de la grabación */
+/* Video real de la app sobre el mock: el recuadro toma la forma del video */
 .tour-view.has-video { aspect-ratio: var(--vid-ar, 16 / 9); max-height: none; }
 .tour-video { position: absolute; inset: 0; z-index: 2; overflow: hidden; background: #000; opacity: 0; visibility: hidden; transition: opacity .35s, visibility .35s; }
 .tour-video.is-on { opacity: 1; visibility: visible; }
-.tour-video video { position: absolute; left: 0; top: var(--vid-top, 0); display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+.tour-video video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
 
 .tour-nav { display: flex; align-items: stretch; }
 .tour-cards { flex: 1; min-width: 0; display: flex; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; }
@@ -660,6 +660,10 @@ main, .footer, .nav { position: relative; z-index: 1; }
 .faq-a > div { overflow: hidden; }
 .faq-a p { padding: 0 40px 20px 0; font-size: 14.5px; color: var(--ink-2); max-width: 60ch; }
 .faq-item.is-open .faq-a { grid-template-rows: 1fr; }
+/* requisitos: título, lista corta y la recomendación debajo */
+.faq-spec-t { padding-bottom: 8px; font-size: 14.5px; font-weight: 600; color: var(--ink); }
+.faq-spec { display: grid; gap: 4px; margin: 0; padding: 0 8px 12px 0; list-style: none; font-size: 14.5px; color: var(--ink-2); }
+.faq-spec b, .faq-a p b { font-weight: 600; color: var(--ink); }
 
 /* ---------- Compra ---------- */
 .buy { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 470px); gap: clamp(36px, 6vw, 100px); align-items: center; }
