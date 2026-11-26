@@ -135,9 +135,10 @@
     </div>
 
     <div class="stage" id="stage">
-      <!-- Gráficas reales del programa (video grabado). -->
-      <video class="stage-video" id="heroVideo" autoplay muted loop playsinline preload="auto" poster="/landing/video/graficas-inicio.webp?v=2" aria-label="Gráficas de Hyro Visuals reaccionando a una canción" data-i18n-attr="aria-label:hero.video">
-        <source src="/landing/video/graficas-inicio.mp4?v=2" type="video/mp4">
+      <!-- Gráficas reales del programa (video grabado). El mp4 es solo para navegadores que no reproducen webm. -->
+      <video class="stage-video" id="heroVideo" autoplay muted loop playsinline preload="auto" poster="/landing/video/graficas-inicio.webp?v=3" aria-label="Gráficas de Hyro Visuals reaccionando a una canción" data-i18n-attr="aria-label:hero.video">
+        <source src="/landing/video/graficas-inicio.webm?v=3" type="video/webm">
+        <source src="/landing/video/graficas-inicio.mp4?v=3" type="video/mp4">
       </video>
     </div>
   </div>
