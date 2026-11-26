@@ -5,7 +5,7 @@
   'use strict';
   const EN = {
     'a11y.skip': 'Skip to content', 'a11y.mainnav': 'Main', 'a11y.lang': 'Change language', 'a11y.theme': 'Change theme', 'a11y.menu': 'Menu',
-    'a11y.sections': 'Sections', 'a11y.prev': 'Previous', 'a11y.next': 'Next',
+    'a11y.layout': 'Layout', 'a11y.sections': 'Sections', 'a11y.prev': 'Previous', 'a11y.next': 'Next',
     'nav.features': 'Features', 'nav.action': 'In action', 'nav.faq': 'FAQ', 'nav.pricing': 'Get it', 'nav.cta': 'Get it',
     'nav.reviews': 'Reviews', 'nav.login': 'Log in', 'nav.signup': 'Sign up', 'nav.account': 'My account',
     'rev.eyebrow': 'Reviews', 'rev.t1': 'What producers', 'rev.t2': 'are saying', 'rev.lead': 'Producers who keep Hyro Visuals open in every session.',
@@ -15,6 +15,7 @@
     'hero.cta': 'Get Hyro Visuals', 'hero.cta2': 'See it in action',
     'hero.p1': '30+ spectrums', 'hero.p2': 'Windows & macOS', 'hero.p3': 'One-time payment', 'hero.p4': 'Lifetime license',
     'hero.video': 'Hyro Visuals graphics reacting to a song',
+    'stage.grid': 'Grid', 'stage.strip': 'Strip', 'stage.single': 'Individual',
     'hf.live': 'Live', 'hf.theme': 'Style', 'hf.brutal': 'Brutalism', 'hf.palettes': '12 palettes',
     'feat.eyebrow': 'Features', 'feat.t1': 'Built for', 'feat.t2': 'producers', 'feat.lead': 'The essentials of Hyro Visuals in four points.',
     'feat.next': 'Show the next spectrum', 'feat.hint': 'Click to switch',
@@ -99,12 +100,13 @@
     ['dna', 'ADN', 'DNA'], ['storm', 'Tormenta', 'Storm'], ['pointwave', 'Onda de partículas', 'Particle Wave'], ['terrain', 'Relieve espectral', 'Spectral Terrain']
   ];
 
-  // Gráficas del inicio que no están en el catálogo de arriba (ese catálogo arma el carrusel de Funciones)
+  // Nombres de las gráficas del inicio: las que no están en el catálogo de arriba (ese catálogo arma el carrusel de
+  // Funciones) y las que en el inicio llevan el nombre del programa (heroName las prefiere)
   const HERO_MODULES = [
     ['vumodern', 'VU Moderno', 'Modern VU'], ['pixelorb', 'Mapa de píxeles', 'Pixel Map'],
     ['tuner', 'Afinador', 'Tuner'], ['tunerpiano', 'Afinador piano', 'Piano Tuner'], ['phasecore', 'Núcleo de fase', 'Phase Core'],
     ['rgbwaves', 'Ondas cromáticas', 'Chroma Waves'], ['comet', 'Estela de luz', 'Light Trail'], ['prism', 'Haz prismático', 'Prism Beam'],
-    ['nebula', 'Nebulosa', 'Nebula']
+    ['nebula', 'Nebulosa', 'Nebula'], ['threads', 'Hilo', 'Thread']
   ];
 
   const THEMES = [
@@ -158,6 +160,6 @@
   window.I18N = {
     collect, apply, t, get lang() { return lang; },
     js: k => JS[lang][k], MODULES, THEMES, PALETTES, STEPS,
-    moduleName: name([...MODULES, ...HERO_MODULES]), themeName: name(THEMES), paletteName: name(PALETTES)
+    moduleName: name([...MODULES, ...HERO_MODULES]), heroName: name([...HERO_MODULES, ...MODULES]), themeName: name(THEMES), paletteName: name(PALETTES)
   };
 })();

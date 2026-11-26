@@ -13,9 +13,10 @@ export const COMBOS = [
   [[['threads', .5], ['mirror', .5]], [['sparks', .45], ['synapse', .55]]],
 ];
 
-/* Lugares de una combinación en píxeles enteros (las líneas entre gráficas quedan nítidas). */
-export function slots(index, W = STAGE.w, H = STAGE.h) {
-  const rows = COMBOS[index], out = [];
+/* Lugares en píxeles enteros (las líneas entre gráficas quedan nítidas). Franja e Individual (app.js) usan las mismas
+   grabaciones: solo las reacomodan conservando la proporción de cada una. */
+function place(rows, prefix, W, H) {
+  const out = [];
   rows.forEach((row, r) => {
     const y0 = Math.round((H * r) / rows.length), y1 = Math.round((H * (r + 1)) / rows.length);
     let acc = 0;
@@ -23,8 +24,9 @@ export function slots(index, W = STAGE.w, H = STAGE.h) {
       const x0 = Math.round(acc * W);
       acc += f;
       const x1 = i === row.length - 1 ? W : Math.round(acc * W);
-      out.push({ id: `c${index + 1}-${module}`, module, x: x0, y: y0, w: x1 - x0, h: y1 - y0, end: i === row.length - 1, bottom: r === rows.length - 1 });
+      out.push({ id: `${prefix}-${module}`, module, x: x0, y: y0, w: x1 - x0, h: y1 - y0, end: i === row.length - 1, bottom: r === rows.length - 1 });
     });
   });
   return out;
 }
+export const slots = (index, W = STAGE.w, H = STAGE.h) => place(COMBOS[index], `c${index + 1}`, W, H);

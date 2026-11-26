@@ -265,11 +265,13 @@
   // Cuadrícula de dos filas que se turna entre las combinaciones de hero-combos.js. Cada gráfica es la del programa,
   // grabada con la canción de referencia (tools/visual-capture): como trazos, nítidos a cualquier tamaño, o como video
   // las de miles de puntos. Cada combinación dura 2 compases y sigue la canción donde la dejó la anterior. Al cambiar,
-  // las gráficas que se repiten se transforman hacia su nuevo lugar y las demás se disuelven.
+  // las gráficas que se repiten se transforman hacia su nuevo lugar y las demás se disuelven. Modos (control debajo):
+  // Cuadrícula, Franja (las mismas gráficas a la par en una fila) e Individual (separadas como tarjetas); los tres usan
+  // las mismas grabaciones, solo las reacomodan sin cambiar la proporción de ninguna.
   function hero() {
     const stage = $('#stage'), screen = $('#stageScreen');
     if (!stage || !screen || !('DecompressionStream' in window) || !('createImageBitmap' in window)) return;
-    Promise.all([import('/landing/js/hero-combos.js?v=3'), import('/landing/js/hyro-trace.js?v=2')])
+    Promise.all([import('/landing/js/hero-combos.js?v=4'), import('/landing/js/hyro-trace.js?v=2')])
       .then(([combos, traces]) => safe('gráficas del inicio', () => heroGrid(stage, screen, combos, traces)))
       .catch(err => console.warn('[Hyro] gráficas del inicio', err));
   }
@@ -281,7 +283,6 @@
     const webm = !!document.createElement('video').canPlayType('video/webm; codecs="vp9"');
     const visTheme = () => (root.dataset.theme === 'light' ? 'light' : 'dark');
     const now = () => performance.now() / 1000;
-    const pct = x => (x * 100).toFixed(4) + '%';
     const play = v => { const p = v.play(); p && p.catch(() => {}); };
 
     // Cada combinación se arma una sola vez por tema; se piden la que se ve y la siguiente
@@ -293,7 +294,6 @@
         const el = document.createElement('div');
         el.className = 'tile' + (s.end ? ' is-end' : '') + (s.bottom ? ' is-bottom' : '');
         el.dataset.theme = theme;
-        Object.assign(el.style, { left: pct(s.x / STAGE.w), top: pct(s.y / STAGE.h), width: pct(s.w / STAGE.w), height: pct(s.h / STAGE.h) });
         const tile = { el, slot: s, video: VIDEO.includes(s.module), player: null };
         const file = '/landing/traces/' + s.id + '-' + theme;
         let load;
@@ -311,17 +311,18 @@
           load = loadTrace(file + '.hvt?v=' + V).then(trace => { tile.player = new TracePlayer(tile.media, trace); });
         }
         const name = document.createElement('span');
-        name.className = 'tile-name mono'; name.dataset.name = s.module; name.textContent = I18N.moduleName(s.module);
+        name.className = 'tile-name mono'; name.dataset.name = s.module; name.textContent = I18N.heroName(s.module);
         el.append(tile.media, name);
         screen.appendChild(el);
         tile.ready = load.then(() => true, err => { console.warn('[Hyro] gráfica', s.id, theme, err); return false; });
         return tile;
       });
       const set = sets[key] = { i, theme, tiles, done: false };
+      arrange(set, false);
       set.ready = Promise.all(tiles.map(t => t.ready)).then(() => { set.done = true; return set; });
       return set;
     }
-    onLang(() => $$('.tile-name', screen).forEach(n => { n.textContent = I18N.moduleName(n.dataset.name); }));
+    onLang(() => $$('.tile-name', screen).forEach(n => { n.textContent = I18N.heroName(n.dataset.name); }));
 
     // Dibuja cada trazo en el instante de la canción que le toca; los videos corren solos desde que entran
     function paint(set, local) {
@@ -340,11 +341,56 @@
       });
     }
 
+    // Lugares de una combinación en cada modo, en unidades de STAGE (1240 de ancho). Ninguna gráfica cambia su
+    // proporción: Franja las pone a la par en una fila y Individual las separa como tarjetas del mismo alto.
+    let mode = 'grid';
+    const ratio = s => s.w / s.h;
+    function layoutOf(set, m = mode) {
+      const ss = set.tiles.map(t => t.slot);
+      if (m === 'strip') {
+        const h = STAGE.w / ss.reduce((a, s) => a + ratio(s), 0);
+        let x = 0;
+        return { h, list: ss.map((s, i) => { const last = i === ss.length - 1, w = last ? STAGE.w - x : ratio(s) * h, r = { x, y: 0, w, h, end: last, bottom: true }; x += w; return r; }) };
+      }
+      if (m === 'single') {
+        const rows = [];
+        ss.forEach((s, i) => { let row = rows.find(r => r.y === s.y); if (!row) rows.push(row = { y: s.y, items: [] }); row.items.push(i); });
+        const gap = 18, pad = 30, AW = STAGE.w - pad * 2, AH = STAGE.h - pad * 2;
+        let h = (AH - gap * (rows.length - 1)) / rows.length;
+        rows.forEach(r => { h = Math.min(h, (AW - gap * (r.items.length - 1)) / r.items.reduce((a, i) => a + ratio(ss[i]), 0)); });
+        const list = [], top = (STAGE.h - (h * rows.length + gap * (rows.length - 1))) / 2;
+        rows.forEach((r, ri) => {
+          const width = r.items.reduce((a, i) => a + ratio(ss[i]) * h, 0) + gap * (r.items.length - 1);
+          let x = (STAGE.w - width) / 2;
+          r.items.forEach(i => { const w = ratio(ss[i]) * h; list[i] = { x, y: top + ri * (h + gap), w, h }; x += w + gap; });
+        });
+        return { h: STAGE.h, list };
+      }
+      return { h: STAGE.h, list: ss };
+    }
+    // Lo lleva a su lugar en píxeles (con animación si animate) y ajusta el alto del recuadro
+    function arrange(set, animate = true) {
+      const k = screen.clientWidth / STAGE.w, { list } = layoutOf(set);
+      set.tiles.forEach((t, i) => {
+        const r = list[i], el = t.el;
+        if (!animate) el.style.transition = 'none';
+        else el.style.transitionDelay = (i * .035) + 's';
+        Object.assign(el.style, { left: r.x * k + 'px', top: r.y * k + 'px', width: r.w * k + 'px', height: r.h * k + 'px' });
+        el.classList.toggle('is-end', !!r.end);
+        el.classList.toggle('is-bottom', !!r.bottom);
+        if (!animate) { void el.offsetWidth; el.style.transition = ''; }
+      });
+    }
+    const fitScreen = (set, animate = true) => {
+      if (!animate) screen.style.transition = 'none';
+      screen.style.height = layoutOf(set).h * screen.clientWidth / STAGE.w + 'px';
+      if (!animate) { void screen.offsetWidth; screen.style.transition = ''; }
+    };
     // Lleva un elemento de su lugar (a) a parecer que está en otro (b): para transformar las que se repiten
     function place(a, b) {
-      const k = screen.clientWidth / STAGE.w, q = screen.clientHeight / STAGE.h;
-      return `translate(${(b.x - a.x) * k}px, ${(b.y - a.y) * q}px) scale(${b.w / a.w}, ${b.h / a.h})`;
+      return `translate(${b.x - a.x}px, ${b.y - a.y}px) scale(${b.w / a.w}, ${b.h / a.h})`;
     }
+    const rectOf = el => ({ x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight });
 
     let cur = null, curT0 = 0, prev = null, prevT0 = 0, prevTimer = 0;
     function swap(next, t0, first = false) {
@@ -353,6 +399,8 @@
       cur = next; curT0 = t0;
       stage.dataset.vis = next.theme;
       startVideos(next, t0);
+      arrange(next, false);
+      fitScreen(next, !first);
       // pares: la misma gráfica en la combinación que sale y en la que entra
       const pairs = new Map(), left = old && old !== next ? [...old.tiles] : [];
       next.tiles.forEach(t => {
@@ -364,7 +412,7 @@
         el.classList.remove('is-out', 'is-on');
         el.style.transition = 'none';
         el.style.zIndex = 2;
-        el.style.transform = o ? place(t.slot, o.slot) : '';
+        el.style.transform = o ? place(rectOf(el), rectOf(o.el)) : '';
         void el.offsetWidth;
         el.style.transition = '';
         // la primera vez entran una por una a semicorcheas; después todas juntas, con un leve escalonado
@@ -379,7 +427,7 @@
         const partner = [...pairs].find(([, p]) => p === o);
         o.el.style.zIndex = 1;
         o.el.style.transitionDelay = '0s';
-        o.el.style.transform = partner ? place(o.slot, partner[0].slot) : '';
+        o.el.style.transform = partner ? place(rectOf(o.el), rectOf(partner[0].el)) : '';
         o.el.classList.remove('is-on');
         o.el.classList.add('is-out');
       });
@@ -425,6 +473,39 @@
       nextOf(same);
       same.ready.then(() => { if (cur && cur.i === same.i && cur.theme !== th && visTheme() === th) swap(same, curT0); });
     }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+    // Control de modos: las gráficas se mueven a su nuevo lugar y siguen turnándose
+    const seg = $('#stageSeg'), thumb = seg && $('.seg-thumb', seg), small = matchMedia('(max-width: 640px)');
+    const moveThumb = () => {
+      const on = seg && $('button[aria-selected="true"]', seg);
+      if (on && thumb) { thumb.style.left = on.offsetLeft + 'px'; thumb.style.width = on.offsetWidth + 'px'; }
+    };
+    function setMode(m) {
+      if (m === 'strip' && small.matches) m = 'grid'; // en el celular la franja quedaría ilegible
+      mode = m;
+      stage.dataset.mode = m;
+      if (seg) $$('button', seg).forEach(b => b.setAttribute('aria-selected', String(b.dataset.mode === m)));
+      moveThumb();
+      [cur, prev].forEach(s => s && arrange(s));
+      if (cur) fitScreen(cur);
+    }
+    if (seg) {
+      $$('button', seg).forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+      onLang(() => requestAnimationFrame(moveThumb));
+      moveThumb();
+    }
+    small.addEventListener('change', () => { if (small.matches && mode === 'strip') setMode('grid'); });
+    stage.dataset.mode = mode;
+    // al cambiar el ancho se reacomoda sin animación (solo cuenta el ancho: el alto lo cambia el modo)
+    let lastW = 0;
+    new ResizeObserver(() => {
+      const w = screen.clientWidth;
+      if (!w || w === lastW) return;
+      lastW = w;
+      Object.values(sets).forEach(s => arrange(s, false));
+      if (cur) fitScreen(cur, false);
+      moveThumb();
+    }).observe(stage);
 
     // Entrada: cuando terminó la intro y llegó la primera combinación
     const first = build(0, visTheme());
