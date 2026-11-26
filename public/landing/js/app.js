@@ -262,14 +262,22 @@
   }
 
   /* ---------- Hero: video de las gráficas reales del programa ---------- */
-  // Se reproduce solo mientras se ve; con «reducir movimiento» queda en pausa en su primer cuadro (el póster).
+  // Hay uno por tema (página clara → visual oscuro y viceversa): solo se descarga y reproduce el del tema activo,
+  // mientras se ve. Con «reducir movimiento» se queda el póster.
   function hero() {
-    const video = $('#heroVideo');
-    if (!video) return;
-    if (reduce) { video.removeAttribute('autoplay'); video.pause(); return; }
-    const play = () => { const p = video.play(); p && p.catch(() => {}); };
-    new IntersectionObserver(es => { es[0].isIntersecting && !document.hidden ? play() : video.pause(); }).observe(video);
-    document.addEventListener('visibilitychange', () => { document.hidden ? video.pause() : play(); });
+    const stage = $('#stage'), videos = $$('.stage-video', stage);
+    if (!videos.length) return;
+    let visible = true;
+    const current = () => videos.find(v => v.dataset.for === (root.dataset.theme === 'light' ? 'light' : 'dark')) || videos[0];
+    const sync = () => {
+      const cur = current();
+      videos.forEach(v => { if (v !== cur) v.pause(); });
+      if (reduce) return;
+      if (visible && !document.hidden) { cur.preload = 'auto'; const p = cur.play(); p && p.catch(() => {}); } else cur.pause();
+    };
+    new IntersectionObserver(es => { visible = es[0].isIntersecting; sync(); }).observe(stage);
+    document.addEventListener('visibilitychange', sync);
+    new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
   }
 
   /* ---------- Funciones ---------- */
