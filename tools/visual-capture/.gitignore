@@ -1,0 +1,6 @@
+# canción de referencia para grabar las gráficas: no se sube al repositorio
+audio/
+# cuadros sueltos de las gráficas que van como video
+frames/
+# informe de la última grabación
+index.json

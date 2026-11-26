@@ -316,11 +316,35 @@ main, .footer, .nav { position: relative; z-index: 1; }
 .ribbon-track span { display: inline-flex; align-items: center; gap: 16px; padding-right: clamp(36px, 4vw, 64px); font-size: clamp(13px, 1.05vw, 17px); font-weight: 700; letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; }
 .star { width: .8em; height: .8em; background: currentColor; clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); flex: none; }
 
-/* Video de las gráficas: esquinas apenas redondeadas y un borde que casi no se nota en ningún tema */
-.stage { position: relative; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: transparent; aspect-ratio: 1920 / 108; }
-.stage-video { display: block; width: 100%; height: 100%; object-fit: cover; }
-/* cada tema muestra el visual contrario */
-:root[data-theme="dark"] .stage-video[data-for="light"], :root[data-theme="light"] .stage-video[data-for="dark"] { display: none; }
+/* Gráficas reales del inicio (app.js · hero): combinaciones que se turnan. Esquinas apenas redondeadas y un borde
+   que casi no se nota en ningún tema. Las gráficas van en el tema de la página, con el fondo del programa. */
+.stage { position: relative; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: #000; transition: background-color .9s; }
+.stage[data-vis="light"] { background: var(--vis-light); }
+:root { --vis-light: #f9f6f6; } /* fondo del tema claro del programa */
+.stage-screen { position: relative; width: 100%; aspect-ratio: 1240 / 540; overflow: hidden; }
+
+/* Al cambiar de combinación: las que se repiten se transforman hacia su nuevo lugar y las demás se disuelven */
+.tile {
+  position: absolute; overflow: hidden; background: #000; transform-origin: 0 0; visibility: hidden; opacity: 0; filter: blur(6px);
+  transition: opacity .9s var(--ease), filter .9s var(--ease), transform .9s var(--ease);
+}
+.tile[data-theme="light"] { background: var(--vis-light); }
+.tile.is-on, .tile.is-out { visibility: visible; }
+.tile.is-on { opacity: 1; filter: none; }
+.tile canvas, .tile video { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+/* solo hay líneas entre gráficas: el borde de afuera ya lo pone el marco */
+.tile::after { content: ''; position: absolute; inset: 0; border-right: 1px solid rgba(255, 255, 255, .1); border-bottom: 1px solid rgba(255, 255, 255, .1); pointer-events: none; }
+.tile[data-theme="light"]::after { border-color: rgba(0, 0, 0, .1); }
+.tile.is-end::after { border-right-color: transparent; }
+.tile.is-bottom::after { border-bottom-color: transparent; }
+.tile-name {
+  position: absolute; left: 12px; bottom: 10px; font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: #a9a69f; background: rgba(0, 0, 0, .6); padding: 3px 7px; border-radius: 999px;
+  opacity: 0; transform: translateY(4px); transition: opacity .3s, transform .3s; pointer-events: none;
+}
+.tile[data-theme="light"] .tile-name { color: #54514c; background: rgba(255, 255, 255, .7); }
+.tile.is-on:hover .tile-name { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .tile { transition: opacity .3s; filter: none; } }
 
 /* ---------- Secciones ---------- */
 .sec { position: relative; border-top: 1px solid var(--line); }

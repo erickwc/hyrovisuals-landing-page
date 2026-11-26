@@ -261,23 +261,180 @@
     ['inicio', 'funciones', 'accion', 'resenas', 'preguntas', 'comprar'].forEach(id => { const s = document.getElementById(id); s && io.observe(s); });
   }
 
-  /* ---------- Hero: video de las gráficas reales del programa ---------- */
-  // Hay uno por tema (página clara → visual oscuro y viceversa): solo se descarga y reproduce el del tema activo,
-  // mientras se ve. Con «reducir movimiento» se queda el póster.
+  /* ---------- Hero: combinaciones de gráficas reales del programa ---------- */
+  // Cuadrícula de dos filas que se turna entre las combinaciones de hero-combos.js. Cada gráfica es la del programa,
+  // grabada con la canción de referencia (tools/visual-capture): como trazos, nítidos a cualquier tamaño, o como video
+  // las de miles de puntos. Cada combinación dura 2 compases y sigue la canción donde la dejó la anterior. Al cambiar,
+  // las gráficas que se repiten se transforman hacia su nuevo lugar y las demás se disuelven.
   function hero() {
-    const stage = $('#stage'), videos = $$('.stage-video', stage);
-    if (!videos.length) return;
-    let visible = true;
-    const current = () => videos.find(v => v.dataset.for === (root.dataset.theme === 'light' ? 'light' : 'dark')) || videos[0];
-    const sync = () => {
-      const cur = current();
-      videos.forEach(v => { if (v !== cur) v.pause(); });
-      if (reduce) return;
-      if (visible && !document.hidden) { cur.preload = 'auto'; const p = cur.play(); p && p.catch(() => {}); } else cur.pause();
+    const stage = $('#stage'), screen = $('#stageScreen');
+    if (!stage || !screen || !('DecompressionStream' in window) || !('createImageBitmap' in window)) return;
+    Promise.all([import('/landing/js/hero-combos.js?v=3'), import('/landing/js/hyro-trace.js?v=2')])
+      .then(([combos, traces]) => safe('gráficas del inicio', () => heroGrid(stage, screen, combos, traces)))
+      .catch(err => console.warn('[Hyro] gráficas del inicio', err));
+  }
+
+  function heroGrid(stage, screen, { COMBOS, STAGE, BARS, slots }, { loadTrace, TracePlayer }) {
+    const V = 6; // súbelo al volver a grabar: el navegador guarda estos archivos 4 horas
+    const VIDEO = ['pixelorb', 'comet', 'membrane', 'sparks', 'synapse']; // las de miles de puntos: como trazos pesarían varios MB
+    const BEAT = 60 / 95, LEN = BARS * 4 * BEAT, FADE = .9;
+    const webm = !!document.createElement('video').canPlayType('video/webm; codecs="vp9"');
+    const visTheme = () => (root.dataset.theme === 'light' ? 'light' : 'dark');
+    const now = () => performance.now() / 1000;
+    const pct = x => (x * 100).toFixed(4) + '%';
+    const play = v => { const p = v.play(); p && p.catch(() => {}); };
+
+    // Cada combinación se arma una sola vez por tema; se piden la que se ve y la siguiente
+    const sets = {};
+    function build(i, theme) {
+      const key = theme + ':' + i;
+      if (sets[key]) return sets[key];
+      const tiles = slots(i).map(s => {
+        const el = document.createElement('div');
+        el.className = 'tile' + (s.end ? ' is-end' : '') + (s.bottom ? ' is-bottom' : '');
+        el.dataset.theme = theme;
+        Object.assign(el.style, { left: pct(s.x / STAGE.w), top: pct(s.y / STAGE.h), width: pct(s.w / STAGE.w), height: pct(s.h / STAGE.h) });
+        const tile = { el, slot: s, video: VIDEO.includes(s.module), player: null };
+        const file = '/landing/traces/' + s.id + '-' + theme;
+        let load;
+        if (tile.video) {
+          const v = tile.media = document.createElement('video');
+          v.muted = true; v.playsInline = true; v.preload = 'auto';
+          v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
+          load = new Promise((ok, no) => {
+            v.addEventListener('loadeddata', ok, { once: true });
+            v.addEventListener('error', () => no(v.error), { once: true });
+          });
+          v.src = file + (webm ? '.webm' : '.mp4') + '?v=' + V;
+        } else {
+          tile.media = document.createElement('canvas');
+          load = loadTrace(file + '.hvt?v=' + V).then(trace => { tile.player = new TracePlayer(tile.media, trace); });
+        }
+        const name = document.createElement('span');
+        name.className = 'tile-name mono'; name.dataset.name = s.module; name.textContent = I18N.moduleName(s.module);
+        el.append(tile.media, name);
+        screen.appendChild(el);
+        tile.ready = load.then(() => true, err => { console.warn('[Hyro] gráfica', s.id, theme, err); return false; });
+        return tile;
+      });
+      const set = sets[key] = { i, theme, tiles, done: false };
+      set.ready = Promise.all(tiles.map(t => t.ready)).then(() => { set.done = true; return set; });
+      return set;
+    }
+    onLang(() => $$('.tile-name', screen).forEach(n => { n.textContent = I18N.moduleName(n.dataset.name); }));
+
+    // Dibuja cada trazo en el instante de la canción que le toca; los videos corren solos desde que entran
+    function paint(set, local) {
+      for (const t of set.tiles) {
+        const p = t.player;
+        if (!p || !p.fit()) continue;
+        const tr = p.trace, pos = Math.min(Math.max(0, local * tr.fps), tr.frames - 1), f = Math.floor(pos);
+        p.paint(p.c, f, f >= tr.frames - 1 ? 0 : pos - f);
+      }
+    }
+    function startVideos(set, t0) {
+      set.tiles.forEach(t => {
+        if (!t.video) return;
+        try { t.media.currentTime = Math.max(0, now() - t0); } catch (e) { /* aún sin datos */ }
+        if (reduce) t.media.pause(); else play(t.media);
+      });
+    }
+
+    // Lleva un elemento de su lugar (a) a parecer que está en otro (b): para transformar las que se repiten
+    function place(a, b) {
+      const k = screen.clientWidth / STAGE.w, q = screen.clientHeight / STAGE.h;
+      return `translate(${(b.x - a.x) * k}px, ${(b.y - a.y) * q}px) scale(${b.w / a.w}, ${b.h / a.h})`;
+    }
+
+    let cur = null, curT0 = 0, prev = null, prevT0 = 0, prevTimer = 0;
+    function swap(next, t0, first = false) {
+      // la que sale sigue su canción con el reloj que tenía
+      const old = cur, oldT0 = curT0;
+      cur = next; curT0 = t0;
+      stage.dataset.vis = next.theme;
+      startVideos(next, t0);
+      // pares: la misma gráfica en la combinación que sale y en la que entra
+      const pairs = new Map(), left = old && old !== next ? [...old.tiles] : [];
+      next.tiles.forEach(t => {
+        const k = left.findIndex(o => o.slot.module === t.slot.module);
+        if (k >= 0) pairs.set(t, left.splice(k, 1)[0]);
+      });
+      next.tiles.forEach((t, i) => {
+        const el = t.el, o = pairs.get(t);
+        el.classList.remove('is-out', 'is-on');
+        el.style.transition = 'none';
+        el.style.zIndex = 2;
+        el.style.transform = o ? place(t.slot, o.slot) : '';
+        void el.offsetWidth;
+        el.style.transition = '';
+        // la primera vez entran una por una a semicorcheas; después todas juntas, con un leve escalonado
+        el.style.transitionDelay = (first ? i * BEAT / 4 : o ? 0 : i * .05) + 's';
+        el.style.transform = '';
+        el.classList.add('is-on');
+      });
+      if (!old || old === next) return;
+      if (prev && prev !== next) prev.tiles.forEach(o => { o.el.classList.remove('is-out'); o.el.style.transform = ''; if (o.video) o.media.pause(); });
+      prev = old; prevT0 = oldT0;
+      old.tiles.forEach(o => {
+        const partner = [...pairs].find(([, p]) => p === o);
+        o.el.style.zIndex = 1;
+        o.el.style.transitionDelay = '0s';
+        o.el.style.transform = partner ? place(o.slot, partner[0].slot) : '';
+        o.el.classList.remove('is-on');
+        o.el.classList.add('is-out');
+      });
+      clearTimeout(prevTimer);
+      prevTimer = setTimeout(() => {
+        if (prev !== old) return;
+        old.tiles.forEach(o => { o.el.classList.remove('is-out'); o.el.style.transform = ''; if (o.video) o.media.pause(); });
+        prev = null;
+      }, (FADE + .5) * 1000);
+    }
+    const nextOf = set => build((set.i + 1) % COMBOS.length, visTheme());
+    let visible = true, pausedAt = 0;
+    function tick() {
+      requestAnimationFrame(tick);
+      if (!cur || !visible || document.hidden || HV.paused) return;
+      const t = now();
+      if (!reduce && t - curT0 >= LEN) {
+        const next = nextOf(cur);
+        if (next.done) { swap(next, curT0 + LEN); nextOf(next); }
+        else { curT0 += LEN; startVideos(cur, curT0); } // vuelve a empezar mientras llega la siguiente
+      }
+      paint(cur, reduce ? 1.2 : t - curT0);
+      if (prev) paint(prev, t - prevT0);
+    }
+
+    // Pausa de verdad cuando no se ve: al volver sigue donde quedó
+    const pause = () => { if (pausedAt) return; pausedAt = now(); [cur, prev].forEach(s => s && s.tiles.forEach(t => t.video && t.media.pause())); };
+    const resume = () => {
+      if (!pausedAt) return;
+      const gap = now() - pausedAt; pausedAt = 0;
+      curT0 += gap; prevT0 += gap;
+      if (cur) startVideos(cur, curT0);
+      if (prev) startVideos(prev, prevT0);
     };
+    const sync = () => (visible && !document.hidden ? resume() : pause());
     new IntersectionObserver(es => { visible = es[0].isIntersecting; sync(); }).observe(stage);
     document.addEventListener('visibilitychange', sync);
-    new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+    // Al cambiar de tema, la misma combinación del otro tema se disuelve encima cuando llega (sigue la canción)
+    new MutationObserver(() => {
+      if (!cur) return;
+      const th = visTheme(), same = build(cur.i, th);
+      nextOf(same);
+      same.ready.then(() => { if (cur && cur.i === same.i && cur.theme !== th && visTheme() === th) swap(same, curT0); });
+    }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+    // Entrada: cuando terminó la intro y llegó la primera combinación
+    const first = build(0, visTheme());
+    nextOf(first);
+    const whenReady = fn => {
+      if (root.classList.contains('is-ready')) return fn();
+      const mo = new MutationObserver(() => { if (root.classList.contains('is-ready')) { mo.disconnect(); fn(); } });
+      mo.observe(root, { attributes: true, attributeFilter: ['class'] });
+    };
+    first.ready.then(() => whenReady(() => { swap(first, now(), true); requestAnimationFrame(tick); }));
   }
 
   /* ---------- Funciones ---------- */

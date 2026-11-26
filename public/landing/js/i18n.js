@@ -101,7 +101,10 @@
 
   // Gráficas del inicio que no están en el catálogo de arriba (ese catálogo arma el carrusel de Funciones)
   const HERO_MODULES = [
-    ['vumodern', 'VU Moderno', 'Modern VU'], ['pixelorb', 'Mapa de píxeles', 'Pixel Map']
+    ['vumodern', 'VU Moderno', 'Modern VU'], ['pixelorb', 'Mapa de píxeles', 'Pixel Map'],
+    ['tuner', 'Afinador', 'Tuner'], ['tunerpiano', 'Afinador piano', 'Piano Tuner'], ['phasecore', 'Núcleo de fase', 'Phase Core'],
+    ['rgbwaves', 'Ondas cromáticas', 'Chroma Waves'], ['comet', 'Estela de luz', 'Light Trail'], ['prism', 'Haz prismático', 'Prism Beam'],
+    ['nebula', 'Nebulosa', 'Nebula']
   ];
 
   const THEMES = [
