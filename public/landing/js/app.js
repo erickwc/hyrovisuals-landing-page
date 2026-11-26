@@ -261,123 +261,15 @@
     ['inicio', 'funciones', 'accion', 'resenas', 'preguntas', 'comprar'].forEach(id => { const s = document.getElementById(id); s && io.observe(s); });
   }
 
-  /* ---------- Hero: franja · cuadrícula · separados ---------- */
+  /* ---------- Hero: video de las gráficas reales del programa ---------- */
+  // Se reproduce solo mientras se ve; con «reducir movimiento» queda en pausa en su primer cuadro (el póster).
   function hero() {
-    const stage = $('#stage'), screen = $('#stageScreen'), tiles = $$('.tile', screen), seg = $('#stageSeg');
-    const thumb = $('.seg-thumb', seg), buttons = $$('button', seg), desc = $('#stageDesc');
-    const inner = document.createElement('div'); inner.className = 'stage-inner'; screen.appendChild(inner);
-    tiles.forEach(tile => { inner.appendChild(tile); tile.inst = HV.create($('canvas', tile), tile.dataset.vis, { zoomAware: true }); });
-    // En móvil el visual se dibuja a tamaño de escritorio y se escala completo, sin recortar módulos.
-    const VW = 900, VH = 600;
-    function dims() {
-      const W0 = screen.clientWidth;
-      if (W0 >= 640) {
-        screen.style.height = ''; inner.style.transform = '';
-        const H0 = screen.clientHeight; inner.style.width = W0 + 'px'; inner.style.height = H0 + 'px';
-        return { W: W0, H: H0 };
-      }
-      const k = W0 / VW;
-      inner.style.width = VW + 'px'; inner.style.height = VH + 'px'; inner.style.transform = `scale(${k})`;
-      screen.style.height = Math.round(VH * k) + 'px';
-      return { W: VW, H: VH };
-    }
-    const names = () => $$('.tile-name', screen).forEach(n => { n.textContent = I18N.moduleName(n.dataset.name); });
-    names(); onLang(() => { names(); desc.innerHTML = t('stage.d.' + mode); });
-
-    let mode = 'grid', timer = 0, hover = false, pausedUntil = 0, visible = true;
-    const MODES = ['grid', 'strip', 'float'];
-
-    function rows(n, r) { const base = Math.floor(n / r), extra = n % r; return Array.from({ length: r }, (_, i) => base + (i < extra ? 1 : 0)); }
-    function layout() {
-      const { W, H } = dims(), mobile = W < 640, n = tiles.length;
-      const rects = new Array(n);
-      if (mode === 'strip') {
-        const pad = mobile ? 12 : 26, SW = W - pad * 2, R = 14;
-        const sh = Math.round(clamp(H * .38, 120, 190)), y = Math.round((H - sh) / 2);
-        const pri = mobile ? ['mascot', 'spectrum', 'mesh'] : null;
-        const shown = pri ? tiles.filter(tl => pri.includes(tl.dataset.vis)) : tiles;
-        const wt = tl => mobile ? Math.min(1.6, +tl.dataset.w) : +tl.dataset.w;
-        const total = shown.reduce((a, tl) => a + wt(tl), 0);
-        let x = pad;
-        tiles.forEach((tl, i) => {
-          if (!shown.includes(tl)) { rects[i] = { x: W + 20, y, w: 120, h: sh, hidden: true, r: '0' }; return; }
-          const w = SW * wt(tl) / total, first = tl === shown[0], last = tl === shown[shown.length - 1];
-          rects[i] = { x, y, w, h: sh, first, r: `${first ? R : 0}px ${last ? R : 0}px ${last ? R : 0}px ${first ? R : 0}px` }; x += w;
-        });
-      } else if (mode === 'grid') {
-        let best = null;
-        for (let cols = 1; cols <= n; cols++) {
-          const r = Math.ceil(n / cols), score = Math.abs(Math.log((W / cols) / (H / r) / 1.3)) + (r * cols - n) * .05;
-          if (!best || score < best.score) best = { score, r };
-        }
-        const counts = rows(n, best.r), rh = H / best.r; let i = 0;
-        counts.forEach((cnt, ri) => {
-          const row = tiles.slice(i, i + cnt), wt = tl => clamp(+tl.dataset.w, 1, 1.8), total = row.reduce((a, tl) => a + wt(tl), 0);
-          let x = 0;
-          row.forEach(tl => { const w = W * wt(tl) / total; rects[i++] = { x, y: ri * rh, w, h: rh }; x += w; });
-        });
-      } else {
-        const gap = mobile ? 10 : 16, pad = mobile ? 14 : 26, AW = W - pad * 2, AH = H - pad * 2;
-        let best = null;
-        for (let cols = 1; cols <= n; cols++) {
-          const r = Math.ceil(n / cols), s = Math.min((AW - gap * (cols - 1)) / cols, (AH - gap * (r - 1)) / r);
-          if (!best || s > best.s) best = { s, cols, r };
-        }
-        const { s, cols, r } = best, counts = rows(n, r), oy = (H - (r * s + (r - 1) * gap)) / 2; let i = 0;
-        counts.forEach((cnt, ri) => {
-          const ox = (W - (cnt * s + (cnt - 1) * gap)) / 2;
-          for (let k = 0; k < cnt; k++) {
-            const lift = (k + ri) % 2 ? -s * .04 : s * .04;
-            rects[i++] = { x: ox + k * (s + gap), y: oy + ri * (s + gap) + lift, w: s, h: s };
-          }
-        });
-        void cols;
-      }
-      tiles.forEach((tl, i) => {
-        const r = rects[i];
-        tl.style.transitionDelay = (i * 28) + 'ms';
-        tl.style.width = r.w + 'px'; tl.style.height = r.h + 'px';
-        tl.style.transform = `translate(${r.x}px, ${r.y}px)`;
-        tl.style.borderRadius = r.r ?? (mode === 'float' ? '14px' : '0');
-        tl.classList.toggle('is-hidden', !!r.hidden);
-        tl.classList.toggle('is-first', !!r.first);
-      });
-    }
-    function moveThumb() {
-      const b = buttons.find(x => x.dataset.mode === mode);
-      thumb.style.left = b.offsetLeft + 'px'; thumb.style.width = b.offsetWidth + 'px';
-    }
-    function setMode(m, user) {
-      mode = m; stage.dataset.mode = m;
-      buttons.forEach(b => b.setAttribute('aria-selected', String(b.dataset.mode === m)));
-      desc.innerHTML = t('stage.d.' + m);
-      moveThumb(); layout();
-      if (user) pausedUntil = performance.now() + 14000;
-    }
-    buttons.forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode, true)));
-    seg.addEventListener('keydown', e => {
-      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-      const i = MODES.indexOf(mode), next = MODES[(i + (e.key === 'ArrowRight' ? 1 : 2)) % 3];
-      setMode(next, true); buttons.find(b => b.dataset.mode === next).focus();
-    });
-    stage.addEventListener('pointerenter', () => { hover = true; });
-    stage.addEventListener('pointerleave', () => { hover = false; });
-    new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(stage);
-    let resizeRaf = 0;
-    new ResizeObserver(() => {
-      cancelAnimationFrame(resizeRaf);
-      resizeRaf = requestAnimationFrame(() => {
-        tiles.forEach(tl => { tl.style.transition = 'none'; }); layout(); moveThumb();
-        requestAnimationFrame(() => tiles.forEach(tl => { tl.style.transition = ''; }));
-      });
-    }).observe(screen);
-    setMode('grid');
-    if (!reduce) timer = setInterval(() => {
-      if (!visible || hover || document.hidden || performance.now() < pausedUntil) return;
-      setMode(MODES[(MODES.indexOf(mode) + 1) % 3]);
-    }, 4200);
-    onLang(() => requestAnimationFrame(moveThumb));
-    document.fonts && document.fonts.ready.then(moveThumb);
+    const video = $('#heroVideo');
+    if (!video) return;
+    if (reduce) { video.removeAttribute('autoplay'); video.pause(); return; }
+    const play = () => { const p = video.play(); p && p.catch(() => {}); };
+    new IntersectionObserver(es => { es[0].isIntersecting && !document.hidden ? play() : video.pause(); }).observe(video);
+    document.addEventListener('visibilitychange', () => { document.hidden ? video.pause() : play(); });
   }
 
   /* ---------- Funciones ---------- */

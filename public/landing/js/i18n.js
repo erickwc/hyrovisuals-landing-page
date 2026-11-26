@@ -5,7 +5,7 @@
   'use strict';
   const EN = {
     'a11y.skip': 'Skip to content', 'a11y.mainnav': 'Main', 'a11y.lang': 'Change language', 'a11y.theme': 'Change theme', 'a11y.menu': 'Menu',
-    'a11y.layout': 'Layout', 'a11y.sections': 'Sections', 'a11y.prev': 'Previous', 'a11y.next': 'Next',
+    'a11y.sections': 'Sections', 'a11y.prev': 'Previous', 'a11y.next': 'Next',
     'nav.features': 'Features', 'nav.action': 'In action', 'nav.faq': 'FAQ', 'nav.pricing': 'Get it', 'nav.cta': 'Get it',
     'nav.reviews': 'Reviews', 'nav.login': 'Log in', 'nav.signup': 'Sign up', 'nav.account': 'My account',
     'rev.eyebrow': 'Reviews', 'rev.t1': 'What producers', 'rev.t2': 'are saying', 'rev.lead': 'Producers who keep Hyro Visuals open in every session.',
@@ -14,9 +14,8 @@
     'hero.lead': 'Stick with the same visuals as always or pick something that makes a difference. You decide how your music looks.',
     'hero.cta': 'Get Hyro Visuals', 'hero.cta2': 'See it in action',
     'hero.p1': '30+ spectrums', 'hero.p2': 'Windows & macOS', 'hero.p3': 'One-time payment', 'hero.p4': 'Lifetime license',
+    'hero.video': 'Hyro Visuals graphics reacting to a song',
     'hf.live': 'Live', 'hf.theme': 'Style', 'hf.brutal': 'Brutalism', 'hf.palettes': '12 palettes',
-    'stage.strip': 'Strip', 'stage.grid': 'Grid', 'stage.float': 'Separate', 'stage.meta': 'Live demo · 124 BPM',
-    'stage.d.strip': 'The strip lives at the top and your apps fit below it.',
     'feat.eyebrow': 'Features', 'feat.t1': 'Built for', 'feat.t2': 'producers', 'feat.lead': 'The essentials of Hyro Visuals in four points.',
     'feat.next': 'Show the next spectrum', 'feat.hint': 'Click to switch',
     'feat.1.t': '30+ audio spectrums', 'feat.1.d': 'More than 30 unique spectrums to choose from.',
@@ -60,9 +59,6 @@
   // Textos generados por JS
   const JS = {
     es: {
-      'stage.d.strip': 'La franja vive arriba y tus apps se acomodan debajo.',
-      'stage.d.grid': 'Cuadrícula autoadaptable: los módulos se reparten solos, sin scroll.',
-      'stage.d.float': 'Separa cada visual como un cuadro independiente.',
       'news.ok': '¡Listo! Te avisaremos de las novedades.', 'news.err': 'Escribe un correo válido.', 'news.consent': 'Marca la casilla para autorizar los correos.', 'news.fail': 'No se pudo enviar. Inténtalo de nuevo.',
       'rv.verified': 'Cliente verificado', 'rv.anon': 'Cliente de Hyro', 'rv.empty': 'Todavía no hay reseñas. Los clientes pueden dejar la suya desde su biblioteca.', 'rv.error': 'No pudimos cargar las reseñas.',
       'mk.nosrc': 'Sin fuente', 'mk.src1': 'Audio del sistema',
@@ -75,9 +71,6 @@
       'search.empty': 'Sin resultados para', 'search.suggest': 'Sugerencias', 'search.module': 'Espectro disponible en Hyro Visuals', 'search.step': 'Paso del recorrido'
     },
     en: {
-      'stage.d.strip': 'The strip lives at the top and your apps fit below it.',
-      'stage.d.grid': 'Self-adapting grid: modules spread out on their own, no scrolling.',
-      'stage.d.float': 'Pull each visual apart as an independent square.',
       'news.ok': 'Done! We’ll keep you posted.', 'news.err': 'Enter a valid email.', 'news.consent': 'Check the box to allow the emails.', 'news.fail': 'Couldn’t send it. Please try again.',
       'rv.verified': 'Verified customer', 'rv.anon': 'Hyro customer', 'rv.empty': 'No reviews yet. Customers can leave theirs from their library.', 'rv.error': 'We couldn’t load the reviews.',
       'mk.nosrc': 'No source', 'mk.src1': 'System audio',
@@ -95,7 +88,7 @@
     ['spectrum', 'Espectro', 'Spectrum'], ['pixels', 'Matriz de píxeles', 'Pixel Matrix'], ['mesh', 'Malla orbital', 'Orbital Mesh'],
     ['mascot', 'Mascota Hyro', 'Hyro Mascot'], ['phase', 'Estéreo & fase', 'Stereo & Phase'], ['waves3d', 'Ondas 3D', '3D Waves'],
     ['dynamics', 'True Peak & RMS', 'True Peak & RMS'], ['geometry', 'Trama geométrica', 'Geometric Grid'], ['spectrogram', 'Espectrograma', 'Spectrogram'],
-    ['waveform', 'Forma de onda', 'Waveform'], ['threads', 'Red de hilos', 'Thread Network'], ['levels', 'Niveles', 'Levels'],
+    ['waveform', 'Forma de onda', 'Waveform'], ['threads', 'Giroscopio', 'Gyroscope'], ['levels', 'Niveles', 'Levels'],
     ['particles', 'Nube de partículas', 'Particle Cloud'], ['dotspectrum', 'Espectro de puntos', 'Dot Spectrum'], ['vu', 'VU Meter', 'VU Meter'],
     ['scope', 'Osciloscopio', 'Oscilloscope'], ['orbit', 'Órbita', 'Orbit'], ['rta', 'Espectro RTA', 'RTA Spectrum'],
     ['loudness', 'Sonoridad LUFS', 'LUFS Loudness'], ['ephemeris', 'Efemérides', 'Ephemeris'], ['vuclassic', 'VU clásico', 'Classic VU'],
@@ -104,6 +97,11 @@
     ['granules', 'Esfera granular', 'Granular Sphere'], ['synapse', 'Sinapsis', 'Synapse'], ['filaments', 'Filamentos', 'Filaments'],
     ['spikes', 'Esfera de picos', 'Spiked Sphere'], ['sparks', 'Destellos', 'Sparkles'], ['membrane', 'Membrana', 'Membrane'],
     ['dna', 'ADN', 'DNA'], ['storm', 'Tormenta', 'Storm'], ['pointwave', 'Onda de partículas', 'Particle Wave'], ['terrain', 'Relieve espectral', 'Spectral Terrain']
+  ];
+
+  // Gráficas del inicio que no están en el catálogo de arriba (ese catálogo arma el carrusel de Funciones)
+  const HERO_MODULES = [
+    ['vumodern', 'VU Moderno', 'Modern VU'], ['pixelorb', 'Mapa de píxeles', 'Pixel Map']
   ];
 
   const THEMES = [
@@ -157,6 +155,6 @@
   window.I18N = {
     collect, apply, t, get lang() { return lang; },
     js: k => JS[lang][k], MODULES, THEMES, PALETTES, STEPS,
-    moduleName: name(MODULES), themeName: name(THEMES), paletteName: name(PALETTES)
+    moduleName: name([...MODULES, ...HERO_MODULES]), themeName: name(THEMES), paletteName: name(PALETTES)
   };
 })();
