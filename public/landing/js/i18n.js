@@ -15,7 +15,7 @@
     'hero.cta': 'Get Hyro Visuals', 'hero.cta2': 'See it in action',
     'hero.p1': '30+ spectrums', 'hero.p2': 'Windows & macOS', 'hero.p3': 'One-time payment', 'hero.p4': 'Lifetime license',
     'hero.video': 'Hyro Visuals graphics reacting to a song',
-    'stage.grid': 'Grid', 'stage.strip': 'Strip', 'stage.single': 'Individual',
+    'stage.hint': '3 modes that adapt to how you work', 'stage.grid': 'Grid', 'stage.strip': 'Strip', 'stage.single': 'Individual',
     'hf.live': 'Live', 'hf.theme': 'Style', 'hf.brutal': 'Brutalism', 'hf.palettes': '12 palettes',
     'feat.eyebrow': 'Features', 'feat.t1': 'Built for', 'feat.t2': 'producers', 'feat.lead': 'The essentials of Hyro Visuals in four points.',
     'feat.next': 'Show the next spectrum', 'feat.hint': 'Click to switch',

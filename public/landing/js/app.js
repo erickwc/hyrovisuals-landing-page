@@ -475,13 +475,12 @@
     }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
     // Control de modos: las gráficas se mueven a su nuevo lugar y siguen turnándose
-    const seg = $('#stageSeg'), thumb = seg && $('.seg-thumb', seg), small = matchMedia('(max-width: 640px)');
+    const seg = $('#stageSeg'), thumb = seg && $('.seg-thumb', seg);
     const moveThumb = () => {
       const on = seg && $('button[aria-selected="true"]', seg);
       if (on && thumb) { thumb.style.left = on.offsetLeft + 'px'; thumb.style.width = on.offsetWidth + 'px'; }
     };
     function setMode(m) {
-      if (m === 'strip' && small.matches) m = 'grid'; // en el celular la franja quedaría ilegible
       mode = m;
       stage.dataset.mode = m;
       if (seg) $$('button', seg).forEach(b => b.setAttribute('aria-selected', String(b.dataset.mode === m)));
@@ -494,7 +493,6 @@
       onLang(() => requestAnimationFrame(moveThumb));
       moveThumb();
     }
-    small.addEventListener('change', () => { if (small.matches && mode === 'strip') setMode('grid'); });
     stage.dataset.mode = mode;
     // al cambiar el ancho se reacomoda sin animación (solo cuenta el ancho: el alto lo cambia el modo)
     let lastW = 0;
