@@ -1,6 +1,6 @@
 /* Hyro Visuals — lo poco que hace falta en el navegador.
    Cada parte arranca por separado: si una falla, las demás siguen funcionando. */
-import { fetchPlans, fetchReviews, subscribe, type Plan, type Review } from '../lib/supabase-rest';
+import { fetchAccount, fetchPlans, fetchReviews, subscribe, type Plan, type Review } from '../lib/supabase-rest';
 // @ts-ignore: reproductor en JS puro (copia de Hyro visual/web-loops/site/hvl-player.js)
 import { mountAll } from '../lib/hvl-player.js';
 import { planName, priceParts, invoiceNo, barcodeText, ticketDate, barcodePath } from '../lib/ticket';
@@ -200,6 +200,63 @@ function gallery() {
   });
 }
 
+/* ---------- Sesión del cliente (la guarda supabase-js en el login de la app) ---------- */
+type Stored = { userId: string; token: string; expiresAt: number };
+function storedSession(): Stored | null {
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || !/^sb-.+-auth-token$/.test(k)) continue;
+      const s = JSON.parse(localStorage.getItem(k) || 'null');
+      if (s?.refresh_token && s.user?.id) return { userId: s.user.id, token: s.access_token, expiresAt: Number(s.expires_at) || 0 };
+    }
+  } catch {}
+  return null;
+}
+
+// comprar pide la sesión: sin ella se entra (o se crea la cuenta) y se vuelve al checkout con el mismo plan
+const checkoutUrl = (planId: string) => {
+  const to = `/checkout?plan=${encodeURIComponent(planId)}`;
+  return storedSession() ? to : `/login?next=${encodeURIComponent(to)}`;
+};
+
+/* «Mi cuenta» en la barra: la foto del cliente (la última guardada al instante y luego la de Supabase) y, si es
+   administrador, el enlace lleva a su panel. Mismas claves que la app (src/lib/landingSession.ts). */
+function account() {
+  const s = storedSession();
+  const link = $<HTMLAnchorElement>('.nav-account');
+  const photo = link ? $<HTMLImageElement>('img', link) : null;
+  if (!s || !link || !photo) return;
+  const show = (url: string | null) => {
+    const ok = Boolean(url && /^https:\/\//.test(url));
+    if (ok) photo.src = url!; else photo.removeAttribute('src');
+    photo.hidden = !ok;
+    link.classList.toggle('has-photo', ok);
+  };
+  const toAdmin = (isAdmin: boolean) => {
+    const href = isAdmin ? '/admin' : '/cuenta/biblioteca';
+    $$<HTMLAnchorElement>('.nav-account, .mm-account').forEach((a) => a.setAttribute('href', href));
+  };
+  photo.addEventListener('error', () => show(null));
+  try {
+    const cached = JSON.parse(localStorage.getItem('hyro.profile') || 'null');
+    if (cached?.id === s.userId) show(cached.avatarUrl);
+    toAdmin(localStorage.getItem('hyro.admin') === s.userId);
+  } catch {}
+  // con el token vencido no se consulta: la app lo renueva al entrar y deja la foto al día
+  if (!s.token || s.expiresAt * 1000 < Date.now()) return;
+  fetchAccount(s.userId, s.token).then((a) => {
+    show(a.avatarUrl);
+    try {
+      localStorage.setItem('hyro.profile', JSON.stringify({ id: s.userId, name: a.name, avatarUrl: a.avatarUrl }));
+      if (a.isAdmin !== null) {
+        toAdmin(a.isAdmin);
+        if (a.isAdmin) localStorage.setItem('hyro.admin', s.userId); else localStorage.removeItem('hyro.admin');
+      }
+    } catch {}
+  }).catch(() => {});
+}
+
 /* ---------- Compra: plan elegido en el ticket ---------- */
 function buy() {
   const fs = $<HTMLFieldSetElement>('#buyPlans')!;
@@ -221,7 +278,7 @@ function buy() {
     const code = barcodeText(p);
     $('#barcode')!.setAttribute('d', barcodePath(code));
     $('#barcodeTxt')!.textContent = code;
-    btn.href = `/checkout?plan=${encodeURIComponent(p.id)}`;
+    btn.href = checkoutUrl(p.id);
     notch();
   };
   // muescas del ticket a la altura del corte
@@ -409,6 +466,7 @@ function keepPlace() {
 }
 
 safe('nav', nav);
+safe('account', account);
 safe('stage', stage);
 safe('tour', tour);
 safe('gallery', gallery);

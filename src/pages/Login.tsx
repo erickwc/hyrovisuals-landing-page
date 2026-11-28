@@ -16,7 +16,10 @@ export function Login() {
   const t = c.auth.login;
   const navigate = useNavigate();
   // solo rutas internas: nunca un enlace a otro sitio
-  const requested = (useLocation().state as { returnTo?: string } | null)?.returnTo;
+  // la app lo pasa en el state; la landing (Astro, sin React Router) en ?next=
+  const location = useLocation();
+  const requested =
+    (location.state as { returnTo?: string } | null)?.returnTo ?? new URLSearchParams(location.search).get("next") ?? undefined;
   const returnTo = requested?.startsWith("/") && !requested.startsWith("//") ? requested : null;
 
   const [email, setEmail] = useState("");

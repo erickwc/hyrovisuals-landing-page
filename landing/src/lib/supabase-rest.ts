@@ -55,6 +55,22 @@ export async function fetchReviews(): Promise<Review[]> {
     }));
 }
 
+/** Perfil del cliente con sesión (su foto) y si es administrador. Va con el token de su sesión: las políticas RLS
+ *  solo le dejan leer lo suyo. Si el token venció, Supabase responde 401 y se queda lo guardado. */
+export async function fetchAccount(userId: string, token: string) {
+  const auth = { headers: { Authorization: `Bearer ${token}` } };
+  const id = encodeURIComponent(userId);
+  const [profiles, admins] = await Promise.all([
+    rest<{ name: string | null; avatar_url: string | null }[]>(`profiles?select=name,avatar_url&id=eq.${id}`, auth),
+    rest<{ user_id: string }[]>(`admin_users?select=user_id&user_id=eq.${id}`, auth).catch(() => null),
+  ]);
+  return {
+    name: profiles?.[0]?.name ?? null,
+    avatarUrl: profiles?.[0]?.avatar_url ?? null,
+    isAdmin: admins ? admins.length > 0 : null,
+  };
+}
+
 /** Newsletter: la función valida el correo, guarda la autorización y limita por IP. */
 export async function subscribe(email: string, lang: string) {
   await rest('rpc/newsletter_subscribe', {

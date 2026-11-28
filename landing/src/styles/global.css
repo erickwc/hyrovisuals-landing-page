@@ -121,7 +121,10 @@ main { overflow-x: clip; }
 .nav.is-scrolled { transform: translateY(calc(-1 * var(--tick-h))); }
 .nav.is-open { transform: none; }
 .ticker { height: var(--tick-h); overflow: hidden; background: var(--red); color: var(--on-red); display: flex; align-items: center; }
-.ticker-track { display: flex; width: max-content; }
+/* cinta en loop: el texto va 3 veces, así que correrla un tercio la deja igual que al empezar */
+.ticker-track { display: flex; width: max-content; animation: marquee 48s linear infinite; }
+@keyframes marquee { to { transform: translateX(-33.3333%); } }
+@media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
 .ticker-track span { display: inline-flex; align-items: center; padding-right: 52px; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
 .nav-inner { position: relative; display: flex; align-items: center; gap: 24px; height: var(--nav-h); }
 .nav-inner::before { content: ''; position: absolute; inset: 0 calc(50% - 50vw); z-index: -1; border-bottom: 1px solid var(--line-2); }
@@ -171,6 +174,9 @@ main { overflow-x: clip; }
 .has-session .mm-account { display: inline-flex; }
 .has-session .mm-auth { grid-template-columns: 1fr; }
 .nav-account { width: 38px; padding: 0; margin-left: 6px; overflow: hidden; border: 1px solid var(--line-3); }
+/* foto del cliente (la pone landing.ts); si no tiene o no carga, se queda el icono */
+.nav-account img { width: 100%; height: 100%; object-fit: cover; }
+.nav-account.has-photo svg { display: none; }
 
 /* ---------- Tipografía display ---------- */
 .display { font-family: var(--f-display); font-weight: 700; font-synthesis: none; text-transform: uppercase; letter-spacing: .015em; line-height: .95; }
