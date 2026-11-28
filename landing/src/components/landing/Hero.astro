@@ -1,0 +1,69 @@
+---
+import Icon from '../Icon.astro';
+import { useDict, type Lang } from '../../i18n';
+import { graphName } from '../../data/gallery';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = useDict(lang);
+/* Gráficas en vivo: grabaciones .hvl de la app (public/loops) que reproduce src/lib/hvl-player.js. Cada
+   recuadro conserva las proporciones de su grabación: en cada fila, el ancho de cada gráfica es proporcional
+   a su relación de aspecto y el alto de la fila sale de la suma.
+   Algunos recuadros se turnan entre gráficas livianas del mismo tamaño (POOL; las cambia src/scripts/landing.ts). */
+const AR: Record<string, number> = { threads: 1.8, synapse: 1.8, vumodern: 1.8, phasecore: 1.2, wavetrail: 1.8, rgbwaves: 1.8, dynamics: 1 };
+const POOL: Record<string, string[]> = {
+  phasecore: ['phasecore', 'pixelglobe'],
+  vumodern: ['vumodern', 'ephemeris'],
+  dynamics: ['dynamics', 'tuner', 'levels'],
+  rgbwaves: ['rgbwaves', 'scope', 'interference'],
+  synapse: ['synapse', 'pixelorb', 'rta', 'pixels', 'bands'],
+};
+const names = Object.fromEntries(Object.values(POOL).flat().map((id) => [id, graphName(id, lang)]));
+const DESK = [['threads', 'synapse', 'vumodern'], ['phasecore', 'wavetrail', 'rgbwaves', 'dynamics']];
+const MOB = [['threads', 'synapse'], ['vumodern', 'dynamics'], ['wavetrail', 'phasecore'], ['rgbwaves']];
+const sum = (row: string[]) => row.reduce((t, id) => t + AR[id], 0);
+---
+<section class="hero" id="inicio">
+  <div class="wrap">
+    <div class="hero-copy">
+      <span class="lead-in"><span class="dot"></span>{d.hero.t0}</span>
+      <h1 class="display h1">
+        <span class="sr">{d.hero.t0} </span>
+        <span class="line">{d.hero.t1a} <mark class="hl">{d.hero.t1b}</mark></span>
+        <span class="line">{d.hero.t2}</span>
+      </h1>
+      <p class="lead">{d.hero.lead}</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="#comprar">{d.hero.cta}<Icon name="arrowRight" /></a>
+        <a class="btn btn-ghost" href="#accion">{d.hero.cta2}</a>
+      </div>
+      <ul class="hero-pills">{d.hero.pills.map((p) => <li>{p}</li>)}</ul>
+    </div>
+
+    <!-- Visual y funciones en una sola tarjeta: las gráficas, la barra «en vivo» y las tres ideas de Hyro -->
+    <div class="stage-frame" id="funciones">
+      <div class="stage" id="stage" data-pools={JSON.stringify(POOL)} data-names={JSON.stringify(names)}>
+        {[['stage-desk', DESK], ['stage-mob', MOB]].map(([cls, rows]) => (
+          <div class={`stage-screen ${cls}`}>
+            {(rows as string[][]).map((row) => (
+              <div class="stage-row" style={`--sum:${sum(row)}`}>
+                {row.map((id) => (
+                  <figure class="tile" style={`--ar:${AR[id]}`} data-slot={id}>
+                    <canvas data-loop={id} data-hvl={`/loops/${id}-dark.hvl`} aria-label={graphName(id, lang)}></canvas>
+                    <figcaption class="tile-name">{graphName(id, lang)}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div class="stage-caption">
+        <span class="stage-live"><span class="dot" aria-hidden="true"></span>{d.feat.live}</span>
+        <span>{d.feat.caption}</span>
+      </div>
+      <ul class="stage-feats">
+        {d.feat.items.map(([t, desc], i) => <li><span class="sf-num">{String(i + 1).padStart(2, '0')}</span><h3>{t}</h3><p>{desc}</p></li>)}
+      </ul>
+    </div>
+  </div>
+</section>

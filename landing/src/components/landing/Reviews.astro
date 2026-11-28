@@ -1,0 +1,34 @@
+---
+/* Reseñas reales (Supabase): se dibujan en el build y el navegador las refresca (src/scripts/landing.ts). */
+import Icon from '../Icon.astro';
+import { useDict, type Lang } from '../../i18n';
+import type { Review } from '../../lib/supabase-rest';
+interface Props { lang: Lang; reviews: Review[] | null }
+const { lang, reviews } = Astro.props;
+const d = useDict(lang);
+const initials = (n: string | null) => (n || 'H').split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+---
+<section class="sec" id="resenas">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow">{d.rev.eyebrow}</p>
+      <h2 class="display h2"><span class="line">{d.rev.t1}</span><span class="line">{d.rev.t2}</span></h2>
+      <p class="sec-lead">{d.rev.lead}</p>
+    </header>
+    <div class="reviews" id="reviews" data-verified={d.rev.verified} data-anon={d.rev.anon} data-empty={d.rev.empty}>
+      {reviews && reviews.length ? reviews.map((r) => (
+        <figure class="rv">
+          <div class="rv-stars" role="img" aria-label={`${r.rating}/5`}>
+            {[1, 2, 3, 4, 5].map((n) => <Icon name="star" class={n > r.rating ? 'off' : undefined} />)}
+          </div>
+          <blockquote class="rv-q">“{r.text}”</blockquote>
+          <figcaption class="rv-who">
+            <span class="rv-av">{r.avatarUrl ? <img src={r.avatarUrl} alt="" width="38" height="38" loading="lazy" /> : initials(r.name)}</span>
+            <span><b>{r.name || d.rev.anon}</b><small>{d.rev.verified}</small></span>
+          </figcaption>
+        </figure>
+      )) : <p class="rv-empty">{reviews ? d.rev.empty : d.rev.error}</p>}
+    </div>
+    <template id="starTpl"><Icon name="star" /></template>
+  </div>
+</section>

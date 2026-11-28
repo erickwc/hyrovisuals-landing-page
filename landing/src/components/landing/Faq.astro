@@ -1,0 +1,41 @@
+---
+import Icon from '../Icon.astro';
+import { useDict, type Lang } from '../../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = useDict(lang);
+---
+<section class="sec" id="preguntas">
+  <div class="wrap">
+    <header class="sec-head">
+      <h2 class="display h2"><span class="line">{d.faq.t1}</span><span class="line">{d.faq.t2}</span></h2>
+    </header>
+    <div class="faq">
+      {d.faq.cols.map((col) => (
+        <div class="faq-col">
+          {col.map((item) => (
+            <details class="faq-item" name="faq">
+              <summary><span>{item.q}</span><Icon name="arrowDownRight" class="faq-i" /></summary>
+              <div class="faq-a">
+                {item.a && <p>{item.a}</p>}
+                {item.spec && (
+                  <>
+                    <div class="faq-spec-t">{d.faq.min}</div>
+                    <ul class="faq-spec">{item.spec.map(([k, v]) => <li><b>{k}:</b> {v}</li>)}</ul>
+                    {item.rec && <p><b>{item.rec[0]}:</b> {item.rec[1]}</p>}
+                  </>
+                )}
+              </div>
+            </details>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Cintas cruzadas (quietas por ahora) -->
+<div class="ribbons" aria-hidden="true">
+  <div class="ribbon r-red"><div class="ribbon-track">{Array.from({ length: 8 }, () => d.ribbonB.map((t) => <span>{t}<i class="star"></i></span>))}</div></div>
+  <div class="ribbon r-dark"><div class="ribbon-track">{Array.from({ length: 8 }, () => d.ribbonA.map((t) => <span>{t}<i class="star"></i></span>))}</div></div>
+</div>

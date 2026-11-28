@@ -1,0 +1,76 @@
+---
+/* «Así funciona»: capturas reales de la app actual (public/tour, las toma web-loops/scripts/capture-tour.mjs en
+   Hyro visual) y, en cada paso, un recuadro rojo sobre la zona que explica. Un paso puede ser un video de la app
+   («video:modo:16/9» → public/tour/modo.mp4, con su proporción), que solo se descarga y reproduce al elegirlo. */
+import Icon from '../Icon.astro';
+import { useDict, type Lang } from '../../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = useDict(lang);
+// por paso (mismo orden que d.act.steps): [captura, x, y, ancho, alto] en % de la captura (1920 × 712)
+const STEPS: [string, number, number, number, number][] = [
+  ['panel', 47.1, 26.7, 52.4, 40.7], // espectros y gráficas
+  ['graph', 35.9, 20.5, 28.6, 54.8], // ajustes individuales
+  // temática: en inglés, video real de la app; en español, la captura con su recuadro
+  // temática: en inglés, una secuencia de capturas nítidas (public/tour/style-en.json); en español, la captura con su recuadro
+  lang === 'en' ? ['seq:style-en', 0, 0, 100, 100] : ['panel', 0.8, 33.1, 22.1, 13.2],
+  ['panel', 23.8, 33.1, 22.6, 29.2], // paleta
+  // modo: video real de la app en el idioma de la página (el recuadro toma la forma del video)
+  [lang === 'en' ? 'video:modo-en:1920/746' : 'video:modo:16/9', 0, 0, 100, 100],
+  ['panel', 47.1, 70.2, 52.4, 11.2], // respuesta al audio
+  ['toolbar', 82.8, 0.4, 16.8, 4.2], // modo individual (barra de la franja)
+  ['grid', 0, 0, 100, 100], // modo cuadrícula (sin recuadro)
+  ['panel', 47.1, 84.8, 52.4, 12.1], // presets
+  ['screens', 8.3, 19.7, 16.7, 15.4], // modo pantallas
+  ['panel', 14.6, 19, 8.4, 5], // visual aleatorio
+  ['source', 1, 25, 15.1, 32.3], // captura del audio
+  ['panel', 0.8, 81.5, 21.6, 8.4], // optimización
+  ['panel', 0, 0, 100, 18.3], // franja
+  ['panel', 23.8, 81.5, 22.6, 8.4], // ajustar automáticamente
+];
+const rect = (i: number) => {
+  const [, x, y, w, h] = STEPS[i];
+  return `--x:${x}%;--y:${y}%;--w:${w}%;--h:${h}%`;
+};
+---
+<section class="sec" id="accion">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow">{d.act.eyebrow}</p>
+      <h2 class="display h2"><span class="line">{d.act.t1}</span><span class="line">{d.act.t2}</span></h2>
+    </header>
+
+    <div class="tour" id="tour" data-steps={JSON.stringify(STEPS)}>
+      <div class="tour-view">
+        <div class="tour-shot" id="tourShot">
+          <img id="tourImg" src={`/tour/${STEPS[0][0]}.webp`} alt={d.act.steps[0][0]} width="1600" height="593" loading="lazy" decoding="async" />
+          <video id="tourVideo" muted loop playsinline preload="none" disablepictureinpicture hidden></video>
+          <!-- secuencia: capturas al doble de resolución que se funden, con un cursor que va al botón de cada cambio -->
+          <div class="tour-seq" id="tourSeq" hidden>
+            <div class="tour-cam">
+              <img alt="" decoding="async" /><img alt="" decoding="async" />
+              <div class="tour-live" aria-hidden="true"></div>
+              <span class="tour-cursor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2.5l14.5 8.6-6.4 1.5-3.2 6.1z" /></svg></span>
+            </div>
+          </div>
+          <span class="tour-focus" id="tourFocus" style={rect(0)}></span>
+        </div>
+      </div>
+      <div class="tour-nav">
+        <div class="tour-cards" id="tourCards" role="tablist" aria-label={d.a11y.sections}>
+          {d.act.steps.map(([t, desc], i) => (
+            <button class="t-card" type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-i={i}>
+              <span class="t-num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="t-title">{t}</span>
+              <span class="t-desc">{desc}</span>
+            </button>
+          ))}
+        </div>
+        <div class="tour-arrows">
+          <button class="tour-arrow" id="tourPrev" type="button" aria-label={d.a11y.prev}><Icon name="arrowLeft" /></button>
+          <button class="tour-arrow" id="tourNext" type="button" aria-label={d.a11y.next}><Icon name="arrowRight" /></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

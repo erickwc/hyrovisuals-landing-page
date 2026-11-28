@@ -1,18 +1,15 @@
 # Hyro Visuals — web (byhyro.com)
 
-Dos páginas que Vite compila juntas:
+Dos proyectos que `npm run build` junta en `dist/`:
 
-- **Landing** (`/`): `index.html`, HTML/CSS/JS sin React. Estilos, scripts, imágenes y fuentes en `public/landing/`
-  (textos ES en el HTML, EN en `public/landing/js/i18n.js`; enlaces a login, registro y checkout en el `CONFIG` de
-  `public/landing/js/app.js`). Lo único que compila Vite ahí es `src/landing/main.ts`: `session.ts` (con sesión
-  iniciada cambia «Iniciar sesión / Crear cuenta» por «Mi cuenta») y `data.ts` (todos los planes activos de la tabla
-  `plans`, reseñas de `public_reviews` y newsletter en `newsletter_subscribers`, por fetch a la API REST), que le pasa
-  los datos a app.js por `window.HyroLanding`. La lista de planes y el ticket de compra se arman solos con los planes
-  que haya en el panel admin; los dos de respaldo de `PLANS` en app.js deben coincidir con Supabase.
-  app.js arranca cada sección con `safe()` y el `<head>` quita la intro si la web no carga: un error en un navegador
-  (p. ej. Safari de iPhone) no puede dejar la intro trabada. La landing anterior en React está en la rama `landing-anterior`.
-  **Al cambiar algo de `public/landing/`, sube el `?v=` de sus enlaces en `index.html`**: Cloudflare deja que el
-  navegador guarde esos archivos 4 horas (el HTML no se guarda).
+- **Landing** (`/` español, `/en/` inglés): **Astro**, en la carpeta `landing/` (ver `landing/README.md`).
+  `npm run build` compila primero la app con Vite y luego `scripts/build-landing.mjs` compila Astro (con las variables
+  `VITE_SUPABASE_*` de `.env.production` pasadas como `PUBLIC_SUPABASE_*`) y copia `landing/dist/` encima de `dist/`.
+  Enlaza a la app por rutas normales: `/login`, `/register`, `/checkout?plan=<id>`, `/cuenta/biblioteca`, `/legal/…`.
+  Para trabajar en ella: `npm run dev:landing` (http://localhost:4321). `_headers` y `_redirects` salen de `public/`
+  de la raíz, no de `landing/public/`.
+  La landing anterior (HTML estático: `index.html` + `public/landing/`) ya no se publica; de `public/landing/` solo
+  se copian `fonts/` e `img/`, que usa la app.
 - **App** (login, registro, recuperar contraseña, checkout, `/cuenta`, `/admin`): `app.html` + React 18 + TypeScript.
   Textos en `src/data/content.ts` (ES/EN), tema e idioma en `src/lib/prefs.tsx` (mismas claves `hyro.theme` y
   `hyro.lang` que la landing).

@@ -1,0 +1,37 @@
+# Encabezados de seguridad de byhyro.com (Cloudflare Pages los aplica a cada respuesta).
+# vite.config.ts los lee para `npm run preview`, así se pueden probar en local antes de publicar.
+#
+# Content-Security-Policy: solo se cargan scripts, estilos, fuentes, imágenes y conexiones de estos orígenes.
+#   - scripts: la propia web, el SDK de PayPal y la analítica de Cloudflare (si está activada). Nada de scripts
+#     sueltos dentro del HTML (el arranque está en public/app-boot.js y public/landing/js/boot.js).
+#   - conexiones: Supabase (API y tiempo real), PayPal, subida de instaladores a R2 (panel admin) y Cloudflare.
+#   - marcos: solo los de PayPal (botones y formulario de tarjeta). Nadie puede meter la web en un marco.
+# Si se agrega un servicio nuevo (analítica, otra pasarela, otro CDN), hay que sumarlo aquí o el navegador lo bloquea.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://*.paypal.com https://*.paypalobjects.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.paypal.com https://*.paypalobjects.com https://*.r2.cloudflarestorage.com https://cloudflareinsights.com; frame-src https://*.paypal.com https://*.paypalobjects.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https://*.paypal.com; frame-ancestors 'none'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), usb=(), payment=(self "https://www.paypal.com")
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+
+# Páginas privadas: que Google no las muestre en los resultados (sí puede rastrearlas para ver este aviso).
+/admin
+  X-Robots-Tag: noindex, nofollow
+/admin/*
+  X-Robots-Tag: noindex, nofollow
+/cuenta
+  X-Robots-Tag: noindex, nofollow
+/cuenta/*
+  X-Robots-Tag: noindex, nofollow
+/checkout
+  X-Robots-Tag: noindex, nofollow
+/login
+  X-Robots-Tag: noindex, nofollow
+/register
+  X-Robots-Tag: noindex, nofollow
+/recuperar-contrasena
+  X-Robots-Tag: noindex, nofollow
+/baja
+  X-Robots-Tag: noindex, nofollow

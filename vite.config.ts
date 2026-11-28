@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { defineConfig, type Connect, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 
-/* La landing es index.html: HTML estático con sus estilos y scripts en public/landing/.
+/* La landing es Astro (carpeta landing/, se compila aparte y se junta en dist/ al final de `npm run build`).
    La app de React (login, registro, checkout, cuenta y panel admin) vive en app.html y atiende estas rutas.
    En producción las reescribe public/_redirects (Cloudflare Pages); aquí el plugin hace lo mismo en
    `npm run dev` y `npm run preview`. Si se agrega una ruta nueva en App.tsx, va en los dos lugares. */
@@ -55,10 +55,8 @@ export default defineConfig({
   server: { port: 5173 },
   build: {
     rolldownOptions: {
-      input: {
-        landing: resolve(import.meta.dirname, "index.html"),
-        app: resolve(import.meta.dirname, "app.html"),
-      },
+      // la landing (/ y /en/) es Astro, en landing/: scripts/build-landing.mjs la compila y la copia a dist/
+      input: { app: resolve(import.meta.dirname, "app.html") },
     },
   },
 });

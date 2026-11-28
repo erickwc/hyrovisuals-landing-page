@@ -1,0 +1,31 @@
+---
+// Todos los iconos salen de Hugeicons (set gratuito): se dibujan en el build, sin JS en el navegador.
+// Para uno nuevo, búscalo en https://hugeicons.com/icons y agrégalo a ICONS con un nombre corto.
+import {
+  Search01Icon, Moon02Icon, Sun03Icon, TranslateIcon, Tick02Icon, UserIcon, Menu01Icon, Cancel01Icon,
+  ArrowRight02Icon, ArrowLeft02Icon, ArrowDownRight01Icon, ArrowUpRight01Icon, SquareLock02Icon, Mail01Icon,
+  WindowsOldIcon, AppleIcon, SlidersHorizontalIcon, LayoutTopIcon, ComputerIcon, HeadphonesIcon, Key01Icon,
+  Download01Icon, PlayIcon, StarIcon, LanguageCircleIcon, ReturnRequestIcon,
+} from '@hugeicons/core-free-icons';
+
+const ICONS = {
+  search: Search01Icon, moon: Moon02Icon, sun: Sun03Icon, translate: TranslateIcon, check: Tick02Icon, tick: Tick02Icon,
+  user: UserIcon, menu: Menu01Icon, close: Cancel01Icon, arrowRight: ArrowRight02Icon, arrowLeft: ArrowLeft02Icon,
+  arrowDownRight: ArrowDownRight01Icon, arrowUpRight: ArrowUpRight01Icon, lock: SquareLock02Icon, mail: Mail01Icon,
+  windows: WindowsOldIcon, apple: AppleIcon, sliders: SlidersHorizontalIcon, layout: LayoutTopIcon, monitor: ComputerIcon,
+  headphones: HeadphonesIcon, key: Key01Icon, download: Download01Icon, play: PlayIcon, star: StarIcon,
+  language: LanguageCircleIcon, enter: ReturnRequestIcon,
+} as const;
+export type IconName = keyof typeof ICONS;
+
+interface Props { name: IconName; size?: number; class?: string }
+const { name, size, class: cls } = Astro.props;
+const kebab = (k: string) => k.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase());
+const nodes = (ICONS[name] as unknown as [string, Record<string, string | number>][])
+  .map(([tag, attrs]) => {
+    const a = Object.entries(attrs).filter(([k]) => k !== 'key').map(([k, v]) => `${kebab(k)}="${v}"`).join(' ');
+    return `<${tag} ${a}/>`;
+  })
+  .join('');
+---
+<svg class:list={['i', cls]} data-icon={name} width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true" set:html={nodes} />

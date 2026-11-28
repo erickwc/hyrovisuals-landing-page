@@ -1,0 +1,34 @@
+---
+/* Búsqueda en la web: índice fijo (secciones, pasos del recorrido, preguntas y gráficas) armado en el build. */
+import Icon from '../Icon.astro';
+import { useDict, type Lang } from '../../i18n';
+import { GRAPHS } from '../../data/gallery';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = useDict(lang);
+const s = d.search;
+type Entry = { t: string; s: string; tag: string; href: string; i?: number };
+const index: Entry[] = [
+  { t: d.nav.features, s: d.feat.caption, tag: s.section, href: '#funciones' },
+  ...d.feat.items.map(([t, desc]) => ({ t, s: desc, tag: d.nav.features, href: '#funciones' })),
+  { t: d.nav.action, s: d.act.lead, tag: s.section, href: '#accion' },
+  ...d.act.steps.map(([t, desc], i) => ({ t, s: desc, tag: s.step, href: '#accion', i })),
+  { t: d.gal.eyebrow, s: d.gal.lead, tag: s.section, href: '#graficas' },
+  ...GRAPHS.map((g, i) => ({ t: lang === 'en' ? g[3] : g[2], s: lang === 'en' ? g[5] : g[4], tag: s.module, href: '#graficas', i })),
+  { t: d.nav.reviews, s: d.rev.lead, tag: s.section, href: '#resenas' },
+  ...d.faq.cols.flat().map((q) => ({ t: q.q, s: q.a ?? q.rec?.[1] ?? '', tag: s.faq, href: '#preguntas' })),
+  { t: d.nav.pricing, s: d.buy.lead, tag: s.section, href: '#comprar' },
+];
+---
+<div class="search" id="search" hidden data-index={JSON.stringify(index)} data-empty={s.empty} data-suggest={s.suggest}>
+  <div class="search-backdrop" data-close></div>
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label={s.title}>
+    <div class="search-field">
+      <Icon name="search" />
+      <input id="searchInput" type="text" placeholder={s.ph} autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="searchResults" aria-autocomplete="list" />
+      <button class="search-esc" type="button" data-close>ESC</button>
+    </div>
+    <ul class="search-results" id="searchResults" role="listbox"></ul>
+    <div class="search-foot"><span><kbd>↑</kbd><kbd>↓</kbd> {s.nav}</span><span><kbd>Enter</kbd> {s.open}</span><span><kbd>Esc</kbd> {s.close}</span></div>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+---
+import Icon from '../Icon.astro';
+import { useDict, type Lang } from '../../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = useDict(lang);
+const f = d.foot;
+---
+<footer class="footer" id="footer">
+  <div class="wrap">
+    <img class="foot-mascot" src="/img/mascot-head.webp" alt={f.mascot} width="180" height="180" loading="lazy" decoding="async" />
+    <div class="foot-cta">
+      <h2 class="display h2"><span class="line">{f.t1}</span><span class="line">{f.t2}</span></h2>
+      <a class="btn btn-primary btn-lg" href="#comprar">{d.hero.cta}<Icon name="arrowRight" /></a>
+    </div>
+
+    <div class="foot-grid">
+      <nav class="foot-col" aria-label={f.map}>
+        <h4>{f.map}</h4>
+        <a href="#inicio">{f.home}</a>
+        <a href="#funciones">{d.nav.features}</a>
+        <a href="#accion">{d.nav.action}</a>
+        <a href="#preguntas">{d.nav.faq}</a>
+        <a href="#comprar">{f.buy}</a>
+      </nav>
+      <nav class="foot-col" aria-label="Legal">
+        <h4>Legal</h4>
+        <a href="/legal/terminos">{f.terms}</a>
+        <a href="/legal/privacidad">{f.privacy}</a>
+        <a href="/legal/cookies">{f.cookies}</a>
+        <a href="/legal/reembolsos">{f.refunds}</a>
+        <a href="/legal/terminos#proveedor">{f.company}</a>
+      </nav>
+      <form class="news" id="newsForm" novalidate data-msg={JSON.stringify({ ok: f.ok, err: f.err, consent: f.needConsent, fail: f.fail })}>
+        <h4>{f.news}</h4>
+        <p>{f.newsd}</p>
+        <div class="news-field">
+          <Icon name="mail" />
+          <label class="sr" for="newsEmail">{f.email}</label>
+          <input id="newsEmail" name="email" type="email" autocomplete="email" placeholder={f.ph} required />
+          <button class="btn btn-primary btn-sm" type="submit">{f.sub}</button>
+        </div>
+        <!-- autorización aparte y sin marcar (Ley 1581): sin ella no se envía el correo -->
+        <label class="news-consent">
+          <input type="checkbox" id="newsConsent" name="consent" />
+          <span class="news-box" aria-hidden="true"><Icon name="tick" /></span>
+          <span>{f.consent} <a href="/legal/privacidad" target="_blank" rel="noopener">{f.consentLink}</a>.</span>
+        </label>
+        <p class="news-msg" id="newsMsg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <div class="foot-bottom">
+      <span>© {new Date().getFullYear()} Hyro Visuals. {f.rights}</span>
+      <span>{f.made}</span>
+      <a href="#inicio" class="to-top"><span>{f.top}</span><Icon name="arrowUpRight" /></a>
+    </div>
+  </div>
+</footer>

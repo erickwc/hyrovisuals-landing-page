@@ -20,3 +20,6 @@ supabase/.temp/
 .DS_Store
 Thumbs.db
 skills-lock.json
+
+# caché de Astro (landing/)
+.astro/

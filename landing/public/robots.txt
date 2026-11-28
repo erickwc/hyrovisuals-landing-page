@@ -1,0 +1,6 @@
+# byhyro.com: se puede rastrear todo. Las páginas privadas (panel, cuenta, login, checkout) llevan
+# X-Robots-Tag: noindex en public/_headers para que Google no las muestre en los resultados.
+User-agent: *
+Allow: /
+
+Sitemap: https://byhyro.com/sitemap.xml

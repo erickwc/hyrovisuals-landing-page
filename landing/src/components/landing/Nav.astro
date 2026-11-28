@@ -1,0 +1,50 @@
+---
+import Icon from '../Icon.astro';
+import { useDict, type Lang } from '../../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = useDict(lang);
+const links = [
+  ['#funciones', d.nav.features], ['#accion', d.nav.action], ['#resenas', d.nav.reviews], ['#preguntas', d.nav.faq], ['#comprar', d.nav.pricing],
+];
+---
+<a class="skip" href="#main">{d.a11y.skip}</a>
+<header class="nav" id="nav">
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      {[0, 1, 2].map(() => d.ticker.map((t) => <span>{t}</span>))}
+    </div>
+  </div>
+  <div class="wrap nav-inner">
+    <a class="brand" href="#inicio" aria-label="Hyro Visuals">HYRO</a>
+    <nav class="nav-links" aria-label={d.a11y.mainnav}>
+      {links.map(([href, label]) => <a href={href}>{label}</a>)}
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="searchBtn" type="button" aria-label={d.a11y.search} aria-haspopup="dialog" aria-controls="search"><Icon name="search" /></button>
+      <button class="icon-btn theme-btn" id="themeBtn" type="button" aria-label={d.a11y.theme}><Icon name="moon" class="i-moon" /><Icon name="sun" class="i-sun" /></button>
+      <div class="lp">
+        <button class="icon-btn" id="langBtn" type="button" aria-label={d.a11y.lang} aria-haspopup="menu" aria-expanded="false" aria-controls="langPop"><Icon name="translate" /><span class="lang-label">{lang.toUpperCase()}</span></button>
+        <div class="lp-pop" id="langPop" role="menu" aria-label={d.a11y.lang} hidden>
+          <a role="menuitem" class="lp-opt" href="/" data-lang="es" aria-current={lang === 'es' ? 'true' : undefined}><b>Español</b><em>ES</em><Icon name="check" class="lp-check" /></a>
+          <a role="menuitem" class="lp-opt" href="/en/" data-lang="en" aria-current={lang === 'en' ? 'true' : undefined}><b>English</b><em>EN</em><Icon name="check" class="lp-check" /></a>
+        </div>
+      </div>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <a class="nav-login" href="/login" data-auth>{d.nav.login}</a>
+      <a class="btn btn-primary btn-sm nav-cta" href="/register" data-auth>{d.nav.signup}</a>
+      <a class="icon-btn nav-account" href="/cuenta/biblioteca" aria-label={d.nav.account} title={d.nav.account}><Icon name="user" /></a>
+      <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label={d.a11y.menu}><Icon name="menu" class="i-menu" /><Icon name="close" class="i-close" /></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="wrap">
+      {links.map(([href, label], i) => <a href={href}><span class="mono">{String(i + 1).padStart(2, '0')}</span><span>{label}</span></a>)}
+      <div class="mm-auth">
+        <a class="btn btn-ghost" href="/login" data-auth>{d.nav.login}</a>
+        <a class="btn btn-primary" href="/register" data-auth>{d.nav.signup}</a>
+        <a class="btn btn-primary mm-account" href="/cuenta/biblioteca">{d.nav.account}</a>
+      </div>
+    </div>
+  </div>
+</header>

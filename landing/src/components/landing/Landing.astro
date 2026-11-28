@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import Nav from './Nav.astro';
+import Hero from './Hero.astro';
+import Tour from './Tour.astro';
+import Gallery from './Gallery.astro';
+import Reviews from './Reviews.astro';
+import Faq from './Faq.astro';
+import Buy from './Buy.astro';
+import Footer from './Footer.astro';
+import Search from './Search.astro';
+import type { Lang } from '../../i18n';
+import { fetchPlans, fetchReviews, FALLBACK_PLANS, type Review } from '../../lib/supabase-rest';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+// Precios y reseñas reales al compilar: el HTML ya sale completo (el navegador solo los refresca).
+let plans = FALLBACK_PLANS;
+let reviews: Review[] | null = null;
+await Promise.all([
+  fetchPlans().then((p) => { if (p.length) plans = p; }).catch((e) => console.warn('[Hyro] planes: se usan los de respaldo', e.message)),
+  fetchReviews().then((r) => { reviews = r; }).catch((e) => console.warn('[Hyro] reseñas', e.message)),
+]);
+---
+<Base lang={lang}>
+  <Nav lang={lang} />
+  <main id="main">
+    <Hero lang={lang} />
+    <Tour lang={lang} />
+    <Gallery lang={lang} />
+    <Reviews lang={lang} reviews={reviews} />
+    <Faq lang={lang} />
+    <Buy lang={lang} plans={plans} />
+  </main>
+  <Footer lang={lang} />
+  <Search lang={lang} />
+</Base>
+
+<script>
+  import '../../scripts/landing';
+</script>

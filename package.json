@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "build": "tsc --noEmit && vite build && node scripts/build-landing.mjs",
+    "preview": "vite preview",
+    "dev:landing": "npm run dev --prefix landing"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

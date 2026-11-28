@@ -1,0 +1,40 @@
+---
+/* «Una gráfica para cada oído»: las 40 gráficas en tarjetas, cuatro por fila. Cada tarjeta lleva la foto de la
+   gráfica (public/gallery, sacadas de la app con los colores del inicio: web-loops/scripts/record.mjs --stills en
+   Hyro visual), su número y tipo, qué muestra y para qué sirve. Las fotos se cargan al acercarse (loading lazy). */
+import { useDict, type Lang } from '../../i18n';
+import { GRAPHS } from '../../data/gallery';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = useDict(lang);
+const en = lang === 'en';
+const catLabel = { meter: d.gal.meter, wave: d.gal.wave, gen: d.gal.gen } as const;
+---
+<section class="sec" id="graficas">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="eyebrow">{d.gal.eyebrow}</p>
+      <h2 class="display h2"><span class="line">{d.gal.t1}</span><span class="line">{d.gal.t2}</span></h2>
+      <p class="sec-lead">{d.gal.lead}</p>
+    </header>
+
+    <div class="gx" id="gallery">
+      <ul class="gx-grid" aria-label={d.a11y.gallist}>
+        {GRAPHS.map(([id, cat, nes, nen, des, den], i) => (
+          <li class="gx-card">
+            <div class="gx-shot">
+              <img class="v-dark" src={`/gallery/${id}-dark.webp`} alt={en ? nen : nes} width="800" height="500" loading="lazy" decoding="async" />
+              <img class="v-light" src={`/gallery/${id}-light.webp`} alt={en ? nen : nes} width="800" height="500" loading="lazy" decoding="async" />
+            </div>
+            <div class="gx-cap">
+              <span class="gx-meta"><b>{String(i + 1).padStart(2, '0')}</b> / {GRAPHS.length} · {catLabel[cat]}</span>
+              <h3>{en ? nen : nes}</h3>
+              <p>{en ? den : des}</p>
+              <em>{d.gal.use[cat]}</em>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>

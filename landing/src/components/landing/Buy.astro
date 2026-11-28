@@ -1,0 +1,85 @@
+---
+/* «Adquiérelo hoy»: una tarjeta por plan activo (Supabase) y el ticket con el plan elegido.
+   El botón lleva al checkout de la app con el id del plan. */
+import Icon from '../Icon.astro';
+import { useDict, type Lang } from '../../i18n';
+import type { Plan } from '../../lib/supabase-rest';
+import { planName, priceParts, invoiceNo, barcodeText, ticketDate, barcodePath } from '../../lib/ticket';
+interface Props { lang: Lang; plans: Plan[] }
+const { lang, plans } = Astro.props;
+const d = useDict(lang);
+const b = d.buy;
+const sel = plans[0];
+const price = priceParts(sel.price);
+const keysTxt = (n: number) => `${n} ${b.keyShort[n === 1 ? 0 : 1]}`;
+const code = barcodeText(sel);
+const i18n = { names: b.plan, keyShort: b.keyShort, months: b.months, invoice: b.invoiceNo, preparing: b.preparing };
+---
+<section class="sec" id="comprar">
+  <div class="wrap buy">
+    <div class="buy-copy">
+      <header class="sec-head">
+        <p class="eyebrow">{b.eyebrow}</p>
+        <h2 class="display h2"><span class="line">{b.t1}</span><span class="line">{b.t2}</span></h2>
+        <p class="sec-lead">{b.lead}</p>
+      </header>
+      <fieldset class="buy-plans" id="buyPlans" aria-label={b.choose} data-plans={JSON.stringify(plans)} data-i18n={JSON.stringify(i18n)}>
+        {plans.map((p, i) => (
+          <label class="bp">
+            <input type="radio" name="plan" value={p.id} checked={i === 0} />
+            <span class="bp-top"><span class="bp-keys">{keysTxt(p.keys)}</span><span class="bp-check"><Icon name="tick" /></span></span>
+            <span class="bp-name">{planName(p, b.plan)}</span>
+            <span class="bp-price display">${priceParts(p.price).int}.{priceParts(p.price).dec}</span>
+          </label>
+        ))}
+      </fieldset>
+      <ul class="incl">{b.incl.map((t) => <li><Icon name="tick" /><span>{t}</span></li>)}</ul>
+    </div>
+
+    <div class="ticket-wrap">
+      <span class="sticker">{b.lifetime}</span>
+      <div class="ticket" id="ticket">
+        <div class="tk-top">
+          <div class="tk-row"><span>{b.software}</span><b id="tkNo">{b.invoiceNo} {invoiceNo(sel)}</b></div>
+          <p class="tk-title display"><span>Hyro</span><span>Visuals</span></p>
+          <ul class="tk-feats">{d.hero.pills.slice(0, 3).map((t) => <li>{t}</li>)}</ul>
+        </div>
+        <div class="tk-perf" id="tkPerf"></div>
+        <div class="tk-bottom">
+          <dl class="tk-grid">
+            <div class="tk-lic"><dt>{b.licl}</dt><dd id="tkPlan">{planName(sel, b.plan)}</dd></div>
+            <div><dt>{b.date}</dt><dd id="tkDate">{ticketDate(b.months)}</dd></div>
+            <div><dt>{b.keysl}</dt><dd id="tkKeys">{String(sel.keys).padStart(2, '0')}</dd></div>
+            <div><dt>{b.os}</dt><dd>Win · Mac</dd></div>
+          </dl>
+          <div class="tk-total">
+            <div>
+              <span class="tk-label">{b.total}</span>
+              <p class="tk-meta"><span>USD</span><i></i><em>{b.once}</em></p>
+            </div>
+            <div class="tk-price" aria-live="polite">
+              <span class="tk-cur display">$</span>
+              <span class="tk-int display" id="tkInt">{price.int}</span>
+              <span class="tk-dec display" id="tkDec">.{price.dec}</span>
+            </div>
+          </div>
+          <a class="btn btn-primary btn-lg tk-cta" id="buyBtn" href={`/checkout?plan=${encodeURIComponent(sel.id)}`}><span class="tk-cta-label">{b.cta}</span><Icon name="arrowRight" /></a>
+          <div class="tk-foot">
+            <div class="tk-barcode">
+              <svg viewBox="0 0 199 38" preserveAspectRatio="none" aria-hidden="true"><path id="barcode" d={barcodePath(code)} fill="currentColor" /></svg>
+              <span id="barcodeTxt">{code}</span>
+            </div>
+            <div class="tk-pay">
+              <span class="pay-marks" role="img" aria-label="PayPal, Visa, Mastercard">
+                <span class="pay-mark pm-paypal"><svg viewBox="0 0 24 24" width="14" height="14"><path fill="#003087" d="M7.1 21.4H3.6a.5.5 0 0 1-.5-.6L6 2.6a.7.7 0 0 1 .7-.6h7c3.3 0 5.4 1.6 4.9 4.9-.6 3.9-3.1 5.7-6.6 5.7H9.8a.7.7 0 0 0-.7.6Z"/><path fill="#009cde" d="M19.4 7.6c-.7 3.9-3.3 5.6-6.8 5.6h-1.7a.8.8 0 0 0-.8.7l-1 6.4-.3 1.7a.4.4 0 0 0 .4.5h3a.7.7 0 0 0 .7-.6l.6-3.8a.7.7 0 0 1 .7-.6h.5c2.9 0 5.1-1.2 5.8-4.6.3-1.6.1-2.9-.8-3.8Z"/></svg></span>
+                <span class="pay-mark pm-visa">VISA</span>
+                <span class="pay-mark"><svg viewBox="0 0 24 16" width="22" height="14"><circle cx="9" cy="8" r="6" fill="#eb001b"/><circle cx="15" cy="8" r="6" fill="#f79e1b"/><path fill="#ff5f00" d="M12 3.2a6 6 0 0 1 0 9.6 6 6 0 0 1 0-9.6Z"/></svg></span>
+              </span>
+              <span class="tk-secure"><Icon name="lock" /><span>{b.secure}</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
