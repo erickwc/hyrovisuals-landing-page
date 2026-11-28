@@ -32,20 +32,18 @@ function nav() {
     document.dispatchEvent(new Event('theme:change'));
   });
 
-  const langBtn = $('#langBtn')!, pop = $('#langPop')!;
-  const setPop = (open: boolean) => { pop.hidden = !open; langBtn.setAttribute('aria-expanded', String(open)); };
-  langBtn.addEventListener('click', (e) => { e.stopPropagation(); setPop(Boolean(pop.hidden)); });
-  document.addEventListener('click', (e) => { if (!pop.hidden && !pop.contains(e.target as Node)) setPop(false); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setPop(false); });
-  // el idioma elegido se recuerda (boot.js lleva a /en/ si corresponde); se conserva la sección actual
-  $$<HTMLAnchorElement>('[data-lang]', pop).forEach((a) => a.addEventListener('click', (e) => {
+  // botón de idioma: cada clic cambia al otro (ES ↔ EN) y abre esa página en la misma sección.
+  // El idioma elegido se recuerda (boot.js lleva a /en/ si corresponde).
+  const toggle = $<HTMLAnchorElement>('#langToggle')!;
+  toggle.addEventListener('click', (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // abrir en otra pestaña sigue funcionando
     e.preventDefault();
     try {
-      localStorage.setItem('hyro.lang', a.dataset.lang!);
+      localStorage.setItem('hyro.lang', toggle.dataset.lang!);
       sessionStorage.setItem('hyro.keep', JSON.stringify(here()));
     } catch {}
-    location.href = a.getAttribute('href')!;
-  }));
+    location.href = toggle.getAttribute('href')!;
+  });
 }
 
 /* ---------- Inicio: gráficas en vivo (grabaciones .hvl de la app); algunos recuadros se turnan ---------- */

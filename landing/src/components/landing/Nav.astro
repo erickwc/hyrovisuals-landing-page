@@ -4,6 +4,8 @@ import { useDict, type Lang } from '../../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = useDict(lang);
+// el interruptor de idioma lleva siempre al otro
+const other = lang === 'es' ? { code: 'en', href: '/en/', name: 'English' } : { code: 'es', href: '/', name: 'Español' };
 const links = [
   ['#funciones', d.nav.features], ['#accion', d.nav.action], ['#resenas', d.nav.reviews], ['#preguntas', d.nav.faq], ['#comprar', d.nav.pricing],
 ];
@@ -23,13 +25,8 @@ const links = [
     <div class="nav-actions">
       <button class="icon-btn" id="searchBtn" type="button" aria-label={d.a11y.search} aria-haspopup="dialog" aria-controls="search"><Icon name="search" /></button>
       <button class="icon-btn theme-btn" id="themeBtn" type="button" aria-label={d.a11y.theme}><Icon name="moon" class="i-moon" /><Icon name="sun" class="i-sun" /></button>
-      <div class="lp">
-        <button class="icon-btn" id="langBtn" type="button" aria-label={d.a11y.lang} aria-haspopup="menu" aria-expanded="false" aria-controls="langPop"><Icon name="translate" /><span class="lang-label">{lang.toUpperCase()}</span></button>
-        <div class="lp-pop" id="langPop" role="menu" aria-label={d.a11y.lang} hidden>
-          <a role="menuitem" class="lp-opt" href="/" data-lang="es" aria-current={lang === 'es' ? 'true' : undefined}><b>Español</b><em>ES</em><Icon name="check" class="lp-check" /></a>
-          <a role="menuitem" class="lp-opt" href="/en/" data-lang="en" aria-current={lang === 'en' ? 'true' : undefined}><b>English</b><em>EN</em><Icon name="check" class="lp-check" /></a>
-        </div>
-      </div>
+      <a class="icon-btn" id="langToggle" href={other.href} data-lang={other.code} hreflang={other.code}
+         aria-label={`${d.a11y.lang}: ${other.name}`} title={other.name}><Icon name="translate" /><span class="lang-label">{lang.toUpperCase()}</span></a>
       <span class="nav-sep" aria-hidden="true"></span>
       <a class="nav-login" href="/login" data-auth>{d.nav.login}</a>
       <a class="btn btn-primary btn-sm nav-cta" href="/register" data-auth>{d.nav.signup}</a>
